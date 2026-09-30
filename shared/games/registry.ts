@@ -2,6 +2,8 @@ import { ActionType, GameId, Seat, TerminalResult, ViewerContext } from "../prot
 import { ErrorDetails } from "../protocol/errors";
 import { connectFourEngineAdapter } from "./connect-four/adapter";
 import { rpsEngineAdapter } from "./rps/adapter";
+import { ludoEngineAdapter } from "./ludo/adapter";
+import { snakesAndLaddersEngineAdapter } from "./snakes-and-ladders/adapter";
 
 export interface SuppliedStartFacts {
   serverTime: number;
@@ -54,6 +56,8 @@ const engineRegistry = new Map<GameId, GameEngineAdapter<any, any, any, any>>();
 // Auto-register available engine adapters
 registerGameEngine(connectFourEngineAdapter);
 registerGameEngine(rpsEngineAdapter);
+registerGameEngine(ludoEngineAdapter);
+registerGameEngine(snakesAndLaddersEngineAdapter);
 
 export function registerGameEngine(adapter: GameEngineAdapter<any, any, any, any>): void {
   engineRegistry.set(adapter.gameId, adapter);
