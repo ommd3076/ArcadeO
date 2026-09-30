@@ -83,9 +83,7 @@ describe("Rock Paper Scissors Engine", () => {
       expect(res.newState.lockedSeats).toEqual(["A"]);
       expect(res.newState.secretChoices.A).toBe("rock");
       expect(res.newState.secretChoices.B).toBeUndefined();
-      expect(res.effects).toEqual([
-        { type: "secret-locked", seat: "A", roundId: 1 },
-      ]);
+      expect(res.effects).toEqual([{ type: "secret-locked", seat: "A", roundId: 1 }]);
     });
 
     it("rejects duplicate lock from the same seat with CHOICE_LOCKED", () => {
@@ -559,7 +557,7 @@ describe("Rock Paper Scissors Engine", () => {
 
   describe("JSON Serialization Round-Trip & Adapter Verification", () => {
     it("survives JSON serialization and deserialization intact across phases", () => {
-      let state = createInitialState({
+      const state = createInitialState({
         serverTime: 1000,
         startingSeat: "A",
         config: { format: "best-of-5" },

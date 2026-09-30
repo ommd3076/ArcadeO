@@ -220,14 +220,21 @@
         "planning/GAME-RULES.md",
         "planning/API-CONTRACT.md"
       ],
-      "status": "RUNNING",
+      "status": "VERIFIED",
       "attempts": 1,
       "assignedHandle": "game-engineer",
-      "lease": "shared/games/rps/**, tests/unit/games/rps/**",
+      "lease": null,
       "acceptance": [
         "RP01–RP04; private locks, tie and format/readiness terminal fixtures"
       ],
-      "evidence": [],
+      "evidence": [
+        "18 unit tests passing in tests/unit/games/rps/rps.test.ts",
+        "Deterministic RPS engine and adapter adhering to GameEngineAdapter contract",
+        "All 9 matchups, formats best-of-3/5/7, tie handling without score increments",
+        "Strict privacy filtering in toPublicView (secretChoices never leaked)",
+        "Integrated into shared/games/registry.ts",
+        "planning/execution/reports/G02.md written and verified"
+      ],
       "report": "planning/execution/reports/G02.md",
       "blockReason": null
     },
@@ -460,10 +467,10 @@
         "planning/GAME-RULES.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
-      "assignedHandle": null,
-      "lease": null,
+      "status": "RUNNING",
+      "attempts": 1,
+      "assignedHandle": "game-engineer",
+      "lease": "shared/games/ludo/**, shared/games/snakes-and-ladders/**, tests/unit/games/ludo/**, tests/unit/games/snakes-and-ladders/**",
       "acceptance": [
         "L01–L08/SL01–SL04, explicit fixed geometry; saved roll/effects/serialization",
         "Third/further six ignored; one lowest-ID capture; exact arrival/bonus/completion"

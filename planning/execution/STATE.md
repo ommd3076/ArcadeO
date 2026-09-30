@@ -1,16 +1,18 @@
 # Execution checkpoint
 
-Status: **IN_PROGRESS**. F00, F01, F03, G01 verified.
+Status: **IN_PROGRESS**. F00, F01, F02, F03, G01, G02 verified.
 
 - Target host/model: Google Antigravity / Gemini 3.8 Flash (inherited); native subagents active.
-- Queue: TASKS.json (F00, F01, F03, G01 VERIFIED).
+- Queue: TASKS.json (F00, F01, F02, F03, G01, G02 VERIFIED).
 - Active tasks:
-  - F02 (backend-engineer): Auth & database foundation.
-  - G02 (game-engineer): RPS engine.
-- Active worker handles: backend-engineer (F02), game-engineer (G02).
+  - B01 (backend-engineer): Match Authority Durable Object and transport.
+  - S01 (sudoku-engineer): Verified versioned Sudoku catalog.
+  - G03 (game-engineer): Ludo and Snakes & Ladders engines.
+- Active worker handles: backend-engineer (B01), sudoku-engineer (S01), game-engineer (G03).
 - Leased paths:
-  - F02: worker/auth/**, worker/api/auth.ts, migrations/**, scripts/provision-accounts.*, tests/integration/auth/**
-  - G02: shared/games/rps/**, tests/unit/games/rps/**
+  - B01: worker/matches/**, worker/api/matches.ts, tests/integration/matches/**
+  - S01: scripts/import-sudoku.*, scripts/verify-sudoku.*, content/sudoku/**, tests/unit/content/**
+  - G03: shared/games/ludo/**, shared/games/snakes-and-ladders/**, tests/unit/games/ludo/**, tests/unit/games/snakes-and-ladders/**
 - Runtime: Node v24.18.1, npm 11.16.0, Git 2.55.0.windows.3, Vite 6, Vitest 3, TypeScript 5.7.
 - Local functional / visual / actual-device / deployed: Foundation established; game engine and auth slices next.
 - Secrets: zero credentials committed; safe .gitignore active.

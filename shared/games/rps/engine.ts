@@ -25,13 +25,7 @@ import {
 } from "../../protocol/types";
 import { AcceptedFacts, ReductionResult, SuppliedStartFacts } from "../registry";
 import { ErrorCode, createError } from "../../protocol/errors";
-import {
-  RPSEffect,
-  RPSFormat,
-  RPSRoundResult,
-  RPSState,
-  RPSView,
-} from "./types";
+import { RPSEffect, RPSFormat, RPSRoundResult, RPSState, RPSView } from "./types";
 
 const VALID_CHOICES: ReadonlySet<string> = new Set<RPSChoice>(["rock", "paper", "scissors"]);
 
@@ -142,8 +136,7 @@ export function validateAndReduce(
     const newLockedSeats: Seat[] = [...state.lockedSeats, actorSeat];
 
     // Check if both players have now locked
-    const bothLocked =
-      newSecretChoices.A !== undefined && newSecretChoices.B !== undefined;
+    const bothLocked = newSecretChoices.A !== undefined && newSecretChoices.B !== undefined;
 
     if (!bothLocked) {
       const newState: RPSState = {
@@ -185,11 +178,7 @@ export function validateAndReduce(
 
     // Check if any player has reached targetWins
     const matchWinner: Seat | null =
-      newScores.A >= state.targetWins
-        ? "A"
-        : newScores.B >= state.targetWins
-        ? "B"
-        : null;
+      newScores.A >= state.targetWins ? "A" : newScores.B >= state.targetWins ? "B" : null;
 
     if (matchWinner !== null) {
       const terminalResult: TerminalResult = {
@@ -369,7 +358,11 @@ export function validateAndReduce(
 /**
  * Returns legal actions for a seat given the current RPS state.
  */
-export function legalActions(state: RPSState, seat: Seat, mode?: "remote" | "together"): ActionType[] {
+export function legalActions(
+  state: RPSState,
+  seat: Seat,
+  mode?: "remote" | "together",
+): ActionType[] {
   if (state.phase === "terminal" || state.terminalResult !== undefined) {
     return [];
   }
@@ -412,8 +405,7 @@ export function toPublicView(state: RPSState, viewer?: ViewerContext): RPSView {
 
   // Hide roundResult in together mode until explicitly revealed
   const shouldHideRoundResult =
-    state.phase === "locking" ||
-    (state.phase === "resolved" && isTogether && !state.revealed);
+    state.phase === "locking" || (state.phase === "resolved" && isTogether && !state.revealed);
 
   return {
     targetWins: state.targetWins,
@@ -437,11 +429,7 @@ export function isTerminal(state: RPSState): TerminalResult | null {
   }
   if (state.phase === "terminal") {
     const winner: Seat | null =
-      state.scores.A > state.scores.B
-        ? "A"
-        : state.scores.B > state.scores.A
-        ? "B"
-        : null;
+      state.scores.A > state.scores.B ? "A" : state.scores.B > state.scores.A ? "B" : null;
     return {
       winner,
       reason: "rules_win",
