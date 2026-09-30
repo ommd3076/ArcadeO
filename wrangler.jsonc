@@ -1,0 +1,42 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "private-arcade",
+  "main": "worker/index.ts",
+  "compatibility_date": "2024-11-12",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "arcade-db",
+      "database_id": "local-arcade-db",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "MATCH_DO",
+        "class_name": "MatchDurableObject"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "MatchDurableObject"
+      ]
+    }
+  ],
+  "vars": {
+    "ENVIRONMENT": "development",
+    "ALLOWED_ORIGIN": "http://localhost:5173"
+  }
+}

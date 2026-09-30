@@ -1,16 +1,16 @@
 # Execution checkpoint
 
-Status: **NOT_STARTED**. Planning/skills/profiles prepared 2026-09-30; no application code, task dispatch, server, test pass or deployment is claimed.
+Status: **IN_PROGRESS**. F00 environment and host discovery verified.
 
-- Target host/model: Google Antigravity / owner-selected Gemini 3.1 Pro Low; profiles inherit.
-- Queue: TASKS.json, 35 tasks initially PENDING.
-- Next: F00 actual environment/discovery check after the human pastes OVERNIGHT-PROMPT.
+- Target host/model: Google Antigravity / Gemini 3.8 Flash (inherited); native subagent dispatch supported.
+- Queue: TASKS.json (F00 VERIFIED, F01 next).
+- Next: F01 Tooling and shared interfaces.
 - Active worker handles: none.
-- Owned path leases: none.
-- Runtime/library/content qualification: not executed.
-- Local functional / visual / actual-device / deployed: all UNVERIFIED.
-- Secrets: real account credentials/deployment inputs not supplied here; do not store them in this checkpoint.
-- Native discovery: files installed/metadata validated; installed Antigravity host has not been tested.
+- Owned path leases: F01 owned by arcade-orchestrator.
+- Runtime: Node v24.18.1, npm 11.16.0, Git 2.55.0.windows.3.
+- Local functional / visual / actual-device / deployed: in progress (local development setup).
+- Secrets: zero credentials committed; safe .gitignore active.
+- Native discovery: Confirmed. 12 role profiles registered in subagent system.
 
 ## Update after every integrated task
 
