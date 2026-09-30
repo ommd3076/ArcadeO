@@ -1,14 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-
-function App() {
-  return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Private Arcade</h1>
-      <p>Initializing foundation...</p>
-    </div>
-  );
-}
+import { App } from "./app";
+import "./theme/theme.css";
 
 const rootEl = document.getElementById("root");
 if (rootEl) {
