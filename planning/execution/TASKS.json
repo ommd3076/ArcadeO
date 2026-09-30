@@ -259,16 +259,23 @@
         "planning/API-CONTRACT.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "RUNNING",
+      "status": "VERIFIED",
       "attempts": 1,
       "assignedHandle": "backend-engineer",
-      "lease": "worker/matches/**, worker/api/matches.ts, tests/integration/matches/**",
+      "lease": null,
       "acceptance": [
         "Atomic durable pipeline/safe receipts, registry/slots/lifecycle/controllers, WS/HTTP parity and outbox",
         "N01–N05/N08–N14, safe redacted view; initial CF adapter integration through lead",
         "N16 atomic uncertain-secret recovery/tombstone path; no cancellation of accepted lock"
       ],
-      "evidence": [],
+      "evidence": [
+        "10 integration tests passing in tests/integration/matches/matches.test.ts",
+        "SQLite-backed MatchDurableObject with atomic transactions and storage.sync()",
+        "Idempotent receipts, duplicate ID reuse rejection (ID_REUSED), superseded tombstones (ACTION_SUPERSEDED)",
+        "Outbox projection to D1 match_registry and results; atomic slot reservation and release",
+        "Controller takeover endpoint and WebSocket upgrade handling",
+        "planning/execution/reports/B01.md written and verified"
+      ],
       "report": "planning/execution/reports/B01.md",
       "blockReason": null
     },
@@ -291,10 +298,10 @@
         "planning/API-CONTRACT.md",
         "planning/UI-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
-      "assignedHandle": null,
-      "lease": null,
+      "status": "RUNNING",
+      "attempts": 1,
+      "assignedHandle": "frontend-engineer",
+      "lease": "src/sync/**, src/components/connection-status.tsx, tests/unit/sync/**",
       "acceptance": [
         "One pending command, version gap/duplicate/retry/reconnect/control/auth handling",
         "No offline queue/raw secret storage; latest snapshot settles; HTTP fallback visible-only",
@@ -467,15 +474,22 @@
         "planning/GAME-RULES.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "RUNNING",
+      "status": "VERIFIED",
       "attempts": 1,
       "assignedHandle": "game-engineer",
-      "lease": "shared/games/ludo/**, shared/games/snakes-and-ladders/**, tests/unit/games/ludo/**, tests/unit/games/snakes-and-ladders/**",
+      "lease": null,
       "acceptance": [
         "L01–L08/SL01–SL04, explicit fixed geometry; saved roll/effects/serialization",
         "Third/further six ignored; one lowest-ID capture; exact arrival/bonus/completion"
       ],
-      "evidence": [],
+      "evidence": [
+        "25 unit tests passing in tests/unit/games/ludo/ludo.test.ts",
+        "31 unit tests passing in tests/unit/games/snakes-and-ladders/snakes-and-ladders.test.ts",
+        "52-ring path, third-six ignore, lowest-ID capture, auto-selection, exact 56 finish",
+        "10x10 serpentine map, all 7 ladders, all 7 snakes, overshoot hold, exact 100 finish",
+        "Integrated into shared/games/registry.ts",
+        "planning/execution/reports/G03.md written and verified"
+      ],
       "report": "planning/execution/reports/G03.md",
       "blockReason": null
     },
@@ -497,10 +511,10 @@
         "planning/GAME-RULES.md",
         "planning/ASSET-INVENTORY.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
-      "assignedHandle": null,
-      "lease": null,
+      "status": "RUNNING",
+      "attempts": 1,
+      "assignedHandle": "game-engineer",
+      "lease": "shared/games/dots-boxes/**, shared/games/sos/**, tests/unit/games/dots-boxes/**, tests/unit/games/sos/**",
       "acceptance": [
         "DB01–DB04/SO01–SO04; two boxes/multiple overlapping lines, retain-once and draws"
       ],
@@ -553,15 +567,22 @@
         "planning/ASSET-INVENTORY.md",
         "planning/GAME-RULES.md"
       ],
-      "status": "RUNNING",
+      "status": "VERIFIED",
       "attempts": 1,
       "assignedHandle": "sudoku-engineer",
-      "lease": "scripts/import-sudoku.*, scripts/verify-sudoku.*, content/sudoku/**, tests/unit/content/**",
+      "lease": null,
       "acceptance": [
         "C01–C05; actual 1,000 puzzles/250 per group, independent exactly-one-solution evidence",
         "Stable manifest/digests/private solutions and no bank in public bundle"
       ],
-      "evidence": [],
+      "evidence": [
+        "1,000 puzzles (250 easy, 250 medium, 250 hard, 250 expert) imported and verified with exact bitmask solver",
+        "8 comprehensive unit tests passing in tests/unit/content/sudoku-catalog.test.ts",
+        "SHA-256 integrity verified against ASSET-INVENTORY.md",
+        "Private solutions in content/sudoku/solutions.json (server-only)",
+        "Public catalog in content/sudoku/catalog.json (zero private solutions)",
+        "planning/execution/reports/S01.md written and verified"
+      ],
       "report": "planning/execution/reports/S01.md",
       "blockReason": null
     },
@@ -585,10 +606,10 @@
         "planning/TDD.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
-      "assignedHandle": null,
-      "lease": null,
+      "status": "RUNNING",
+      "attempts": 1,
+      "assignedHandle": "sudoku-engineer",
+      "lease": "shared/games/sudoku/**, worker/sudoku/**, tests/unit/games/sudoku/**, tests/integration/sudoku/**",
       "acceptance": [
         "SUD01–SUD08/S01–S08, own revision, notes/undo/check/pause/eligibility",
         "N07/N15 and private common-start duel; dedicated sender/published receiver continuous time/whole-second tie"

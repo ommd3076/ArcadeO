@@ -1,0 +1,71 @@
+{
+  "catalogVersion": 1,
+  "generatedAt": "2026-09-30T19:20:59.102Z",
+  "totalPuzzles": 1000,
+  "buckets": {
+    "easy": {
+      "sourceFile": "assets/sudoku-exchange-puzzle-bank-master/easy.txt",
+      "sourceSha256": "789aab6f52cc4588e0c3aa4269ad3282cfda7e1cc79ea693d16507decde3fc50",
+      "sourceBytes": 10000000,
+      "totalSourcePuzzles": 100000,
+      "importedCount": 250,
+      "ratingRange": [
+        1.2,
+        1.2
+      ],
+      "numberRange": [
+        1,
+        250
+      ],
+      "validationOutcome": "EXACTLY_ONE_SOLUTION_VERIFIED"
+    },
+    "medium": {
+      "sourceFile": "assets/sudoku-exchange-puzzle-bank-master/medium.txt",
+      "sourceSha256": "c2a5f8fac99dcf215b25d46ece47f346375e51730b182de70a6f8f2107b2b38d",
+      "sourceBytes": 35264300,
+      "totalSourcePuzzles": 352643,
+      "importedCount": 250,
+      "ratingRange": [
+        1.5,
+        2.3
+      ],
+      "numberRange": [
+        1,
+        250
+      ],
+      "validationOutcome": "EXACTLY_ONE_SOLUTION_VERIFIED"
+    },
+    "hard": {
+      "sourceFile": "assets/sudoku-exchange-puzzle-bank-master/hard.txt",
+      "sourceSha256": "abcff1512411e601abd5e861c60add5be5d877739b6faa249ee86960f5ad85e9",
+      "sourceBytes": 32159200,
+      "totalSourcePuzzles": 321592,
+      "importedCount": 250,
+      "ratingRange": [
+        2.5,
+        4.6
+      ],
+      "numberRange": [
+        1,
+        250
+      ],
+      "validationOutcome": "EXACTLY_ONE_SOLUTION_VERIFIED"
+    },
+    "expert": {
+      "sourceFile": "assets/sudoku-exchange-puzzle-bank-master/diabolical.txt",
+      "sourceSha256": "08553d0c1145ea4d7c13008040f47ea8205d21fe1eaf8f4ab17a1a6981928b35",
+      "sourceBytes": 11968100,
+      "totalSourcePuzzles": 119681,
+      "importedCount": 250,
+      "ratingRange": [
+        5,
+        9
+      ],
+      "numberRange": [
+        1,
+        250
+      ],
+      "validationOutcome": "EXACTLY_ONE_SOLUTION_VERIFIED"
+    }
+  }
+}

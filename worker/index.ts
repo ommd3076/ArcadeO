@@ -1,4 +1,5 @@
 import { handleAuthRequest } from "./api/auth";
+import { handleMatchesRequest } from "./api/matches";
 
 export interface Env {
   DB: D1Database;
@@ -9,15 +10,7 @@ export interface Env {
   SESSION_SECRET?: string;
 }
 
-export class MatchDurableObject implements DurableObject {
-  constructor(_state: DurableObjectState, _env: Env) {}
-
-  async fetch(_request: Request): Promise<Response> {
-    return new Response(JSON.stringify({ status: "ok" }), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-}
+export { MatchDurableObject } from "./matches/match-do";
 
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
@@ -31,9 +24,15 @@ export default {
     }
 
     // Auth endpoints
-    if (url.pathname.startsWith("/api/v1/auth/")) {
+    if (url.pathname.startsWith("/api/v1/auth/") || url.pathname.startsWith("/api/auth/")) {
       const authRes = await handleAuthRequest(request, env);
       if (authRes) return authRes;
+    }
+
+    // Matches endpoints
+    if (url.pathname.startsWith("/api/v1/matches") || url.pathname.startsWith("/api/matches")) {
+      const matchRes = await handleMatchesRequest(request, env);
+      if (matchRes) return matchRes;
     }
 
     return new Response("Not Found", { status: 404 });
