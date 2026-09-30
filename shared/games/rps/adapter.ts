@@ -13,16 +13,12 @@ import {
   validateAndReduce,
 } from "./engine";
 
-export const rpsEngineAdapter: GameEngineAdapter<
-  RPSState,
-  SecretLockPayload,
-  RPSEffect,
-  RPSView
-> = {
-  gameId: "rock-paper-scissors",
-  createInitialState,
-  validateAndReduce,
-  legalActions,
-  toPublicView,
-  isTerminal,
-};
+export const rpsEngineAdapter: GameEngineAdapter<RPSState, SecretLockPayload, RPSEffect, RPSView> =
+  {
+    gameId: "rock-paper-scissors",
+    createInitialState,
+    validateAndReduce,
+    legalActions,
+    toPublicView,
+    isTerminal,
+  };
