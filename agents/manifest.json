@@ -1,0 +1,228 @@
+{
+  "version": 1,
+  "host": "Google Antigravity",
+  "requestedModel": "Gemini 3.1 Pro Low",
+  "modelPolicy": "inherit",
+  "maxActiveSpecialists": 3,
+  "orchestrator": "arcade-orchestrator",
+  "canSpawn": [
+    "arcade-orchestrator"
+  ],
+  "status": "definitions-created-not-host-launched",
+  "nativeRoot": ".agents/agents",
+  "skillRoot": ".agents/skills",
+  "fallback": "sequential canonical role execution; no independent review claim",
+  "roles": [
+    {
+      "id": "arcade-orchestrator",
+      "profile": "agents/profiles/arcade-orchestrator.md",
+      "nativeEntrypoint": ".agents/agents/arcade-orchestrator.md",
+      "staging": "agents/native/arcade-orchestrator.md",
+      "kind": "lead",
+      "skills": [
+        "arcade-v1-build"
+      ],
+      "reads": [
+        "AGENTS.md",
+        "PRODUCT.md",
+        "planning/IMPLEMENTATION-PLAN.md",
+        "planning/execution/TASKS.json",
+        "planning/execution/STATE.md"
+      ],
+      "ownership": "Root package/lock/config, shared protocol registry, migrations integration, task queue/checkpoints and any explicitly unassigned integration seam."
+    },
+    {
+      "id": "system-designer",
+      "profile": "agents/profiles/system-designer.md",
+      "nativeEntrypoint": ".agents/agents/system-designer.md",
+      "staging": "agents/native/system-designer.md",
+      "kind": "review",
+      "skills": [],
+      "reads": [
+        "PRODUCT.md",
+        "planning/SYSTEM-CONTRACT.md",
+        "planning/TRD.md",
+        "planning/TDD.md",
+        "planning/API-CONTRACT.md",
+        "planning/DATA-MODEL.md"
+      ],
+      "ownership": "Read-only implementation review by default; assigned architecture report only. Contract changes require lead approval, not broad redesign."
+    },
+    {
+      "id": "backend-engineer",
+      "profile": "agents/profiles/backend-engineer.md",
+      "nativeEntrypoint": ".agents/agents/backend-engineer.md",
+      "staging": "agents/native/backend-engineer.md",
+      "kind": "write",
+      "skills": [],
+      "reads": [
+        "planning/SYSTEM-CONTRACT.md",
+        "planning/TDD.md",
+        "planning/API-CONTRACT.md",
+        "planning/DATA-MODEL.md",
+        "planning/TEST-PLAN.md"
+      ],
+      "ownership": "Assigned worker/** files, assigned integration tests and provisioning/import helpers. Shared protocol/migrations/config only under explicit lease."
+    },
+    {
+      "id": "security-reviewer",
+      "profile": "agents/profiles/security-reviewer.md",
+      "nativeEntrypoint": ".agents/agents/security-reviewer.md",
+      "staging": "agents/native/security-reviewer.md",
+      "kind": "review",
+      "skills": [],
+      "reads": [
+        "planning/SYSTEM-CONTRACT.md",
+        "planning/API-CONTRACT.md",
+        "planning/TRD.md",
+        "planning/TEST-PLAN.md"
+      ],
+      "ownership": "Read-only source/runtime review; task report only. May run bounded local adversarial checks with supplied test credentials."
+    },
+    {
+      "id": "ux-designer",
+      "profile": "agents/profiles/ux-designer.md",
+      "nativeEntrypoint": ".agents/agents/ux-designer.md",
+      "staging": "agents/native/ux-designer.md",
+      "kind": "write",
+      "skills": [
+        "better-ui",
+        "better-layout",
+        "better-typography",
+        "better-colors",
+        "better-accessibility"
+      ],
+      "reads": [
+        "PRODUCT.md",
+        "DESIGN.md",
+        "planning/PRD.md",
+        "planning/UI-CONTRACT.md",
+        "assets/ui-references/README.md"
+      ],
+      "ownership": "Assigned src/theme/**, shared component/shell files or visual review report. Screen implementation only if explicitly assigned; no shared ownership with frontend."
+    },
+    {
+      "id": "frontend-engineer",
+      "profile": "agents/profiles/frontend-engineer.md",
+      "nativeEntrypoint": ".agents/agents/frontend-engineer.md",
+      "staging": "agents/native/frontend-engineer.md",
+      "kind": "write",
+      "skills": [
+        "better-ui",
+        "better-layout",
+        "better-accessibility",
+        "mobile-native"
+      ],
+      "reads": [
+        "DESIGN.md",
+        "planning/PRD.md",
+        "planning/UI-CONTRACT.md",
+        "planning/API-CONTRACT.md",
+        "planning/TDD.md"
+      ],
+      "ownership": "Assigned src/screens/** or src/games/<game>/** and corresponding browser tests. Shared sync/theme/components only by explicit lease."
+    },
+    {
+      "id": "motion-reviewer",
+      "profile": "agents/profiles/motion-reviewer.md",
+      "nativeEntrypoint": ".agents/agents/motion-reviewer.md",
+      "staging": "agents/native/motion-reviewer.md",
+      "kind": "review",
+      "skills": [
+        "animate",
+        "mobile-native",
+        "better-accessibility"
+      ],
+      "reads": [
+        "DESIGN.md",
+        "planning/UI-CONTRACT.md",
+        "planning/TEST-PLAN.md",
+        "planning/TDD.md"
+      ],
+      "ownership": "Read-only review/report by default; assigned src/games motion fixes only if separately leased."
+    },
+    {
+      "id": "game-engineer",
+      "profile": "agents/profiles/game-engineer.md",
+      "nativeEntrypoint": ".agents/agents/game-engineer.md",
+      "staging": "agents/native/game-engineer.md",
+      "kind": "write",
+      "skills": [],
+      "reads": [
+        "planning/GAME-RULES.md",
+        "planning/TDD.md",
+        "planning/TEST-PLAN.md",
+        "planning/ASSET-INVENTORY.md"
+      ],
+      "ownership": "Assigned shared/games/<game>/** and tests/unit/games/<game>/**. No UI/network/auth edits; shared registry only lead-owned integration."
+    },
+    {
+      "id": "sudoku-engineer",
+      "profile": "agents/profiles/sudoku-engineer.md",
+      "nativeEntrypoint": ".agents/agents/sudoku-engineer.md",
+      "staging": "agents/native/sudoku-engineer.md",
+      "kind": "write",
+      "skills": [],
+      "reads": [
+        "planning/GAME-RULES.md",
+        "planning/PRD.md",
+        "planning/TDD.md",
+        "planning/DATA-MODEL.md",
+        "planning/ASSET-INVENTORY.md",
+        "planning/TEST-PLAN.md"
+      ],
+      "ownership": "Assigned shared/games/sudoku/**, worker/sudoku/**, content manifest/import helpers and tests. Backend/migrations shared seams require lead coordination."
+    },
+    {
+      "id": "consistency-reviewer",
+      "profile": "agents/profiles/consistency-reviewer.md",
+      "nativeEntrypoint": ".agents/agents/consistency-reviewer.md",
+      "staging": "agents/native/consistency-reviewer.md",
+      "kind": "review",
+      "skills": [],
+      "reads": [
+        "planning/GAME-RULES.md",
+        "planning/TDD.md",
+        "planning/TEST-PLAN.md",
+        "planning/API-CONTRACT.md"
+      ],
+      "ownership": "Read-only engine review and task report; may add review fixtures only if lead leases distinct test files."
+    },
+    {
+      "id": "qa-engineer",
+      "profile": "agents/profiles/qa-engineer.md",
+      "nativeEntrypoint": ".agents/agents/qa-engineer.md",
+      "staging": "agents/native/qa-engineer.md",
+      "kind": "write",
+      "skills": [
+        "better-accessibility",
+        "mobile-native"
+      ],
+      "reads": [
+        "planning/PRD.md",
+        "planning/TEST-PLAN.md",
+        "DESIGN.md",
+        "planning/API-CONTRACT.md",
+        "planning/IMPLEMENTATION-PLAN.md"
+      ],
+      "ownership": "Assigned tests/integration/qa-*/**, tests/e2e/** fixtures/config under explicit lease, QA report/screenshots. No production fix without lead reassignment."
+    },
+    {
+      "id": "release-reviewer",
+      "profile": "agents/profiles/release-reviewer.md",
+      "nativeEntrypoint": ".agents/agents/release-reviewer.md",
+      "staging": "agents/native/release-reviewer.md",
+      "kind": "review",
+      "skills": [],
+      "reads": [
+        "PRODUCT.md",
+        "planning/PRD.md",
+        "planning/TRD.md",
+        "planning/TEST-PLAN.md",
+        "planning/execution/TASKS.json",
+        "planning/execution/STATE.md"
+      ],
+      "ownership": "Read-only final audit/report; may write assigned morning review section/report, not task status or production files."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+name: Publish NPM Package
+
+on:
+  # push:
+  #   branches:
+  #     - main
+  workflow_dispatch:
+
+jobs:
+  npm-publish:
+    uses: devshareacademy/shared-workflows/.github/workflows/publish-package.yml@v1.0.3
+    secrets:
+      npm_token: ${{ secrets.NPM_TOKEN }}
+      gh_token: ${{ secrets.GH_TOKEN }}
