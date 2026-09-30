@@ -1,0 +1,8 @@
+{
+  "reporter": "spec",
+  "r": "ts-node/register",
+  "slow": "3000",
+  "timeout": "60000",
+  "check-leaks": true,
+  "full-trace": true
+}

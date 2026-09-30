@@ -1,0 +1,42 @@
+name: Unit Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "npm"
+        env:
+          CI: true
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: yarn lint
+        run: yarn lint
+        env:
+          CI: true
+
+      - name: yarn build
+        run: yarn build
+        env:
+          CI: true
+
+      - name: yarn test
+        run: yarn test
+        env:
+          CI: true

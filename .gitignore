@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build and runtime outputs
+dist/
+build/
+.wrangler/
+.mf/
+
+# Testing and coverage
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+
+# Logs and environment
+*.log
+.env
+.env*.local
+!.env.example
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Local state overrides
+*.local
+planning/execution/*.local.md

@@ -1,0 +1,858 @@
+{
+  "meta": {
+    "document_type": "project_context_handoff",
+    "purpose": "Single source of context for Astra or another planning/architecture agent. This is NOT a final product spec, UI spec, or implementation plan. The receiving agent should use it to generate those artifacts without restarting ideation.",
+    "project_stage": "concept and direction substantially locked; visual details still intentionally open",
+    "created_on": "2026-09-30",
+    "ship_target": "roughly 4-5 days for a private usable V1",
+    "priority_order": [
+      "ship a genuinely usable private two-person arcade",
+      "make interaction and game motion feel polished",
+      "support both remote two-device play and same-device together play",
+      "stay free to host at this scale",
+      "avoid design drift and unnecessary infrastructure"
+    ],
+    "important_instruction_to_receiving_agent": "Do not turn this into a startup-scale platform. Preserve the small, private, two-user nature of the product."
+  },
+  "product_vision": {
+    "working_description": "A private, installable two-person game arcade for a couple. It should feel modern, intimate, fast, smooth and lightly gamified, while many games themselves draw from familiar old-school / pre-2010 / notebook / casual-game nostalgia.",
+    "not_a_public_platform": true,
+    "number_of_users": 2,
+    "audience": "exactly the two predetermined users",
+    "core_emotional_goal": "something the two users genuinely open and play together, both while apart and while physically together",
+    "experience_keywords": [
+      "clean",
+      "playful",
+      "private",
+      "responsive",
+      "smooth",
+      "lightly nostalgic",
+      "not childish",
+      "not over-designed",
+      "not corporate",
+      "not cluttered"
+    ]
+  },
+  "hard_constraints": {
+    "free_or_near_zero_monthly_cost": true,
+    "installable_web_app": true,
+    "mobile_first": true,
+    "same_device_play_must_work_on_phone": true,
+    "same_device_play_must_also_work_on_laptop": true,
+    "remote_play_on_two_separate_devices": true,
+    "only_two_fixed_accounts": true,
+    "no_public_signup": true,
+    "no_email_authentication": true,
+    "no_public_rooms": true,
+    "no_matchmaking": true,
+    "no_social_network_features": true,
+    "no_ads": true,
+    "no_heavy_AI_requirement": true,
+    "animations_are_part_of_game_quality_not_optional_polish": true,
+    "avoid_manual_asset_hoarding": true,
+    "avoid_hundreds_of_custom_SVG_files": true
+  },
+  "users_and_devices": {
+    "player_A": {
+      "role": "owner/developer",
+      "primary_phone": "Google Pixel 7",
+      "platform": "Android",
+      "notes": "Android provides system back navigation, but the app must not depend on it."
+    },
+    "player_B": {
+      "role": "significant other",
+      "primary_phone": "iPhone 16 Pro Max",
+      "platform": "iOS",
+      "notes": "No Android-style system back button. All hierarchical navigation must have an obvious in-app path back/close."
+    },
+    "shared_devices": [
+      "either user's phone",
+      "owner's laptop",
+      "tablet if used later"
+    ],
+    "responsive_priority": [
+      "phone portrait",
+      "phone landscape only when useful for a game",
+      "tablet",
+      "laptop/desktop"
+    ],
+    "browser_layout_rule": "Design in responsive CSS layout units, not physical screen pixel resolutions."
+  },
+  "navigation_and_ios_rules": {
+    "principle": "Never rely on device-specific hardware/system navigation to escape a screen.",
+    "requirements": [
+      "Every hierarchical game/settings/detail screen must expose a visible Back, Close, Home, or equivalent escape affordance where appropriate.",
+      "Back should normally map to browser/app history semantics rather than a hard-coded route when history is meaningful.",
+      "Directly opened/deep-linked screens must still have a safe fallback destination such as Games or Home.",
+      "Do not implement custom edge gestures that conflict with iOS system gestures.",
+      "A swipe-back or gesture may supplement navigation but may never be the only navigation mechanism.",
+      "Modal/overlay experiences must have a visible close/cancel path.",
+      "Do not place critical tap targets in unsafe screen edges; respect iOS safe-area insets and Android cutouts/navigation areas.",
+      "Bottom navigation must account for env(safe-area-inset-bottom).",
+      "Top bars must account for env(safe-area-inset-top) where needed.",
+      "On same-device secret-input games, the transition/pass-phone screen must prevent the next player from seeing the prior player's choice."
+    ],
+    "ios_specific_quality_bar": [
+      "The PWA should feel complete when launched from the iPhone home screen in standalone mode.",
+      "No flow may assume a browser toolbar back button is present.",
+      "Touch targets should be comfortably finger-sized.",
+      "Avoid hover-dependent interactions."
+    ]
+  },
+  "deployment_and_infrastructure": {
+    "preferred_platform": "Cloudflare",
+    "reason_for_cloudflare_choice": [
+      "Avoid dependency on a backend that may be paused after inactivity.",
+      "Keep static hosting, API/server logic, durable realtime coordination and database in one ecosystem.",
+      "Current free-tier capacity is vastly above expected usage for two people."
+    ],
+    "recommended_topology": {
+      "frontend": "Cloudflare static assets / Pages-style deployment or Workers static assets, implemented as an installable PWA",
+      "api": "Cloudflare Workers",
+      "persistent_database": "Cloudflare D1",
+      "realtime_match_coordination": "Cloudflare Durable Objects with WebSockets, preferably WebSocket Hibernation where suitable",
+      "static_assets": "served through Cloudflare",
+      "optional_future_storage": "R2 only if future photo-based features genuinely require object storage; not needed for V1"
+    },
+    "verified_free_tier_context_as_of_2026_09_30": {
+      "workers_requests": "100,000 requests/day on Workers Free",
+      "d1_rows_read": "5,000,000 rows/day on Free",
+      "d1_rows_written": "100,000 rows/day on Free",
+      "d1_total_storage": "5 GB total on Free; individual D1 database limit 500 MB on Free",
+      "durable_objects": "SQLite-backed Durable Objects available on Workers Free",
+      "durable_objects_total_storage": "5 GB total on Free",
+      "warning": "These are platform limits, not design targets. Re-verify before deployment because pricing/limits can change. On Free, exceeding certain daily limits causes operations to fail until reset, so the UI must handle backend/quota failures gracefully."
+    },
+    "reliability_principles": [
+      "Persistent match state must never live only in an active WebSocket connection.",
+      "Realtime transport is an optimization for immediacy; authoritative recoverable state must be reconstructable after reconnect.",
+      "Network drop must not destroy an in-progress game.",
+      "On reconnect, re-fetch or rehydrate authoritative match state and reconcile local UI.",
+      "Use idempotent move/event handling where practical to avoid duplicate actions on retries.",
+      "Display subtle connection states: connected, reconnecting, offline, restored.",
+      "For same-device local play, avoid unnecessary round trips for visual interaction, but persist accepted moves to the backend so history remains consistent."
+    ]
+  },
+  "authentication": {
+    "model": "exactly two predetermined accounts",
+    "login_fields": [
+      "username or short user ID",
+      "password or PIN"
+    ],
+    "no_signup": true,
+    "no_email": true,
+    "requirements": [
+      "Never bundle plaintext credentials in frontend JavaScript.",
+      "Store only secure password verifier/hash material server-side.",
+      "Use a Worker-compatible secure password hashing/KDF implementation.",
+      "Use secure sessions; prefer HttpOnly + Secure cookies where compatible with the chosen app architecture.",
+      "No forgot-password flow is needed for V1; credentials can be manually reset by the owner/admin path if necessary.",
+      "No account-creation endpoint."
+    ]
+  },
+  "play_modes": {
+    "remote": {
+      "description": "Both users play from separate devices.",
+      "identity_rule": "The signed-in account determines the player identity.",
+      "realtime": true,
+      "examples": [
+        "Pixel 7 vs iPhone 16 Pro Max",
+        "phone vs laptop"
+      ]
+    },
+    "together": {
+      "description": "Both users are physically together and use one shared device, including a phone.",
+      "supported_shared_devices": [
+        "Pixel 7",
+        "iPhone 16 Pro Max",
+        "laptop",
+        "tablet"
+      ],
+      "identity_rule": "Device identity never determines player identity. The game state's active player / turn determines who owns an action.",
+      "critical_mental_model": "DEVICE != PLAYER",
+      "no_account_switching_each_turn": true,
+      "secret_choice_flow": [
+        "player 1 chooses secretly",
+        "choice locks",
+        "neutral pass-device screen",
+        "player 2 confirms readiness",
+        "player 2 chooses secretly",
+        "choice locks",
+        "animated reveal"
+      ]
+    }
+  },
+  "shared_game_event_contract": {
+    "intent": "All game engines should share a consistent event envelope so local and remote play do not become separate implementations.",
+    "suggested_fields": [
+      "eventId",
+      "gameId",
+      "gameType",
+      "playerId",
+      "action",
+      "payload",
+      "sequenceNumber or version",
+      "clientTimestamp",
+      "serverTimestamp"
+    ],
+    "rules": [
+      "Never use deviceId as the authoritative player identity for a move.",
+      "Server validates turn ownership and move legality for remote/shared persistent matches.",
+      "Game state should be deterministic from validated state + event where practical.",
+      "Duplicate/retried event IDs should not apply a move twice.",
+      "Animations should render the accepted state transition, not define game truth."
+    ]
+  },
+  "v1_games": {
+    "count": 8,
+    "locked": true,
+    "do_not_add_more_games_to_v1": true,
+    "games": [
+      {
+        "name": "Ludo",
+        "priority": "flagship",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "core_requirements": [
+          "dice roll",
+          "legal move highlighting",
+          "piece movement",
+          "captures",
+          "safe cells",
+          "home path",
+          "win state",
+          "resume/reconnect"
+        ],
+        "motion_examples": [
+          "dice tumble/roll",
+          "piece movement along path rather than teleporting",
+          "subtle legal-move pulse",
+          "capture feedback",
+          "home arrival feedback",
+          "restrained win celebration"
+        ]
+      },
+      {
+        "name": "Sudoku",
+        "priority": "flagship because player_B especially likes Sudoku",
+        "modes": [
+          "classic solo",
+          "remote duel on same puzzle",
+          "async challenge / beat-my-time"
+        ],
+        "optional_later_mode": "same-device cooperative or alternating-entry mode",
+        "requirements": [
+          "valid generated or curated puzzles",
+          "difficulty support",
+          "notes/pencil marks if scope allows",
+          "completion validation",
+          "best time / challenge result"
+        ],
+        "motion_examples": [
+          "number entry feedback",
+          "selected row/column/box highlighting",
+          "subtle completion cascade",
+          "restrained puzzle-complete celebration"
+        ]
+      },
+      {
+        "name": "Dots & Boxes",
+        "priority": "core",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "visual_identity": "player-owned line colors and softly tinted completed boxes",
+        "motion_examples": [
+          "line physically draws from one dot to another",
+          "dot/tap response",
+          "completed square softly fills with owner's accent color",
+          "score increment animation"
+        ]
+      },
+      {
+        "name": "Rock Paper Scissors",
+        "priority": "quick game",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "recommended_match_formats": [
+          "best of 3",
+          "best of 5",
+          "best of 7"
+        ],
+        "requirements": [
+          "choices remain secret until both players lock",
+          "same-device pass-phone privacy interstitial"
+        ],
+        "motion_examples": [
+          "lock confirmation",
+          "3-2-1 reveal",
+          "choice clash/reveal",
+          "small round-win feedback"
+        ]
+      },
+      {
+        "name": "Hand Cricket",
+        "priority": "quick nostalgic game",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "requirements": [
+          "secret simultaneous number choices",
+          "batting/bowling role",
+          "run scoring",
+          "out on matching values",
+          "innings swap",
+          "match result",
+          "same-device pass-phone privacy interstitial"
+        ],
+        "motion_examples": [
+          "locked choice",
+          "simultaneous reveal",
+          "run count pop",
+          "OUT impact feedback",
+          "innings transition"
+        ]
+      },
+      {
+        "name": "SOS",
+        "priority": "core nostalgic notebook game",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "requirements": [
+          "grid",
+          "place S or O",
+          "detect SOS horizontally/vertically/diagonally",
+          "score ownership",
+          "turn/scoring rules clearly defined before coding"
+        ],
+        "motion_examples": [
+          "letter placement",
+          "completed SOS path highlight",
+          "score increase"
+        ]
+      },
+      {
+        "name": "Connect Four",
+        "priority": "core strategy",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "requirements": [
+          "7x6 board unless deliberately changed",
+          "gravity drop",
+          "four-in-a-row detection",
+          "draw state"
+        ],
+        "motion_examples": [
+          "disc physically falls into slot",
+          "small landing response",
+          "winning four highlight"
+        ]
+      },
+      {
+        "name": "Snakes & Ladders",
+        "priority": "longer casual board game",
+        "modes": [
+          "remote",
+          "together"
+        ],
+        "requirements": [
+          "dice",
+          "board path",
+          "snake transitions",
+          "ladder transitions",
+          "finish/win rules",
+          "rules such as exact-roll-to-finish must be explicitly chosen before coding"
+        ],
+        "motion_examples": [
+          "dice roll",
+          "piece cell-to-cell movement",
+          "ladder climb",
+          "snake slide",
+          "finish celebration"
+        ]
+      }
+    ]
+  },
+  "explicitly_removed_or_deferred_games": {
+    "removed_from_current_scope": [
+      "Tic Tac Toe / XO",
+      "Hangman",
+      "Battleship"
+    ],
+    "deferred": [
+      {
+        "name": "Memory Match with couple photos",
+        "reason": "Would introduce image upload/storage/privacy/asset-management work; revisit after V1."
+      },
+      {
+        "name": "Gomoku / Five in a Row",
+        "reason": "Good candidate but not needed in the locked eight-game V1."
+      },
+      {
+        "name": "Checkers",
+        "reason": "More rules/UI complexity and not required for current V1."
+      },
+      {
+        "name": "Reversi/Othello-style game",
+        "reason": "Good two-player game but V1 is already full."
+      }
+    ]
+  },
+  "pwa": {
+    "required": true,
+    "goal": "Both users can add the web app to their home screen and launch it in an app-like standalone experience.",
+    "requirements": [
+      "valid web app manifest",
+      "app icons and maskable icon",
+      "standalone display mode where appropriate",
+      "service worker strategy chosen conservatively",
+      "cache app shell/static assets",
+      "do not cache authenticated game state in a way that creates stale authoritative truth",
+      "graceful offline screen/state",
+      "responsive safe-area handling",
+      "test actual installation on iOS and Android rather than assuming browser simulation is sufficient"
+    ]
+  },
+  "information_architecture": {
+    "bottom_navigation": [
+      "Home",
+      "Games",
+      "Us"
+    ],
+    "settings_location": "inside profile/Us or a secondary menu; avoid a fourth primary tab unless later proven necessary",
+    "home_structure_not_pixel_locked": [
+      "greeting/identity",
+      "weekly shared-game snapshot",
+      "active match / continue if one exists",
+      "quick access to games",
+      "small streak or contextual insight if useful",
+      "bottom navigation"
+    ],
+    "home_should_not_be": [
+      "a long recent-activity feed",
+      "an analytics dashboard",
+      "a wall of cards",
+      "a public leaderboard"
+    ],
+    "games_screen": "clean grid/list of the eight games with obvious game identity and minimal metadata",
+    "us_screen": [
+      "head-to-head summary",
+      "per-game records",
+      "streaks",
+      "lightweight milestones/interesting facts",
+      "appearance/player preferences access"
+    ]
+  },
+  "design_direction": {
+    "one_coherent_app_shell": true,
+    "principle": "Games may have small identity cues, but the app must use one coherent design system rather than eight unrelated mini-sites.",
+    "theme": {
+      "modes": [
+        "system",
+        "light",
+        "dark"
+      ],
+      "default": "system/adaptive",
+      "avoid_theme_explosion": true
+    },
+    "fonts": {
+      "count": 3,
+      "roles": {
+        "display_font": "personality / large headings / moments",
+        "ui_font": "body, controls, navigation, settings, explanations",
+        "game_numeric_font": "scores, timers, game numbers, compact game data where appropriate"
+      },
+      "rule": "Three deliberate roles only. Agents must not introduce additional font families ad hoc."
+    },
+    "player_colors": {
+      "hardcoded_by_gender": false,
+      "user_configurable": true,
+      "recommended_approach": "Offer a small curated palette, e.g. 6-8 accessible accent choices, rather than an unrestricted color picker in V1.",
+      "usage": [
+        "turn indicators",
+        "game pieces",
+        "Dots & Boxes lines",
+        "owned boxes",
+        "score accents",
+        "profile halo/avatar accent",
+        "head-to-head charts or bars",
+        "winning highlights"
+      ],
+      "contrast_rule": "If both players select colors too visually similar, prompt them to choose more distinct accents for gameplay clarity.",
+      "accessibility_rule": "Do not communicate ownership only by color when ambiguity could matter; also use shape/position/label/pattern where suitable."
+    },
+    "border_radius_system": {
+      "purpose": "Consistent rounding, not a feature users need to think about.",
+      "suggested_tokens": {
+        "small": "10px",
+        "medium": "16px",
+        "large": "24px",
+        "pill": "999px"
+      },
+      "rule": "Use tokens; do not invent random radius values component-by-component."
+    },
+    "surfaces": {
+      "direction": "clean modern surfaces, restrained borders/shadows, readable in light and dark",
+      "avoid": [
+        "glassmorphism everywhere",
+        "excessive gradients",
+        "large decorative blobs",
+        "AI-template dashboard look",
+        "overuse of neon"
+      ]
+    }
+  },
+  "icons_and_assets": {
+    "principle": "Use packages/MCP-backed icon libraries instead of manually downloading many SVG files.",
+    "primary_icon_family_candidates": [
+      "Lucide",
+      "Phosphor"
+    ],
+    "supporting_source": "21st.dev icon/MCP ecosystem may be used for discovery or carefully chosen animated icon variants if accessible in the implementation environment.",
+    "rules": [
+      "Choose ONE primary icon family before implementation.",
+      "Do not randomly mix Lucide, Tabler, Heroicons, Material, etc. across the interface.",
+      "Animated icons are accents, not the default for every control.",
+      "Prefer CSS/SVG primitives for game geometry: dots, lines, discs, grids, dice, board paths.",
+      "Keep external custom asset count small."
+    ]
+  },
+  "motion_system": {
+    "importance": "first-class acceptance criterion",
+    "target": "perceptually smooth, ideally 60 FPS on target phones",
+    "personality": "Duolingo-like responsiveness and delight, but materially more restrained and less motion-dense",
+    "motion_classes": {
+      "interaction": {
+        "typical_duration": "100-180ms",
+        "examples": [
+          "button press",
+          "selection",
+          "toggle",
+          "card press"
+        ]
+      },
+      "game_action": {
+        "typical_duration": "200-600ms, longer only when the physical action warrants it",
+        "examples": [
+          "Ludo piece travel",
+          "dice roll",
+          "Connect Four disc drop",
+          "Dots & Boxes line draw",
+          "Snakes & Ladders movement"
+        ]
+      },
+      "state_change": {
+        "typical_duration": "200-350ms",
+        "examples": [
+          "turn switch",
+          "score update",
+          "connection restored",
+          "game state transition"
+        ]
+      },
+      "celebration": {
+        "typical_duration": "600-1200ms",
+        "examples": [
+          "match win",
+          "Sudoku completion",
+          "milestone",
+          "major comeback"
+        ]
+      }
+    },
+    "preferred_implementation": [
+      "CSS transforms",
+      "opacity",
+      "SVG transforms",
+      "SVG stroke-dasharray/stroke-dashoffset for line drawing",
+      "requestAnimationFrame only when truly necessary",
+      "a motion library only for coordinated interactions that would otherwise be fragile"
+    ],
+    "performance_rules": [
+      "Prefer transform and opacity over animating layout properties.",
+      "Avoid repeated width/height/top/left animations for gameplay.",
+      "Do not use heavy particle systems as a default.",
+      "Animations must not delay input unnecessarily.",
+      "Respect prefers-reduced-motion and provide simpler alternatives.",
+      "Logic/state update must never depend on an animation finishing correctly.",
+      "Use haptics only where supported and only as enhancement."
+    ],
+    "example_quality_bar_dots_and_boxes": [
+      "first dot responds subtly",
+      "second dot selection is acknowledged",
+      "line visibly draws between dots in the active player's color",
+      "if a box is completed, fill fades in softly using that player's accent",
+      "score increments with a compact motion",
+      "game remains responsive throughout"
+    ]
+  },
+  "gamification_and_algorithmic_layer": {
+    "philosophy": "Use lightweight deterministic feedback and shared history. Do not build an XP/coin/gem economy.",
+    "allowed_examples": [
+      "games played this week",
+      "head-to-head score",
+      "current play streak",
+      "per-game win streak",
+      "most played game",
+      "closest rivalry",
+      "largest comeback where game state supports measuring it",
+      "longest/shortest match",
+      "milestones such as 50th match",
+      "simple revenge/comeback contextual card",
+      "what-should-we-play suggestion"
+    ],
+    "what_should_we_play": {
+      "optional": true,
+      "no_AI_needed": true,
+      "example_factors": [
+        "time since game was last played",
+        "recent repetition penalty",
+        "historical usage",
+        "variety bonus"
+      ],
+      "goal": "A playful deterministic picker, not a recommendation engine."
+    },
+    "explicitly_not_wanted": [
+      "XP",
+      "coins",
+      "gems",
+      "battle pass",
+      "loot",
+      "public achievements leaderboard",
+      "fake progression for its own sake"
+    ]
+  },
+  "data_and_history": {
+    "store": [
+      "users/profiles",
+      "profile preferences",
+      "games/matches",
+      "match participants",
+      "current authoritative state or recoverable snapshot",
+      "validated move/event history where useful",
+      "match result",
+      "timestamps/duration",
+      "derived stats or enough raw data to derive them"
+    ],
+    "history_goal": "Enable head-to-head stats, resume, lightweight replay where practical, milestones and weekly summaries.",
+    "replay": {
+      "concept": "Replay from move/event history, not video recording.",
+      "priority": "nice to have after core match reliability; do not let replay block V1 ship"
+    },
+    "privacy": "Only the two authenticated users need access. No public profiles or discoverability."
+  },
+  "realtime_and_sync": {
+    "authoritative_match_owner": "Durable Object per active match is a strong candidate; Astra should validate the final topology.",
+    "persistence": "Persist sufficient snapshots/events/results to D1 so completed/in-progress games survive connection loss and object lifecycle changes.",
+    "remote_flow": [
+      "client submits action",
+      "server validates player/turn/rules",
+      "authoritative state version advances",
+      "broadcast accepted event/state to both clients",
+      "persist required state/history",
+      "clients animate accepted transition"
+    ],
+    "reconnect_flow": [
+      "detect disconnect",
+      "show subtle reconnecting/offline state",
+      "reconnect WebSocket",
+      "request latest authoritative version/state",
+      "discard or reconcile stale optimistic UI",
+      "resume without losing the match"
+    ],
+    "same_device_flow": [
+      "same game engine and validation rules",
+      "active player from game state determines move ownership",
+      "render locally immediately when safe",
+      "persist accepted move/history",
+      "secret-choice games use privacy interstitial"
+    ]
+  },
+  "game_engine_principles": {
+    "separation": [
+      "pure game rules/state",
+      "transport/realtime",
+      "persistence",
+      "UI rendering",
+      "animation"
+    ],
+    "rule": "A game should be testable without rendering its React/UI components.",
+    "benefits": [
+      "same engine for remote and together modes",
+      "easier unit tests",
+      "animations cannot corrupt rules",
+      "easier replay",
+      "easier reconnect/state restoration"
+    ]
+  },
+  "accessibility_and_input": {
+    "requirements": [
+      "touch-first controls",
+      "keyboard support where natural on laptop",
+      "no hover-only critical affordances",
+      "visible focus states",
+      "sufficient text/background contrast",
+      "color is not the only signal for ownership where confusion is possible",
+      "reduced-motion support",
+      "large enough touch targets",
+      "prevent accidental double-submit/double-move"
+    ]
+  },
+  "performance_budget_mindset": {
+    "goal": "fast personal app, not a heavy marketing site",
+    "rules": [
+      "avoid loading assets for all games upfront if code splitting is easy",
+      "lazy-load game-specific code",
+      "avoid large animation/video bundles",
+      "use vector/CSS primitives for boards where possible",
+      "keep runtime dependencies deliberate",
+      "test actual Pixel 7 and iPhone 16 Pro Max, not just desktop devtools",
+      "measure before adding optimization complexity"
+    ]
+  },
+  "v1_scope_guardrails": {
+    "must_have": [
+      "two fixed accounts",
+      "PWA installability",
+      "Home / Games / Us navigation",
+      "eight locked games",
+      "remote and together play architecture",
+      "same-device phone support",
+      "reliable reconnect/recovery",
+      "player accent preferences",
+      "light/dark/system appearance",
+      "basic match history/head-to-head",
+      "meaningful motion for game actions"
+    ],
+    "not_in_v1": [
+      "public users",
+      "signup",
+      "email verification",
+      "password recovery service",
+      "friend system",
+      "public chat",
+      "voice/video",
+      "matchmaking",
+      "public leaderboards",
+      "photo upload system",
+      "AI opponent",
+      "AI recommendations",
+      "large achievement economy",
+      "20 games",
+      "deep admin dashboard",
+      "custom design language per game",
+      "complex avatar creator"
+    ]
+  },
+  "parallel_agent_execution_context": {
+    "owner_tooling_intent": "Planning/review may be done with ChatGPT Codex; implementation/code generation may be offloaded to AntiGravity/Astra-style agents. The owner wants parallelism but not architectural divergence.",
+    "recommended_principle": "Parallelize along hard module boundaries, not arbitrary files.",
+    "possible_workstreams_for_receiving_agent_to_refine": [
+      "platform/auth/realtime/persistence",
+      "app shell/PWA/responsive navigation",
+      "Ludo engine/UI",
+      "Sudoku engine/UI",
+      "small deterministic games",
+      "motion/performance integration",
+      "tests/integration/reconnect QA"
+    ],
+    "critical_rule": "No implementation agent should invent a new visual system, font family, icon family, navigation pattern, player-color convention or motion language independently.",
+    "integration_warning": "More agents do not remove integration cost. Keep shared contracts stable before parallel implementation."
+  },
+  "quality_and_acceptance_examples": {
+    "global": [
+      "no game action should silently fail",
+      "no duplicate move after reconnect",
+      "no route that traps an iPhone user without visible navigation",
+      "no layout that requires desktop width",
+      "no core interaction dependent on hover",
+      "no obvious jank during primary game animations",
+      "no plaintext credentials in shipped client code",
+      "no state loss from a routine network interruption"
+    ],
+    "mobile": [
+      "works at narrow phone portrait widths",
+      "respects safe areas",
+      "bottom navigation is reachable with one hand",
+      "boards remain legible without requiring browser zoom",
+      "same-device pass-and-play is practical on a single phone"
+    ]
+  },
+  "visual_direction_still_open": {
+    "do_not_force_final_answers_here": true,
+    "items_for_astra_to_propose_concisely": [
+      "project/app name or codename",
+      "exact three font families",
+      "exact neutral/background palette",
+      "default curated player accent palette",
+      "choose Lucide vs Phosphor as primary icon family",
+      "final surface/card style",
+      "final home composition",
+      "exact motion easing tokens",
+      "PWA icon/logo treatment"
+    ],
+    "instruction": "Offer a small number of coherent choices, not a giant design exploration. The owner is perfectionism-prone and wants to ship within days."
+  },
+  "open_rule_decisions_to_resolve_before_each_game_is_coded": [
+    "Ludo: exact house rules for rolling six, repeated sixes, captures, safe cells, entry conditions and exact finish.",
+    "Snakes & Ladders: exact-roll-to-finish or overshoot behavior.",
+    "SOS: whether scoring an SOS grants another turn and how overlapping SOS sequences score.",
+    "Sudoku: puzzle source/generation strategy and whether mistakes are limited or simply highlighted.",
+    "Hand Cricket: number range and innings/wicket format.",
+    "Remote challenge UX: whether a user can have multiple active matches or only one active match per game."
+  ],
+  "receiving_agent_instructions": [
+    "Treat the eight-game V1, Cloudflare preference, two-user constraint, PWA requirement, remote+together architecture, mobile-first requirement and motion quality bar as locked unless a genuine technical blocker is found.",
+    "Do not ask the owner to restart ideation.",
+    "Do not expand scope because an additional feature would be easy to generate.",
+    "When proposing architecture, optimize for correctness, simplicity, free-tier suitability and recoverability.",
+    "When proposing UI, optimize for a coherent small design system and touch ergonomics, especially iPhone standalone PWA behavior.",
+    "When proposing animation, prioritize game-state communication and tactile feedback over decoration.",
+    "Separate game logic from animation/UI.",
+    "Prefer one clean solution over a large menu of implementation options.",
+    "Flag any assumption that could invalidate the 4-5 day ship target.",
+    "Re-verify Cloudflare pricing/limits at implementation/deployment time."
+  ],
+  "_verified_references": [
+    {
+      "topic": "Apple gesture/navigation guidance",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/gestures",
+      "note": "Apple recommends shortcut gestures supplement rather than replace familiar navigation controls such as a visible Back button."
+    },
+    {
+      "topic": "Cloudflare Workers Free limits",
+      "url": "https://developers.cloudflare.com/workers/platform/limits/",
+      "verified_on": "2026-09-30"
+    },
+    {
+      "topic": "Cloudflare D1 pricing/free usage",
+      "url": "https://developers.cloudflare.com/d1/platform/pricing/",
+      "verified_on": "2026-09-30"
+    },
+    {
+      "topic": "Cloudflare D1 limits",
+      "url": "https://developers.cloudflare.com/d1/platform/limits/",
+      "verified_on": "2026-09-30"
+    },
+    {
+      "topic": "Cloudflare Durable Objects limits",
+      "url": "https://developers.cloudflare.com/durable-objects/platform/limits/",
+      "verified_on": "2026-09-30"
+    },
+    {
+      "topic": "Cloudflare Durable Objects overview",
+      "url": "https://developers.cloudflare.com/durable-objects/",
+      "verified_on": "2026-09-30"
+    }
+  ]
+}
