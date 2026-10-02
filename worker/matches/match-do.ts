@@ -155,6 +155,24 @@ export class MatchDurableObject implements DurableObject {
     const now = Date.now();
     const times: number[] = [];
 
+    // A Sudoku Duel becomes editable when its persisted start time arrives. Keep
+    // that wakeup in Durable Object storage so it survives eviction and wakes
+    // connected hibernating sockets without a client action or reload.
+    const snapshot = this.getSnapshot();
+    if (
+      snapshot?.gameId === "sudoku" &&
+      snapshot.mode === "duel" &&
+      snapshot.lifecycle === "active"
+    ) {
+      const game = snapshot.gameState as SudokuState;
+      if (
+        !game.terminalResult &&
+        typeof game.scheduledStartTime === "number" &&
+        game.scheduledStartTime > now
+      )
+        times.push(game.scheduledStartTime);
+    }
+
     const pending = this.state.storage.sql
       .exec<{ nextAttemptAt: number }>(
         "SELECT MIN(nextAttemptAt) AS nextAttemptAt FROM projection_outbox",
@@ -1948,8 +1966,63 @@ export class MatchDurableObject implements DurableObject {
   }
 
   async alarm(): Promise<void> {
+    const startRefreshed = await this.refreshDueScheduledStart();
     await this.flushProjectionOutbox();
+    // An earlier projection retry may have woken this alarm just before the
+    // Duel deadline. Re-read authoritative state after the flush in case the
+    // deadline became due while D1 work was in flight.
+    if (!startRefreshed) await this.refreshDueScheduledStart();
     await this.scheduleEarliestAlarm();
+  }
+
+  private refreshDueScheduledStart(): Promise<boolean> {
+    return this.serialize(async () => {
+      const snapshot = this.getSnapshot();
+      if (
+        snapshot?.gameId === "sudoku" &&
+        snapshot.mode === "duel" &&
+        snapshot.lifecycle === "active"
+      ) {
+        const game = snapshot.gameState as SudokuState;
+        if (
+          !game.terminalResult &&
+          typeof game.scheduledStartTime === "number" &&
+          game.scheduledStartTime <= Date.now()
+        ) {
+          await this.broadcastScheduledStart(snapshot);
+          return true;
+        }
+      }
+      return false;
+    });
+  }
+
+  /**
+   * Refreshes each currently authorized player's filtered view at the
+   * persisted Duel start deadline. This is a read-only snapshot delivery: it
+   * does not invent a match event or advance the accepted version.
+   */
+  private async broadcastScheduledStart(snapshot: SnapshotData): Promise<void> {
+    for (const client of this.getActiveSockets()) {
+      try {
+        if (
+          !this.isMember(snapshot, client.accountId) ||
+          !(await this.authorizeSession(client.accountId, client.sessionId))
+        ) {
+          client.ws.close(1008, "Session expired");
+          continue;
+        }
+        client.ws.send(
+          JSON.stringify({
+            type: "snapshot",
+            view: this.buildFilteredView(snapshot, client.accountId, client.sessionId),
+            serverTime: Date.now(),
+          }),
+        );
+      } catch {
+        // A disconnected socket can be cleaned up by the platform.
+      }
+    }
   }
 
   /**
