@@ -1,4 +1,4 @@
-﻿import { Outlet, useLocation } from "react-router-dom";
+﻿import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import { NavTabs } from "../components/nav-tabs";
 
 export function Shell() {
@@ -10,6 +10,7 @@ export function Shell() {
 
   return (
     <div
+      className="app-shell"
       style={{
         minHeight: "100dvh",
         display: "flex",
@@ -18,9 +19,16 @@ export function Shell() {
         color: "var(--color-text)",
       }}
     >
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      {isMainTab && (
+        <a className="skip-to-content" href="#main-content">
+          Skip to content
+        </a>
+      )}
+      <main id="main-content" className="app-shell__outlet" tabIndex={-1}>
         <Outlet />
-      </div>
+      </main>
+
+      <ScrollRestoration />
 
       {isMainTab && <NavTabs />}
     </div>
