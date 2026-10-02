@@ -192,8 +192,11 @@ export function GameDetailScreen() {
         );
       }
 
-      const data = (await res.json()) as { matchId?: string; view?: { matchId?: string } };
-      const matchId = data.matchId || data.view?.matchId;
+      const data = (await res.json().catch(() => null)) as {
+        matchId?: string;
+        view?: { matchId?: string };
+      } | null;
+      const matchId = data?.matchId || data?.view?.matchId;
       if (!matchId) throw new Error("The server did not confirm a saved match. Please retry.");
       creationRequests.current.delete(signature);
       navigate("/matches/" + matchId);
