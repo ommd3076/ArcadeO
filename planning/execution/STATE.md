@@ -36,3 +36,17 @@ See [final checkpoint](reports/owner-corrections-checkpoint.md), [performance co
 ## External release boundary
 
 Cloudflare deployment remains separately authorized work. Physical phone certification requires hardware. Browser emulation/Worker dry-run do not establish either. No deployment or commit was performed in this pass.
+
+## Private Arcade UI handoff — complete, 2026-10-02
+
+The owner-authorized implementation on `codex/ui` is complete and locally verified. The full app shell, account/setup/selection screens and shared presentation across all eight games now use the reviewed Stitch direction while preserving engine, protocol, Worker, migration and board-geometry boundaries. Read `planning/review/UI-IMPLEMENTATION-REPORT.md` for implementation scope, source-fidelity limits, test evidence and the separate phone/deployment boundaries.
+
+Final current-source checks: build, typecheck, lint, targeted formatting, 269 unit, 61 contract, 46 component, 4 real Worker, 26 bundled HTTP, 1,000 Sudoku content and 62 Chromium browser tests passed. The Home/Games/Us four-appearance viewport and text-size matrix also passed after its capture-state correction. Screenshots and motion evidence remain under `planning/review/evidence/owner-corrections/`. No merge or deployment was performed. Physical Pixel/iPhone certification remains open because hardware was not connected.
+
+## Current owner correction — Together Hand Cricket, 2026-10-02
+
+Direct owner implementation request supersedes the historical planning-only limit for this repair. Together version 2 now keeps each batter playing until equal numbers dismiss them. Only a revealed OUT swaps the first batting turn; after both have been out, higher total wins and equal totals draw. The owner was asked about the finish condition; one batting turn each was used as the stated default while correcting the independent state defects. Remote and legacy version-1 chase behavior is preserved.
+
+Fixed the stale revealed flag after a scoring ball, wrong receiver names caused by changing the first chooser mid-ball, and disagreement between the header and current batting role. Resume of old active states preserves accepted totals/locks. Unrevealed old chase wins continue under the correction; completed results stay immutable. Cricket uses named Batting/Bowling, Reveal ball, Next ball and Switch batting.
+
+Fresh repair checks: 274 unit, 61 mocked contracts, 46 server-rendered components, 4 Chromium journeys against the actual isolated bundled Worker/SQLite DO/D1, build, lint and targeted formatting passed. The browser tests use 390x844 and 1082x668, both first batters, multi-ball runs until OUT, reload after a first lock and after Next, blur/resume, keyboard Ready, reduced motion, no early chase finish and saved batting/wicket results. RPS and Remote Cricket regressions pass. No whole-suite browser rerun or physical-phone certification is claimed for this repair. See [repair report](../review/HAND-CRICKET-RULES-REPAIR-2026-10-02.md).
