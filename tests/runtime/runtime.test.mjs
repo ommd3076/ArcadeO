@@ -74,9 +74,13 @@ await check("real Worker KDF, secure session bootstrap and account identity", as
 });
 await check("assets, deep links, installed shell and API never falls back to HTML", async () => {
   for (const asset of ["/", "/matches/deep-link", "/sw.js", "/icon-192.png", "/icon-512.png"]) {
-    const r = await fetch(origin + asset, { headers: { "Sec-Fetch-Mode": asset === "/matches/deep-link" ? "navigate" : "cors" } }); assert.equal(r.status, 200, asset);
+    const r = await fetch(origin + asset, { headers: { "Sec-Fetch-Mode": asset === "/matches/deep-link" ? "navigate" : "cors", Accept: asset === "/matches/deep-link" ? "text/html" : "*/*" } }); assert.equal(r.status, 200, asset);
   }
   const r = await fetch(`${origin}/api/v1/nonexistent`); assert.equal(r.status, 404); assert.match(r.headers.get("content-type"), /json/);
+  const missing = await fetch(`${origin}/assets/missing-runtime-check.js`, { headers: { Accept: "*/*" } });
+  assert.equal(missing.status, 404); assert.ok(!missing.headers.get("content-type")?.includes("text/html"));
+  const unknownDocument = await fetch(`${origin}/not-an-arcade-route`, { headers: { Accept: "text/html" } });
+  assert.equal(unknownDocument.status, 404); assert.match(unknownDocument.headers.get("content-type"), /text\/html/);
 });
 await check("catalog requires auth and never exposes unissued givens or private solutions", async () => {
   const unauthorized = await request(null, "/api/v1/sudoku/catalog?difficulty=easy"); assert.equal(unauthorized.response.status, 401);

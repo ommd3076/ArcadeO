@@ -25,3 +25,6 @@
 ## Handoff and limits
 
 MatchDO and the additional sync/authority test leases are released for A05/A06. The lead owns final integration, the acceptance ledger, and VERIFIED status. Root’s localhost UI-only flow and the separate LAN HTTP check must not be conflated: no post-fix two-account LAN browser game or physical phone flow was run by A02. Production strictness was preserved by inspection/configuration, not by deployment testing.
+
+## Lead integration follow-up
+Lead added an entry guard rejecting retry while the same action is in-flight/reconciling, and a delayed HTTP response regression. Sync suite now passes 25 tests. Updated build, UI-only A/B Remote Connect Four without reload, offline lazy-route recovery, and actual exact-Origin LAN npm dev UI-only completion all pass. Evidence: tests/browser/overnight-remote.spec.ts, tests/browser/overnight-recovery.spec.ts, planning/review/evidence/overnight-lan-ui.json. The LAN run uses isolated state and browser emulation, not physical-phone certification. Product source integration commit ef4ca7c includes the released frontend/sync portion; MatchDO and the A05 backend integration are committed in 8fce4f2.
