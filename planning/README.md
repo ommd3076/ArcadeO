@@ -1,6 +1,6 @@
 # Implementation handoff index
 
-Updated 2026-09-30. Core product/game/navigation decisions are resolved. The current request prepares skills/profiles and the execution handoff only; **application implementation has not started**.
+Updated 2026-10-01. Application code exists and the owner authorized review, repairs and local verification. The prior COMPLETE/VERIFIED reports are historical claims, not current certification. Current evidence and exact remaining checks are tracked in [review](review/REVIEW.md), [checkpoint](execution/STATE.md) and the execution queue.
 
 ## Read progressively
 
@@ -27,6 +27,8 @@ Architect defaults close residual edges: lowest-ID capture; further sixes ignore
 
 ## Remaining execution evidence
 
-All 35 application tasks are PENDING. Actual dependency/KDF resource compatibility, content import validation, implementation checks, rendered UI/motion, real-device PWA and deployment remain execution work. Files/metadata are installed and validated locally; Antigravity host discovery has not been verified. No server, app tests, launched worker, schedule or deployment is claimed.
+The 2026-10-01 owner correction implementation is tracked in execution/STATE.md and reports/owner-*.md. Earlier local verification predates these changes. New reference board endpoints, deliberate Ludo selection, saved grid sizes, personal library, shared recap and UI/motion corrections require fresh evidence.
+
+Use execution/TASKS.json for current task dispositions and planning/review for fresh validation. Real workerd/SQLite DO/D1 and Chromium are available locally; no authenticated deployment or actual-phone certification is implied. Native Codex tools launch bounded specialists from canonical role briefs; Antigravity-specific entrypoint discovery remains distinct.
 
 All twelve original blocking design rows have contracts or bounded adoption gates. Important/deferred edge cases remain in CONVERGENCE and TEST-PLAN; completion of planning does not waive them. External phone/account access cannot be fabricated or replaced by a compilation pass.

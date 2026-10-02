@@ -50,7 +50,7 @@ export function BackHeader({
               fontWeight: 700,
               fontFamily: "var(--font-heading)",
               color: "var(--color-text)",
-              whiteSpace: "nowrap",
+              whiteSpace: "normal",
               overflow: "hidden",
               textOverflow: "ellipsis",
               margin: 0,

@@ -4,6 +4,8 @@ Schema blueprint; migrations/tables do not yet exist. SQL types and indexes are 
 
 ## D1 tables
 
+Owner correction migration 0003 adds `account_favourites(accountId,gameIds,version)` and one `shared_play_next(id=1,gameIds,version)` row. Writes use version predicates; stale lists cannot overwrite other players' changes. Names remain on the same canonical A/B account row. Ludo colours, grid sizes and Snakes board version live in the DO game state, independently of D1 appearance and result projections.
+
 | Table | Essential fields and invariants |
 | --- | --- |
 | accounts | fixed A/B primary key; normalized username unique; displayName; versioned salted verifier; accentFamily; paletteFamily; preferenceVersion. Seed A Standard, B Romantic; initial accents teal/violet. |

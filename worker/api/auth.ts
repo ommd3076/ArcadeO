@@ -10,6 +10,7 @@ import {
   revokeSession,
 } from "../auth/session";
 import { checkLoginRateLimit, recordLoginFailure, recordLoginSuccess } from "../auth/rate-limit";
+import { getCsrfSecret, isAllowedOrigin } from "../config";
 
 export interface AuthEnv {
   DB: D1Database;
@@ -17,8 +18,6 @@ export interface AuthEnv {
   ALLOWED_ORIGIN?: string;
   CSRF_SECRET?: string;
 }
-
-const DEFAULT_CSRF_SECRET = "arcade-dev-csrf-secret-change-in-prod";
 
 function jsonResponse(data: unknown, status = 200, headers: HeadersInit = {}): Response {
   const responseHeaders = new Headers(headers);
@@ -32,15 +31,7 @@ function jsonResponse(data: unknown, status = 200, headers: HeadersInit = {}): R
 }
 
 function checkOrigin(request: Request, allowedOrigin?: string): boolean {
-  const origin = request.headers.get("Origin");
-  if (!origin) {
-    return true;
-  }
-  if (!allowedOrigin) {
-    return true;
-  }
-  const reqUrl = new URL(request.url);
-  return origin === allowedOrigin || origin === reqUrl.origin;
+  return isAllowedOrigin(request, { ALLOWED_ORIGIN: allowedOrigin });
 }
 
 function getClientIp(request: Request): string {
@@ -74,7 +65,7 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
     return null;
   }
 
-  const csrfSecret = env.CSRF_SECRET || DEFAULT_CSRF_SECRET;
+  const csrfSecret = getCsrfSecret(env);
   const isSecure = url.protocol === "https:" || env.ENVIRONMENT === "production";
 
   // POST /login
@@ -133,7 +124,12 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
       );
     }
 
-    const isValidPassword = await verifyPassword(password, account.passwordHash, account.salt);
+    const algorithm = /^PBKDF2-SHA256:(\d+)$/.exec(account.kdfAlgorithm);
+    const iterations = algorithm ? Number(algorithm[1]) : 0;
+    const isValidPassword =
+      iterations >= 600_000 &&
+      iterations <= 2_000_000 &&
+      (await verifyPassword(password, account.passwordHash, account.salt, iterations));
     if (!isValidPassword) {
       await recordLoginFailure(env.DB, normalizedUsername, ip);
       return jsonResponse(

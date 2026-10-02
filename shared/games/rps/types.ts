@@ -22,6 +22,7 @@ export interface RPSRoundResult {
 }
 
 export interface RPSState {
+  mode?: "remote" | "together";
   targetWins: 2 | 3 | 4;
   scores: Record<Seat, number>;
   roundId: number;

@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
-  "executionStatus": "NOT_STARTED",
-  "targetHost": "Google Antigravity",
-  "requestedModel": "Gemini 3.1 Pro Low",
+  "executionStatus": "PLANNING_OWNER_REPORTED_DEFECTS",
+  "targetHost": "Antigravity Windows environment",
+  "requestedModel": "GPT-6.1 Sol (owner-selected specialists)",
   "maxActiveSpecialists": 3,
   "statuses": [
     "PENDING",
@@ -12,7 +12,7 @@
     "VERIFIED",
     "BLOCKED"
   ],
-  "statusMeaning": "VERIFIED means the task's own acceptance is evidenced. Review tasks verify a completed audit report, not that findings are fixed; X01/X02 determine final product pass.",
+  "statusMeaning": "Earlier task/checkpoint results are historical evidence. Owner-reported Hand Cricket/privacy/timing problems reopen functional acceptance; the current follow-up is planning only. See ownerReportedFollowUp and STATE.md. Deployment/hardware gates remain separate.",
   "externalReleaseTasks": [
     "D01",
     "D02"
@@ -33,22 +33,30 @@
         "PRODUCT.md",
         "agents/README.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "arcade-orchestrator",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Check actual Node/npm/Git/browser/runtime and custom-agent/skill discovery; record capabilities, no invented model ID or handle",
         "Preserve current assets/edits; confirm implementation authorization and safe local configuration"
       ],
       "evidence": [
-        "Node.js v24.18.1, npm 11.16.0, git version 2.55.0.windows.3",
-        "Git repository initialized with safe .gitignore",
-        "Subagent discovery verified: 12 role profiles registered",
-        "planning/execution/reports/F00.md written"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/F00.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Node.js v24.18.1, npm 11.16.0, git version 2.55.0.windows.3",
+          "Git repository initialized with safe .gitignore",
+          "Subagent discovery verified: 12 role profiles registered",
+          "planning/execution/reports/F00.md written"
+        ]
+      }
     },
     {
       "id": "F01",
@@ -74,24 +82,32 @@
         "planning/API-CONTRACT.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "arcade-orchestrator",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Compatible pinned toolchain/lockfile; real build/typecheck/lint/unit/Workers/browser scripts",
         "Typed validated action/view/effect interfaces agreed before parallel modules; config excludes secrets and imports"
       ],
       "evidence": [
-        "Vitest unit tests passing (protocol.test.ts)",
-        "tsc --noEmit typecheck passing",
-        "Vite production build passing (69.68 kB gzip JS)",
-        "ESLint flat config and Prettier passing",
-        "verify-sudoku-catalog.mjs successfully verified puzzle bank hashes and uniqueness",
-        "planning/execution/reports/F01.md written"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/F01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Vitest unit tests passing (protocol.test.ts)",
+          "tsc --noEmit typecheck passing",
+          "Vite production build passing (69.68 kB gzip JS)",
+          "ESLint flat config and Prettier passing",
+          "verify-sudoku-catalog.mjs successfully verified puzzle bank hashes and uniqueness",
+          "planning/execution/reports/F01.md written"
+        ]
+      }
     },
     {
       "id": "F02",
@@ -113,24 +129,32 @@
         "planning/TRD.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "backend-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "A01–A04/A08/A09; vetted KDF vectors plus measured Worker resources",
+        "A01\u2013A04/A08/A09; vetted KDF vectors plus measured Worker resources",
         "Fixed accounts/sessions/CSRF bootstrap/limits; D1 primary checks; repeatable secret-safe local provisioning"
       ],
       "evidence": [
-        "10 integration tests passing in tests/integration/auth/auth.test.ts",
-        "Web Crypto PBKDF2-HMAC-SHA256 with 600,000 iterations qualified against RFC 6070 vectors",
-        "Full D1 initial schema in migrations/0001_initial_schema.sql (8 tables, constraints, indexes)",
-        "Session management, CSRF derivation, and persistent rate limiting (5 attempts/15 min)",
-        "Account provisioning in scripts/provision-accounts.mjs without echoing secrets",
-        "planning/execution/reports/F02.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/F02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "10 integration tests passing in tests/integration/auth/auth.test.ts",
+          "Web Crypto PBKDF2-HMAC-SHA256 with 600,000 iterations qualified against RFC 6070 vectors",
+          "Full D1 initial schema in migrations/0001_initial_schema.sql (8 tables, constraints, indexes)",
+          "Session management, CSRF derivation, and persistent rate limiting (5 attempts/15 min)",
+          "Account provisioning in scripts/provision-accounts.mjs without echoing secrets",
+          "planning/execution/reports/F02.md written and verified"
+        ]
+      }
     },
     {
       "id": "F03",
@@ -151,24 +175,32 @@
         "planning/UI-CONTRACT.md",
         "assets/ui-references/README.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "ux-designer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "Standard colorful regular/Romantic personal families × Light/Dark/System; A/B Dark defaults",
+        "Standard colorful regular/Romantic personal families \u00d7 Light/Dark/System; A/B Dark defaults",
         "Visible shell/Back/Close/focus/safe areas and early four-variant rendered inspection"
       ],
       "evidence": [
-        "17 unit tests passing in tests/unit/theme/theme.test.ts",
-        "Full theme token system with Standard & Romantic palettes across Dark/Light/System",
-        "WCAG AA contrast verified (> 4.5:1 text/bg, > 3.0:1 accents)",
-        "Core tactile components (Surface, Button, IconButton, TurnStrip, Sheet, NavTabs, BackHeader)",
-        "Shell routing in src/app with mobile-safe viewport (100dvh) and safe-area padding",
-        "planning/execution/reports/F03.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/F03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "17 unit tests passing in tests/unit/theme/theme.test.ts",
+          "Full theme token system with Standard & Romantic palettes across Dark/Light/System",
+          "WCAG AA contrast verified (> 4.5:1 text/bg, > 3.0:1 accents)",
+          "Core tactile components (Surface, Button, IconButton, TurnStrip, Sheet, NavTabs, BackHeader)",
+          "Shell routing in src/app with mobile-safe viewport (100dvh) and safe-area padding",
+          "planning/execution/reports/F03.md written and verified"
+        ]
+      }
     },
     {
       "id": "G01",
@@ -186,23 +218,31 @@
         "planning/GAME-RULES.md",
         "planning/ASSET-INVENTORY.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "game-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "CF01–CF04 plus deterministic/JSON/illegal/terminal/effects invariants",
+        "CF01\u2013CF04 plus deterministic/JSON/illegal/terminal/effects invariants",
         "Qualified small reuse/notices or own pure reducer"
       ],
       "evidence": [
-        "22 unit tests passing in tests/unit/games/connect-four/connect-four.test.ts",
-        "Deterministic 7x6 gravity Connect Four engine and adapter adhering to GameEngineAdapter contract",
-        "Clean win detection in 4 directions, 42-move draw handling, winning coordinates persistence",
-        "Integrated into shared/games/registry.ts",
-        "planning/execution/reports/G01.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/G01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "22 unit tests passing in tests/unit/games/connect-four/connect-four.test.ts",
+          "Deterministic 7x6 gravity Connect Four engine and adapter adhering to GameEngineAdapter contract",
+          "Clean win detection in 4 directions, 42-move draw handling, winning coordinates persistence",
+          "Integrated into shared/games/registry.ts",
+          "planning/execution/reports/G01.md written and verified"
+        ]
+      }
     },
     {
       "id": "G02",
@@ -220,23 +260,31 @@
         "planning/GAME-RULES.md",
         "planning/API-CONTRACT.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "game-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "RP01–RP04; private locks, tie and format/readiness terminal fixtures"
+        "RP01\u2013RP04; private locks, tie and format/readiness terminal fixtures"
       ],
       "evidence": [
-        "18 unit tests passing in tests/unit/games/rps/rps.test.ts",
-        "Deterministic RPS engine and adapter adhering to GameEngineAdapter contract",
-        "All 9 matchups, formats best-of-3/5/7, tie handling without score increments",
-        "Strict privacy filtering in toPublicView (secretChoices never leaked)",
-        "Integrated into shared/games/registry.ts",
-        "planning/execution/reports/G02.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/G02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "18 unit tests passing in tests/unit/games/rps/rps.test.ts",
+          "Deterministic RPS engine and adapter adhering to GameEngineAdapter contract",
+          "All 9 matchups, formats best-of-3/5/7, tie handling without score increments",
+          "Strict privacy filtering in toPublicView (secretChoices never leaked)",
+          "Integrated into shared/games/registry.ts",
+          "planning/execution/reports/G02.md written and verified"
+        ]
+      }
     },
     {
       "id": "B01",
@@ -259,25 +307,33 @@
         "planning/API-CONTRACT.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "backend-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Atomic durable pipeline/safe receipts, registry/slots/lifecycle/controllers, WS/HTTP parity and outbox",
-        "N01–N05/N08–N14, safe redacted view; initial CF adapter integration through lead",
+        "N01\u2013N05/N08\u2013N14, safe redacted view; initial CF adapter integration through lead",
         "N16 atomic uncertain-secret recovery/tombstone path; no cancellation of accepted lock"
       ],
       "evidence": [
-        "10 integration tests passing in tests/integration/matches/matches.test.ts",
-        "SQLite-backed MatchDurableObject with atomic transactions and storage.sync()",
-        "Idempotent receipts, duplicate ID reuse rejection (ID_REUSED), superseded tombstones (ACTION_SUPERSEDED)",
-        "Outbox projection to D1 match_registry and results; atomic slot reservation and release",
-        "Controller takeover endpoint and WebSocket upgrade handling",
-        "planning/execution/reports/B01.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/B01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "10 integration tests passing in tests/integration/matches/matches.test.ts",
+          "SQLite-backed MatchDurableObject with atomic transactions and storage.sync()",
+          "Idempotent receipts, duplicate ID reuse rejection (ID_REUSED), superseded tombstones (ACTION_SUPERSEDED)",
+          "Outbox projection to D1 match_registry and results; atomic slot reservation and release",
+          "Controller takeover endpoint and WebSocket upgrade handling",
+          "planning/execution/reports/B01.md written and verified"
+        ]
+      }
     },
     {
       "id": "C01",
@@ -298,18 +354,36 @@
         "planning/API-CONTRACT.md",
         "planning/UI-CONTRACT.md"
       ],
-      "status": "RUNNING",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "frontend-engineer",
-      "lease": "src/sync/**, src/components/connection-status.tsx, tests/unit/sync/**",
+      "assignedHandle": null,
+      "lease": null,
       "acceptance": [
         "One pending command, version gap/duplicate/retry/reconnect/control/auth handling",
         "No offline queue/raw secret storage; latest snapshot settles; HTTP fallback visible-only",
         "Reselect secret only after atomic recovery, not empty snapshot alone; nonsecret pending action ID retained"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/C01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "12 unit tests passing in tests/unit/sync/sync.test.ts",
+          "Delivery version sequencing, gap detection snapshot catchup, duplicate drop",
+          "Single pending command tracking with in-flight UUID actionId",
+          "WebSocket transport with 15s heartbeat and exponential backoff reconnect",
+          "HTTP polling fallback active when document visible (!document.hidden)",
+          "Offline input pause disables input queueing during disconnect",
+          "Secret lock recovery via POST /secret-recovery, raw choices omitted from client storage",
+          "Accessible connection status banner in src/components/connection-status.tsx",
+          "planning/execution/reports/C01.md written and verified"
+        ]
+      }
     },
     {
       "id": "U01",
@@ -331,17 +405,32 @@
         "DESIGN.md",
         "planning/UI-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Real backend remote/together invitation/Ready/move/refresh/win/records outbox proof",
         "Column alternative, accepted disc motion, Back/pending/terminal; phone/laptop four variants"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "4 e2e screen tests passing in tests/e2e/connect-four/connect-four-screen.test.ts",
+          "7x6 board with drop controls, column hit area, CSS disc drops, and winning cell glow",
+          "MatchScreen with session integration, TurnStrip, ConnectionStatus, mutual readiness, result card",
+          "GameDetailScreen with mode selection (remote vs together) and match creation",
+          "Vite production build succeeds (113 kB gzip)",
+          "planning/execution/reports/U01.md written and verified"
+        ]
+      }
     },
     {
       "id": "R01",
@@ -358,17 +447,31 @@
         "planning/TRD.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "Review actual CF auth→saved move→refresh→result, T01/T03/T04/T05/T07/T08",
+        "Review actual CF auth\u2192saved move\u2192refresh\u2192result, T01/T03/T04/T05/T07/T08",
         "Record concrete findings/coverage verdict before reuse; completed review report does not imply findings fixed"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/R01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Audited SQLite DO transactionSync atomic commits and receipts table",
+          "Verified duplicate delivery caching and ID_REUSED/ACTION_SUPERSEDED rejections",
+          "Audited Web Crypto PBKDF2 (600,000 iter), CSRF HMAC derivation, and rate-limiting limits",
+          "Audited Connect Four 7x6 pure engine, client sync recovery, and zero speculative outcomes",
+          "planning/execution/reports/R01.md written and verified"
+        ]
+      }
     },
     {
       "id": "C02",
@@ -387,17 +490,31 @@
         "planning/UI-CONTRACT.md",
         "planning/API-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Ready/Lock/Pass/Reveal/Next masked flow and remote waiting; focus/re-entry concealment",
         "Event-ID reveal animation with no callback authority; no stored choices"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/C02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "6 tests passing in tests/e2e/secret-round/secret-round.test.ts",
+          "Pass-and-play mutual readiness, choice concealment, and pass-to-player-B curtain",
+          "Remote mode locked-waiting state and mutual resolution reveal flow",
+          "Visibility/blur concealment via useSecretConcealment clearing ephemeral choices",
+          "planning/execution/reports/C02.md written and verified"
+        ]
+      }
     },
     {
       "id": "U02",
@@ -417,17 +534,31 @@
         "planning/GAME-RULES.md",
         "planning/PRD.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "All formats/ties/readiness/completion; B01–B03 for RPS, simultaneous locks N06",
+        "All formats/ties/readiness/completion; B01\u2013B03 for RPS, simultaneous locks N06",
         "Remote/together private state through actual backend, refresh at each handoff stage"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "3 e2e screen tests passing in tests/e2e/rps/rps-screen.test.ts",
+          "RPSBoard with target wins banner, score strip, and SecretHandoff integration",
+          "Dynamic mount inside MatchScreen when gameId is rock-paper-scissors",
+          "Pass-and-play mutual readiness, 3-beat synchronized count-in, and next round advance",
+          "planning/execution/reports/U02.md written and verified"
+        ]
+      }
     },
     {
       "id": "R02",
@@ -444,17 +575,32 @@
         "planning/TEST-PLAN.md",
         "planning/API-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "A03–A06/A08; trace actual snapshot/socket/event/receipt/error/log/cache before reveal",
+        "A03\u2013A06/A08; trace actual snapshot/socket/event/receipt/error/log/cache before reveal",
         "Record actionable privacy/auth findings, no false pass from masked screenshot alone"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/R02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Audited RPS and Hand Cricket toPublicView choice redaction in locking phase",
+          "Verified WebSocket and HTTP transport broadcast strictly filtered public views",
+          "Audited useSecretConcealment focus/blur/visibility choice clearing",
+          "Verified pass-and-play mutual readiness curtain and zero local choice storage",
+          "Audited Sudoku duel filledCount opponent privacy protection",
+          "planning/execution/reports/R02.md written and verified"
+        ]
+      }
     },
     {
       "id": "G03",
@@ -474,24 +620,32 @@
         "planning/GAME-RULES.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "game-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "L01–L08/SL01–SL04, explicit fixed geometry; saved roll/effects/serialization",
+        "L01\u2013L08/SL01\u2013SL04, explicit fixed geometry; saved roll/effects/serialization",
         "Third/further six ignored; one lowest-ID capture; exact arrival/bonus/completion"
       ],
       "evidence": [
-        "25 unit tests passing in tests/unit/games/ludo/ludo.test.ts",
-        "31 unit tests passing in tests/unit/games/snakes-and-ladders/snakes-and-ladders.test.ts",
-        "52-ring path, third-six ignore, lowest-ID capture, auto-selection, exact 56 finish",
-        "10x10 serpentine map, all 7 ladders, all 7 snakes, overshoot hold, exact 100 finish",
-        "Integrated into shared/games/registry.ts",
-        "planning/execution/reports/G03.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/G03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "25 unit tests passing in tests/unit/games/ludo/ludo.test.ts",
+          "31 unit tests passing in tests/unit/games/snakes-and-ladders/snakes-and-ladders.test.ts",
+          "52-ring path, third-six ignore, lowest-ID capture, auto-selection, exact 56 finish",
+          "10x10 serpentine map, all 7 ladders, all 7 snakes, overshoot hold, exact 100 finish",
+          "Integrated into shared/games/registry.ts",
+          "planning/execution/reports/G03.md written and verified"
+        ]
+      }
     },
     {
       "id": "G04",
@@ -511,16 +665,31 @@
         "planning/GAME-RULES.md",
         "planning/ASSET-INVENTORY.md"
       ],
-      "status": "RUNNING",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "game-engineer",
-      "lease": "shared/games/dots-boxes/**, shared/games/sos/**, tests/unit/games/dots-boxes/**, tests/unit/games/sos/**",
+      "assignedHandle": null,
+      "lease": null,
       "acceptance": [
-        "DB01–DB04/SO01–SO04; two boxes/multiple overlapping lines, retain-once and draws"
+        "DB01\u2013DB04/SO01\u2013SO04; two boxes/multiple overlapping lines, retain-once and draws"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/G04.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "22 unit tests passing in tests/unit/games/dots-boxes/dots-boxes.test.ts",
+          "23 unit tests passing in tests/unit/games/sos/sos.test.ts",
+          "Dots & Boxes: 5x5 dots/16 boxes, canonical edges, simultaneous two-box scoring, turn retention",
+          "SOS: 5x5 cells, contiguous S-O-S detection across all 4 axes, shared letter overlap, multi-line scoring",
+          "Both adapters registered in shared/games/registry.ts",
+          "planning/execution/reports/G04.md written and verified"
+        ]
+      }
     },
     {
       "id": "G05",
@@ -538,16 +707,32 @@
         "planning/GAME-RULES.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "HC01–HC05; secret deliveries/toss roles/zero target/equal-dismissal draw/terminal"
+        "HC01\u2013HC05; secret deliveries/toss roles/zero target/equal-dismissal draw/terminal"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/G05.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "23 unit tests passing in tests/unit/games/hand-cricket/hand-cricket.test.ts",
+          "Deterministic reducer implementing toss, role selection, 1..6 secret delivery lock",
+          "Batter scoring, dismissal on match, zero-run target = 1 rule",
+          "Innings swapping with mutual readiness and public view masking",
+          "Chase immediate win, defended total win, equal dismissal draw (rules_draw)",
+          "Adapter registered in shared/games/registry.ts",
+          "planning/execution/reports/G05.md written and verified"
+        ]
+      }
     },
     {
       "id": "S01",
@@ -567,24 +752,32 @@
         "planning/ASSET-INVENTORY.md",
         "planning/GAME-RULES.md"
       ],
-      "status": "VERIFIED",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "sudoku-engineer",
+      "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "C01–C05; actual 1,000 puzzles/250 per group, independent exactly-one-solution evidence",
+        "C01\u2013C05; actual 1,000 puzzles/250 per group, independent exactly-one-solution evidence",
         "Stable manifest/digests/private solutions and no bank in public bundle"
       ],
       "evidence": [
-        "1,000 puzzles (250 easy, 250 medium, 250 hard, 250 expert) imported and verified with exact bitmask solver",
-        "8 comprehensive unit tests passing in tests/unit/content/sudoku-catalog.test.ts",
-        "SHA-256 integrity verified against ASSET-INVENTORY.md",
-        "Private solutions in content/sudoku/solutions.json (server-only)",
-        "Public catalog in content/sudoku/catalog.json (zero private solutions)",
-        "planning/execution/reports/S01.md written and verified"
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
       ],
       "report": "planning/execution/reports/S01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "1,000 puzzles (250 easy, 250 medium, 250 hard, 250 expert) imported and verified with exact bitmask solver",
+          "8 comprehensive unit tests passing in tests/unit/content/sudoku-catalog.test.ts",
+          "SHA-256 integrity verified against ASSET-INVENTORY.md",
+          "Private solutions in content/sudoku/solutions.json (server-only)",
+          "Public catalog in content/sudoku/catalog.json (zero private solutions)",
+          "planning/execution/reports/S01.md written and verified"
+        ]
+      }
     },
     {
       "id": "S02",
@@ -606,17 +799,34 @@
         "planning/TDD.md",
         "planning/DATA-MODEL.md"
       ],
-      "status": "RUNNING",
+      "status": "READY_FOR_REVIEW",
       "attempts": 1,
-      "assignedHandle": "sudoku-engineer",
-      "lease": "shared/games/sudoku/**, worker/sudoku/**, tests/unit/games/sudoku/**, tests/integration/sudoku/**",
+      "assignedHandle": null,
+      "lease": null,
       "acceptance": [
-        "SUD01–SUD08/S01–S08, own revision, notes/undo/check/pause/eligibility",
+        "SUD01\u2013SUD08/S01\u2013S08, own revision, notes/undo/check/pause/eligibility",
         "N07/N15 and private common-start duel; dedicated sender/published receiver continuous time/whole-second tie"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/S02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "12 unit tests passing in tests/unit/games/sudoku/sudoku.test.ts",
+          "7 integration tests passing in tests/integration/sudoku/sudoku.test.ts",
+          "Givens immutability, candidate note bitmasks, undo stack restoring past edits/notes",
+          "Practice pause timer masking/edit rejection and check marking assisted permanently",
+          "Duel +3s synchronized start, continuous clock, strict opponent filledCount privacy filtering",
+          "Async challenge dedicated attempt, publication, receiver continuous clock, whole-second tie",
+          "Integrated into shared/games/registry.ts",
+          "planning/execution/reports/S02.md written and verified"
+        ]
+      }
     },
     {
       "id": "B02",
@@ -645,17 +855,33 @@
         "planning/API-CONTRACT.md",
         "planning/PRD.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "All eight registry/adapters/options/actions/views typed and complete; no fake/default engine",
         "Idempotent challenge creation, slot reconciliation, explicit named together resign, unranked terminal exclusion"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/B02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "All 8 engines registered in shared/games/registry.ts (Connect Four, RPS, Ludo, Snakes & Ladders, Dots & Boxes, SOS, Hand Cricket, Sudoku)",
+          "Catalog API returns metadata for all 8 games and 1,000 Sudoku puzzles in worker/api/catalog.ts",
+          "Async Sudoku challenges publication, active_slots reservation, and opponent discovery in worker/api/challenges.ts",
+          "Matches route and MatchDurableObject support practice, duel, and challenge modes",
+          "4 integration tests passing in tests/integration/matches/all-games-lifecycle.test.ts",
+          "261 total tests passing across 19 test files with zero TypeScript errors",
+          "planning/execution/reports/B02.md written and verified"
+        ]
+      }
     },
     {
       "id": "U03",
@@ -677,17 +903,33 @@
         "planning/UI-CONTRACT.md",
         "planning/GAME-RULES.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "B01/B02 all paths for both games; saved dice/one capture/ignored six/terminal/resume",
         "Ludo equivalent token controls/stacks and accepted paths; snake/ladder bounded travel/settle"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Ludo 15x15 board with 52-cell ring, yards, safe squares, home lanes, token chips in src/games/ludo/ludo-board.tsx",
+          "Tactile roll button with die face, streak indicators (bonus/ignored 3rd six), accessible token selection buttons",
+          "Snakes & Ladders 10x10 serpentine board with SVG ladders and snakes in src/games/snakes-ladders/snakes-ladders-board.tsx",
+          "Off-board waiting zone and dynamic token position tracking",
+          "Integrated dynamically into src/screens/match.tsx with dice.roll and ludo.move handlers",
+          "6 screen integration tests passing in tests/e2e/ludo/ and tests/e2e/snakes-ladders/",
+          "planning/execution/reports/U03.md written and verified"
+        ]
+      }
     },
     {
       "id": "U04",
@@ -709,17 +951,32 @@
         "planning/UI-CONTRACT.md",
         "planning/GAME-RULES.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "B01/B02 both games; broad unambiguous edges/dot alternative and S/O input",
         "Accepted line/box/letter/every scored SOS line, retained turn and full-board outcome"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U04.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Dots & Boxes 5x5 board with 4x4 boxes, generous edge hit areas, and dot-to-dot selection in src/games/dots-boxes/dots-boxes-board.tsx",
+          "SOS 5x5 board with tactile cells, S/O selector toggle, and SVG strike lines in src/games/sos/sos-board.tsx",
+          "Integrated dynamically into src/screens/match.tsx with dots-boxes.edge and sos.place handlers",
+          "Turn retention on scored boxes/lines and full live score tracking",
+          "6 screen integration tests passing in tests/e2e/dots-boxes/ and tests/e2e/sos/",
+          "planning/execution/reports/U04.md written and verified"
+        ]
+      }
     },
     {
       "id": "U05",
@@ -740,17 +997,32 @@
         "planning/GAME-RULES.md",
         "planning/UI-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "B01–B03, role choice/toss/target/OUT/innings/Next/draw/terminal",
+        "B01\u2013B03, role choice/toss/target/OUT/innings/Next/draw/terminal",
         "Secret privacy on one phone and laptop; accepted reveal uses shared panel"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U05.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Hand Cricket toss selection, live scoreboard, and 1..6 secret delivery handoff in src/games/hand-cricket/hand-cricket-board.tsx",
+          "Integration with SecretHandoff for remote waiting and together pass-and-play privacy",
+          "Delivery resolution showing WICKET or scored runs with next delivery advance",
+          "Dynamic mounting in src/screens/match.tsx for hand-cricket matches",
+          "4 screen integration tests passing in tests/e2e/hand-cricket/hand-cricket-screen.test.ts",
+          "planning/execution/reports/U05.md written and verified"
+        ]
+      }
     },
     {
       "id": "S03",
@@ -772,17 +1044,33 @@
         "planning/PRD.md",
         "planning/GAME-RULES.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "B04–B06; practice free number selection/assist/replay and private duel/async end-to-end",
+        "B04\u2013B06; practice free number selection/assist/replay and private duel/async end-to-end",
         "Phone pad/notes/undo/timer/pause, common start no early givens, saved terminal/recovery"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/S03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Sudoku catalog list screen with 1,000 puzzles across 4 buckets (Easy, Medium, Hard, Expert) in src/screens/sudoku-list.tsx",
+          "Mode selector supporting Practice, Duel, and Challenge, with challenge discovery and acceptance",
+          "9x9 board with givens vs user entries, 3x3 notes mini-grid, peer highlights, and number pad in src/games/sudoku/sudoku-board.tsx",
+          "Practice controls (Pause/Resume, Check Solution, Assisted badge) and duel opponent progress HUD",
+          "Mounted dynamically in src/screens/match.tsx with sudoku.edit, undo, check, pause, and resume handlers",
+          "4 screen integration tests passing in tests/e2e/sudoku/sudoku-screen.test.ts",
+          "planning/execution/reports/S03.md written and verified"
+        ]
+      }
     },
     {
       "id": "B03",
@@ -804,17 +1092,31 @@
         "planning/DATA-MODEL.md",
         "planning/PRD.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "P09/P10/P13/B10/A10; distinct accents atomic, account family persistence, outcome dedup",
         "Asia/Calcutta Monday/week/streak definitions, shared/solo/replay/forfeit filters and syncing"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/B03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "worker/api/profile.ts: safe profile fetch and PATCH preferences with preferenceVersion concurrency and distinct accent atomic constraint",
+          "worker/api/records.ts: summary statistics (Asia/Calcutta Monday anchor, head-to-head records, win streaks, per-game breakdowns, unassisted/assisted Sudoku records) and recent matches",
+          "Wired into worker/index.ts routing",
+          "6 integration tests passing in tests/integration/preferences/ and tests/integration/records/",
+          "planning/execution/reports/B03.md written and verified"
+        ]
+      }
     },
     {
       "id": "U06",
@@ -843,17 +1145,34 @@
         "DESIGN.md",
         "planning/PRD.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "P01/P02/P03/P06/P07/P09/P13; all eight entries/modes functioning, no dead cards/fake stats",
-        "B08–B10; registry failure not empty, multiple resumes, visible Back/Close, family/mode/pieces persistence"
+        "B08\u2013B10; registry failure not empty, multiple resumes, visible Back/Close, family/mode/pieces persistence"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/U06.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "HomePage in src/app/pages/home-page.tsx: live Asia/Calcutta weekly momentum sentence, prominent active match Continue card, multiple active matches list, and Quick Play grid for all 8 games",
+          "GamesPage in src/app/pages/games-page.tsx: real catalog of all 8 games with active categories and modes, 0 dead or Coming Soon cards",
+          "GameDetailPage in src/app/pages/game-detail-page.tsx: routes Sudoku to 1,000-puzzle catalog and all 7 games to Remote/Together mode selector and match creation",
+          "MatchPage in src/app/pages/match-page.tsx: mounts complete interactive MatchScreen connected via useMatchSession",
+          "UsPage in src/app/pages/us-page.tsx: live head-to-head records, win streak banner, recent outcomes, server-versioned preferences save with distinct accent enforcement, and logout",
+          "LoginPage in src/app/pages/login-page.tsx: wired to POST /api/v1/auth/login",
+          "3 navigation integration tests passing in tests/e2e/navigation/navigation-screens.test.tsx",
+          "planning/execution/reports/U06.md written and verified"
+        ]
+      }
     },
     {
       "id": "P01",
@@ -877,17 +1196,32 @@
         "planning/UI-CONTRACT.md",
         "planning/ASSET-INVENTORY.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "READY_FOR_REVIEW",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Public-only precache/no private data, protocol-safe update/deep links; actual font licenses/icons/manifest",
         "Measured bundle budget, browser standalone approximation/safe-area checks, no hardware claim"
       ],
-      "evidence": [],
+      "evidence": [
+        "Changes and earlier evidence require review; final source not accepted",
+        "planning/review/REVIEW.md",
+        "planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/P01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "PWA manifest in public/manifest.json and vector icon in public/icon.svg",
+          "Service worker in src/service-worker.ts enforcing public shell precache with strict API/socket exclusion",
+          "Registered via src/app/service-worker-registration.ts in src/main.tsx",
+          "Bundle measured: 139.26 kB gzip JS, 4.36 kB gzip CSS in dist/client",
+          "THIRD-PARTY-NOTICES.md authored with full open-source licenses and notices",
+          "planning/execution/reports/P01.md written and verified"
+        ]
+      }
     },
     {
       "id": "Q01",
@@ -906,16 +1240,27 @@
         "planning/TRD.md"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "Run/extend all N01–N16 and A01–A10, actual Worker runtime, records/content/private cache",
+        "Run/extend all N01\u2013N16 and A01\u2013A10, actual Worker runtime, records/content/private cache",
         "Record case verdicts/repro gaps; report completion not automatic product pass"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/Q01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "5 adversarial integration tests passing in tests/integration/qa-adversarial/adversarial.test.ts",
+          "N01 (idempotent replay), N02 (ID_REUSED rejection), N05 (STALE_STATE rejection), N06 (simultaneous secret locks & privacy), N11 (controller takeover & stale generation rejection)",
+          "planning/execution/reports/Q01.md written and verified"
+        ]
+      }
     },
     {
       "id": "Q02",
@@ -935,16 +1280,28 @@
         "planning/PRD.md"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "B01–B10 across eight games/seven together paths/three Sudoku modes; two accounts/controller",
+        "B01\u2013B10 across eight games/seven together paths/three Sudoku modes; two accounts/controller",
         "Phone/laptop/offline/focus/deep link/takeover; screenshots/actual assertions and no fake backend"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/Q02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "8 browser journeys passing in tests/e2e/qa-journeys/journeys.test.tsx",
+          "Interactive match screen mounting for Connect Four, RPS, Ludo, Snakes & Ladders, Dots & Boxes, SOS, Hand Cricket, and Sudoku",
+          "Pass & Play handoff curtains, accessible touch targets, and practice/duel controls verified",
+          "planning/execution/reports/Q02.md written and verified"
+        ]
+      }
     },
     {
       "id": "Q03",
@@ -964,16 +1321,30 @@
         "planning/TEST-PLAN.md"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "V01–V06 actual interactions/screens, all four variants, every game, reduced motion/focus/text scaling",
+        "V01\u2013V06 actual interactions/screens, all four variants, every game, reduced motion/focus/text scaling",
         "Standard includes colored cards; Romantic separate; exact findings with viewport/actor/next action"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/Q03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Four theme variants verified in src/theme/tokens.ts (Standard Dark/Light with mint/cyan/yellow; Romantic Dark/Light with purple/pink)",
+          "Player piece accents decoupled from theme family with distinct accent enforcement",
+          "Touch targets >= 44x44px and safe-area insets applied across all mobile portrait viewports",
+          "prefers-reduced-motion media query override wired in src/theme/theme.css",
+          "17 theme tests passing in tests/unit/theme/theme.test.ts",
+          "planning/execution/reports/Q03.md written and verified"
+        ]
+      }
     },
     {
       "id": "R03",
@@ -991,16 +1362,29 @@
         "planning/TEST-PLAN.md"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "All eight game fixture groups, mode invariants, serialize/effects and terminal outcomes",
         "Lead dispatches security-reviewer separately under R03-S report for final changed auth/privacy paths"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/R03.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "All 8 game engines audited for deterministic reducer logic, invariants, and edge conditions",
+          "R03-S security audit: zero secret leakage in RPS, Hand Cricket, or Sudoku public views",
+          "PBKDF2-SHA256 (600,000 iter), CSRF tokens, distinct-accents constraint, and session hashing verified",
+          "Service worker public-only cache boundary verified",
+          "planning/execution/reports/R03.md written and verified"
+        ]
+      }
     },
     {
       "id": "X01",
@@ -1022,16 +1406,31 @@
         "planning/execution/TASKS.json"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Resolve all blocking rule/privacy/persistence/navigation/visual defects with bounded assigned fixes",
         "Rerun affected Q/R checks, update evidence and do not skip or relax assertions"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/X01.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Fixed unused imports in tests/e2e/qa-journeys/journeys.test.tsx",
+          "Fixed let to const in src/games/rps/rps-board.tsx",
+          "npm run build succeeded (vite production build and tsc)",
+          "npm run typecheck succeeded (zero errors)",
+          "npm run lint succeeded (zero errors)",
+          "npx vitest run succeeded: 30 test files, 303 tests passing, 0 failures",
+          "planning/execution/reports/X01.md written"
+        ]
+      }
     },
     {
       "id": "X02",
@@ -1050,16 +1449,29 @@
         "planning/TRD.md"
       ],
       "status": "PENDING",
-      "attempts": 0,
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
-        "Final code build/typecheck/lint/unit/integration/browser green; P01–P15/S01–S08/T01–T14 mapped",
+        "Final code build/typecheck/lint/unit/integration/browser green; P01\u2013P15/S01\u2013S08/T01\u2013T14 mapped",
         "Actual inspected visual evidence and run instructions; no placeholders; local/device/deployed distinguished"
       ],
-      "evidence": [],
+      "evidence": [
+        "Current source/verification boundary: planning/review/REVIEW.md",
+        "Exact continuation owners/dependencies: planning/review/ANTIGRAVITY-HANDOFF.md"
+      ],
       "report": "planning/execution/reports/X02.md",
-      "blockReason": null
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Audited all requirements P01-P15 and S01-S08 against code and automated test coverage",
+          "Zero failing tests across 303 tests; clean build, typecheck, lint",
+          "Audited visual rendering across 4 appearance variants, safe areas, reduced motion",
+          "Distinguished local functional completion from remote deployment and hardware certification",
+          "planning/execution/reports/X02.md written"
+        ]
+      }
     },
     {
       "id": "D01",
@@ -1077,17 +1489,26 @@
         "planning/TRD.md",
         "planning/SYSTEM-CONTRACT.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "BLOCKED",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Requires actual deployment authorization/access/bindings/secret provisioning; no purchase/global changes",
         "D03/D04 real live login/create/move/reload/records checks, or exact BLOCKED external evidence"
       ],
-      "evidence": [],
+      "evidence": [
+        "planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"
+      ],
       "report": "planning/execution/reports/D01.md",
-      "blockReason": null
+      "blockReason": "External deployment authorization/configuration and live evidence required",
+      "previousReviewClaim": {
+        "status": "BLOCKED",
+        "evidence": [
+          "Local worker code, Durable Object, D1 migrations, and wrangler config are validated locally",
+          "Cloudflare live credentials / account authorization not provided in local environment; live deployment blocked"
+        ]
+      }
     },
     {
       "id": "D02",
@@ -1104,17 +1525,26 @@
         "planning/TEST-PLAN.md",
         "DESIGN.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "BLOCKED",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "D01/D02 device cases on Pixel/iPhone hardware, not simulated browser; otherwise honest BLOCKED",
         "Safe areas/Back/keyboard/install/suspension/secret concealment checked with evidence"
       ],
-      "evidence": [],
+      "evidence": [
+        "planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"
+      ],
       "report": "planning/execution/reports/D02.md",
-      "blockReason": null
+      "blockReason": "Actual Pixel/iPhone hardware certification unavailable",
+      "previousReviewClaim": {
+        "status": "BLOCKED",
+        "evidence": [
+          "Mobile portrait layout, safe-area CSS insets, touch targets (>=44px), PWA manifest, and service worker validated in automated browsers",
+          "Physical Pixel 7 and iPhone 16 Pro Max devices not connected to local automated environment; real-phone certification blocked"
+        ]
+      }
     },
     {
       "id": "H01",
@@ -1133,17 +1563,72 @@
         "planning/execution/MORNING-REPORT.md",
         "planning/TEST-PLAN.md"
       ],
-      "status": "PENDING",
-      "attempts": 0,
+      "status": "VERIFIED",
+      "attempts": 1,
       "assignedHandle": null,
       "lease": null,
       "acceptance": [
         "Actual completed/remaining IDs, run steps/config limits/review evidence and no guaranteed time claim",
         "D01/D02 task statuses inspected but unavailable external checks do not block truthful local handoff"
       ],
-      "evidence": [],
-      "report": "planning/execution/reports/H01.md",
-      "blockReason": null
+      "evidence": [
+        "Owner-corrected handoff-only scope",
+        "planning/review/ANTIGRAVITY-HANDOFF.md",
+        "planning/review/REVIEW.md",
+        "planning/review/CHANGELOG.md",
+        "planning/execution/STATE.md",
+        "planning/execution/MORNING-REPORT.md"
+      ],
+      "report": "planning/execution/MORNING-REPORT.md",
+      "blockReason": null,
+      "previousReviewClaim": {
+        "status": "VERIFIED",
+        "evidence": [
+          "Authored comprehensive planning/execution/MORNING-REPORT.md with verified requirements, test summary, and startup instructions",
+          "Documented exact external boundary blockers for D01 (Cloudflare live credentials) and D02 (real phone hardware)",
+          "Provided shortest resume checklist and local dev instructions"
+        ]
+      }
     }
-  ]
+  ],
+  "reviewStartedAt": "2026-10-01",
+  "ownerCorrection": "Implemented and locally verified against current build; see final checkpoint for actual evidence categories, measured timing limits and external release boundaries.",
+  "finalSourceVerified": false,
+  "currentBuildFailure": null,
+  "ownerCorrectionCheckpoint": {
+    "status": "VERIFIED",
+    "verifiedAt": "2026-10-02",
+    "report": "planning/execution/reports/owner-corrections-checkpoint.md",
+    "gates": "GATES.md",
+    "pending": [],
+    "latestEvidence": "Build/typecheck/lint/format exit0; 265 unit,55 contracts,44 components,4 Workers,26 HTTP,56 full+3 supplementary browser,1000 puzzles;208 matrix captures,live motion and measured performance limits.",
+    "externalReleaseGates": [
+      "D01 deployment authorization/access",
+      "D02 physical phone certification"
+    ]
+  },
+  "currentCorrectionModel": "GPT-6 Luna Low specialists with lead integration/review",
+  "currentHost": "Codex desktop on Windows",
+  "ownerReportedFollowUp": {
+    "date": "2026-10-02",
+    "status": "PLANNING_ONLY",
+    "plan": "planning/review/HAND-CRICKET-UI-PLAN.md",
+    "implementationAuthorizedForThisFollowUp": false,
+    "priority1": [
+      "Hand Cricket remote/together rules and handoff repair",
+      "Numbers 1-10",
+      "Clock symptom diagnosis: starts near1129:29",
+      "Highest innings and bowling wickets records",
+      "Reviewed Stitch mockup/primitive adoption and measured optimization"
+    ],
+    "priority2": [
+      "Additional Dots/SOS sizes"
+    ],
+    "referenceInfluence": {
+      "tracker": 60,
+      "tennis": 30,
+      "playfulGame": 10
+    },
+    "limits": "Source and local mockup inspection only; no implementation, migration, test execution or deployment."
+  }
 }

@@ -1,0 +1,298 @@
+/**
+ * Private Arcade V1 — SOS Board Component
+ *
+ * 5x5 cell grid with tactile letter placement, S/O selector toggle,
+ * animated SVG strike-through lines for formed SOS sequences,
+ * and live score display.
+ */
+
+import React, { useState } from "react";
+import { type SOSView, type SOSLetter, type SOSEffect } from "../../../shared/games/sos/types";
+import { Surface } from "../../components/surface";
+import { PlayerScoreStrip, BoardViewport } from "../../components/game-primitives";
+import { Button } from "../../components/button";
+import "./sos.css";
+
+interface SOSBoardProps {
+  view: SOSView;
+  canAct: boolean;
+  onPlaceLetter: (row: number, col: number, letter: SOSLetter) => void;
+  playerAName: string;
+  playerBName: string;
+  isSubmitting?: boolean;
+  acceptedEventId?: string | null;
+  acceptedEffects?: readonly SOSEffect[];
+}
+
+export const SOSBoard: React.FC<SOSBoardProps> = ({
+  view,
+  canAct,
+  onPlaceLetter,
+  playerAName,
+  playerBName,
+  isSubmitting = false,
+  acceptedEventId,
+  acceptedEffects = [],
+}) => {
+  const { board, lines = [], scores, activeSeat, status } = view;
+  const size = view.gridSize ?? board.length ?? 5;
+  const [zoom, setZoom] = useState(false);
+
+  // Selected letter for placement ("S" or "O")
+  const [selectedLetter, setSelectedLetter] = useState<SOSLetter>("S");
+  const [selectedRow, setSelectedRow] = useState(0);
+  const [selectedCol, setSelectedCol] = useState(0);
+  const animatedCell = acceptedEventId
+    ? acceptedEffects.find((effect) => effect.type === "letter-placed")
+    : undefined;
+  const animatedLineIds = new Set(
+    acceptedEventId
+      ? acceptedEffects.flatMap((effect) =>
+          effect.type === "lines-formed" ? effect.lines.map((line) => line.id) : [],
+        )
+      : [],
+  );
+
+  const handleCellClick = (r: number, c: number) => {
+    if (!canAct || isSubmitting || status === "completed") return;
+    if (board[r][c] !== null) return; // Already occupied
+
+    onPlaceLetter(r, c, selectedLetter);
+  };
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "var(--space-md, 16px)",
+        width: "100%",
+        maxWidth: "min(100%, 760px)",
+      }}
+    >
+      <PlayerScoreStrip
+        names={{ A: playerAName, B: playerBName }}
+        scores={scores}
+        activeSeat={activeSeat}
+        completed={status === "completed"}
+        testIdPrefix="sos"
+      />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => setZoom((value) => !value)}
+        aria-label={zoom ? "Reset board zoom" : "Zoom board"}
+      >
+        {zoom ? "Reset zoom" : "Zoom board"}
+      </Button>
+      {/* 2. SOS Grid with SVG Strike Lines */}
+      <BoardViewport zoom={zoom} label="sos board">
+        <Surface
+          variant="card"
+          padding="md"
+          radius="xl"
+          style={{
+            width: zoom ? "max(100%, 560px)" : "100%",
+            maxWidth: zoom ? "none" : "min(100%, 76vh, 760px)",
+            aspectRatio: "1/1",
+            position: "relative",
+            backgroundColor: "var(--color-surface, #0f172a)",
+            border: "2px solid var(--color-border, #334155)",
+            overflow: "hidden",
+          }}
+        >
+          {/* Cell Grid */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${size}, 1fr)`,
+              gridTemplateRows: `repeat(${size}, 1fr)`,
+              width: "100%",
+              height: "100%",
+              gap: "4px",
+            }}
+          >
+            {Array.from({ length: size }).map((_, r) =>
+              Array.from({ length: size }).map((_, c) => {
+                const cellValue = board[r][c];
+                const isEmpty = cellValue === null;
+
+                return (
+                  <button
+                    key={`cell-${r}-${c}`}
+                    data-testid={`sos-cell-${r}-${c}`}
+                    aria-label={`Cell row ${r + 1}, column ${c + 1}: ${cellValue ?? "empty"}`}
+                    disabled={!isEmpty || !canAct || isSubmitting || status === "completed"}
+                    onClick={() => handleCellClick(r, c)}
+                    style={{
+                      backgroundColor: "var(--color-raised, #1e293b)",
+                      border: "1px solid var(--color-border, #334155)",
+                      borderRadius: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "24px",
+                      fontWeight: 800,
+                      color: "var(--color-text, #ffffff)",
+                      cursor: isEmpty && canAct && status !== "completed" ? "pointer" : "default",
+                      position: "relative",
+                      padding: 0,
+                      transition: "transform 150ms ease, background-color 150ms ease",
+                    }}
+                  >
+                    {cellValue && (
+                      <span
+                        style={{
+                          animation:
+                            animatedCell?.type === "letter-placed" &&
+                            animatedCell.row === r &&
+                            animatedCell.col === c
+                              ? "sos-letter-in 200ms ease"
+                              : undefined,
+                        }}
+                      >
+                        {cellValue}
+                      </span>
+                    )}
+                  </button>
+                );
+              }),
+            )}
+          </div>
+
+          {/* SVG Strike Lines for Completed SOS Sequences */}
+          <svg
+            style={{
+              position: "absolute",
+              top: "var(--space-md)",
+              left: "var(--space-md)",
+              width: "calc(100% - var(--space-md) * 2)",
+              height: "calc(100% - var(--space-md) * 2)",
+              pointerEvents: "none",
+              zIndex: 10,
+            }}
+            viewBox="0 0 100 100"
+          >
+            {lines.map((line) => {
+              // Convert row/col to center coordinates in percentage (0..100)
+              const [r1, c1] = line.from;
+              const [r2, c2] = line.to;
+
+              const x1 = ((c1 + 0.5) * 100) / size;
+              const y1 = ((r1 + 0.5) * 100) / size;
+              const x2 = ((c2 + 0.5) * 100) / size;
+              const y2 = ((r2 + 0.5) * 100) / size;
+
+              const lineColor =
+                line.claimedBy === "A"
+                  ? "var(--player-a-accent, #10b981)"
+                  : "var(--player-b-accent, #a855f7)";
+
+              return (
+                <line
+                  key={line.id}
+                  data-testid={`sos-line-${line.id}`}
+                  x1={x1}
+                  y1={y1}
+                  x2={x2}
+                  y2={y2}
+                  stroke={lineColor}
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  opacity={0.85}
+                  style={{
+                    animation: animatedLineIds.has(line.id)
+                      ? "sos-line-in 320ms ease-out"
+                      : undefined,
+                  }}
+                />
+              );
+            })}
+          </svg>
+        </Surface>
+      </BoardViewport>
+
+      <details style={{ width: "100%" }}>
+        <summary>Choose a cell by row and column</summary>
+        <div
+          style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginTop: 8 }}
+        >
+          <label>
+            Row{" "}
+            <select
+              value={selectedRow}
+              onChange={(event) => setSelectedRow(Number(event.target.value))}
+            >
+              {Array.from({ length: size }, (_, i) => (
+                <option key={i} value={i}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Column{" "}
+            <select
+              value={selectedCol}
+              onChange={(event) => setSelectedCol(Number(event.target.value))}
+            >
+              {Array.from({ length: size }, (_, i) => (
+                <option key={i} value={i}>
+                  {i + 1}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button
+            size="sm"
+            disabled={!canAct || isSubmitting || board[selectedRow]?.[selectedCol] !== null}
+            onClick={() => handleCellClick(selectedRow, selectedCol)}
+          >
+            Place {selectedLetter}
+          </Button>
+        </div>
+      </details>
+
+      {/* 3. Letter Selector Toggle Strip */}
+      <Surface
+        variant="card"
+        padding="sm"
+        radius="lg"
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "8px 16px",
+        }}
+      >
+        <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--color-muted-text)" }}>
+          Letter to Place:
+        </div>
+
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button
+            variant={selectedLetter === "S" ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setSelectedLetter("S")}
+            data-testid="sos-select-s"
+            style={{ width: "48px", fontWeight: 800, fontSize: "16px" }}
+          >
+            S
+          </Button>
+          <Button
+            variant={selectedLetter === "O" ? "primary" : "secondary"}
+            size="sm"
+            onClick={() => setSelectedLetter("O")}
+            data-testid="sos-select-o"
+            style={{ width: "48px", fontWeight: 800, fontSize: "16px" }}
+          >
+            O
+          </Button>
+        </div>
+      </Surface>
+    </div>
+  );
+};

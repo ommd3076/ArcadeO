@@ -1,4 +1,22 @@
-﻿/* Private Arcade V1 Theme System */
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: "DM Sans";
+  src: url("/fonts/dm-sans-latin-600.woff2") format("woff2");
+  font-weight: 600 800;
+  font-display: swap;
+}
+/* Private Arcade V1 Theme System */
 
 :root {
   /* Safe-area insets */
@@ -8,10 +26,10 @@
   --sar: env(safe-area-inset-right, 0px);
 
   /* Typography */
-  --font-heading:
-    "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-body: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-mono: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
 
   /* Nested Radii */
   --radius-xs: 4px;
@@ -77,6 +95,14 @@
   --color-accent-fill: rgba(104, 214, 194, 0.18);
   --color-accent-border: #68d6c2;
   --color-accent-on: #0a2b25;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 500 !important;
+  letter-spacing: -0.025em;
 }
 
 /* Explicit Themes */
@@ -297,7 +323,6 @@
 html,
 body {
   width: 100%;
-  height: 100%;
   min-height: 100dvh;
   background-color: var(--color-canvas);
   color: var(--color-text);
@@ -307,7 +332,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 #root {
@@ -400,7 +425,7 @@ a {
   justify-content: center;
   gap: var(--space-sm);
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 500;
   text-align: center;
   user-select: none;
   touch-action: manipulation;
@@ -411,7 +436,7 @@ a {
     opacity var(--duration-press);
 }
 .arcade-btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.96);
 }
 .arcade-btn:disabled {
   opacity: 0.45;
@@ -673,4 +698,24 @@ a {
   background-color: var(--color-canvas);
   border-bottom: 1px solid var(--color-border);
   gap: var(--space-md);
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Native surface controls inherit the active family text color. */
+button.arcade-surface,
+button.arcade-surface:disabled {
+  color: var(--color-text);
+  font: inherit;
 }

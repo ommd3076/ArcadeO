@@ -19,7 +19,8 @@ Architect defaults resolving those choices:
 - Tokens have stable IDs 0–3. An unsafe landing captures the lowest-ID opposing token at that square, returning it to the yard. Remaining opposing tokens stay; mixed occupancy on unsafe squares is permitted. Occupants never block movement. Passing over a square captures nothing; safe landings capture nothing.
 - First and second consecutive sixes allow normal movement and another roll. Once two have occurred, further sixes cause no movement and another roll until a 1–5 appears. Keep the streak capped at two during these rerolls. A non-six resets the streak; a turn transfer also resets it. A capture/home bonus after a non-six continues the turn with a reset streak.
 - A six enters a yard token onto its starting square; it does not then move that token six more cells. The player may instead move a token already on its path.
-- If no token can legally use an accepted non-ignored roll, resolve that fact immediately. A first/second six still grants another roll; a non-six passes the turn. If exactly one token is legal, select it automatically as part of that accepted roll. Otherwise wait for explicit token selection and prohibit another roll.
+- If no token can legally use an accepted non-ignored roll, resolve that fact immediately. A first/second six still grants another roll; a non-six passes the turn. Every legal roll, including exactly one legal pawn, waits for deliberate pawn selection and prohibits another roll. This owner correction applies to pending selections restored after refresh.
+- Curated named pawn colours may change before and during a match. An appearance update changes only the acting seat's colour, preserving path identity, tokens, pending roll, legal moves and outcomes. The trusted Together controller may explicitly select either seat for appearance only. Indistinguishable or near-identical pairs are rejected.
 - Capture, reaching home and rolling six together grant only one bonus roll. A winning move ends the match immediately, before any bonus.
 
 ### Fixed geometry
@@ -75,7 +76,7 @@ Use the imported Sudoku Exchange bank; map `diabolical` to Expert. Retain rating
 
 ## Dots & Boxes
 
-5×5 dots, giving 4×4 boxes. Choose one unused orthogonal edge between adjacent dots. Canonicalize reverse endpoint order. Each newly closed box awards one point and ownership to the placer. One move can close two boxes; award both and retain the turn once. A nonscoring edge transfers the turn. When all 40 edges are used, compare totals; equality is a draw. Invalid/repeated edges are rejected. Box ownership and edge ownership are separate.
+Choose 5×5, 7×7 or 9×9 dots at creation, giving 4×4, 6×6 or 8×8 boxes. Default and missing legacy dimensions are 5. Dimensions cannot change during play. Choose one unused orthogonal edge between adjacent dots. Canonicalize reverse endpoint order. Each newly closed box awards one point and ownership to the placer. One move can close two boxes; award both and retain the turn once. A nonscoring edge transfers the turn. When all `2*n*(n-1)` edges are used, compare totals; equality is a draw. Invalid/repeated edges are rejected. Box ownership and edge ownership are separate.
 
 ## Rock Paper Scissors
 
@@ -87,7 +88,7 @@ Numbers 1–6, one wicket each, no ball limit. A saved server coin toss selects 
 
 ## SOS
 
-General scoring variant on 5×5 cells. Either player may place S or O in an empty cell. Detect all contiguous three-cell S–O–S lines containing that new placement, horizontally, vertically and on both diagonals. Each new line awards one point and ownership to the placer, regardless of who placed its earlier letters. Overlap/shared letters are allowed. Canonicalize endpoints to prevent reversed duplicates. A scoring move retains the turn once even if several lines score; otherwise transfer it. Full board ends the game; greatest total wins, equality draws. Occupied cells cannot change.
+General scoring variant on saved 5×5, 7×7 or 9×9 cells selected at creation. Default and missing legacy dimensions are 5; dimensions cannot change midgame. Either player may place S or O in an empty cell. Detect all contiguous three-cell S–O–S lines containing that new placement, horizontally, vertically and on both diagonals. Each new line awards one point and ownership to the placer, regardless of who placed its earlier letters. Overlap/shared letters are allowed. Canonicalize endpoints to prevent reversed duplicates. A scoring move retains the turn once even if several lines score; otherwise transfer it. Full board ends the game; greatest total wins, equality draws. Occupied cells cannot change.
 
 ## Connect Four
 
@@ -102,7 +103,14 @@ Ladders: 2→23, 8→34, 20→41, 32→51, 49→70, 60→83, 73→94
 Snakes:  27→5, 39→16, 56→35, 68→46, 79→58, 88→66, 97→76
 ```
 
-These are our selected board coordinates, not extracted upstream code. Origins/destinations are distinct, in range and have no chains/cycles. Bottom row reads 1–10 left-to-right; alternate row direction upward. For number n: band=`floor((n-1)/10)`, row=`9-band`, column=`(n-1)%10` for even bands and `9-((n-1)%10)` for odd bands. Store the accepted roll and final position before animation.
+Version 1 above remains the saved behavior for old matches, including missing versions. New matches pin reference board version 2, independently traced from the supplied owner image:
+
+```text
+Ladders: 1→38, 4→14, 9→31, 21→42, 28→84, 51→67, 72→91, 81→99
+Snakes: 17→7, 53→34, 63→18, 64→60, 87→45, 92→73, 95→75, 98→79
+```
+
+The long central ladder is 28→84; its interrupted visible rails are one ladder. Bottom row reads 1–10 left-to-right; alternate row direction upward. For number n: band=`floor((n-1)/10)`, row=`9-band`, column=`(n-1)%10` for even bands and `9-((n-1)%10)` for odd bands. Reducer, editable original artwork and token travel share this versioned map. Store the accepted roll and final position before animation. The watermarked source image is never shipped.
 
 ## Reuse boundaries
 

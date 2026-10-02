@@ -6,7 +6,7 @@ Do not mark these checks passed during planning. Map evidence to P/S requirement
 
 | IDs | Game | Required cases |
 | --- | --- | --- |
-| L01–L08 | Ludo | six entry versus movement; exact home/overshoot; safe square no capture; unsafe multi-token capture lowest ID only/mixed occupancy; no blockade; third/further six ignored with saved prior moves; no legal move/one auto-selected/multiple pending; bonus deduplicated and win ends before bonus |
+| L01–L08 | Ludo | six entry versus movement; exact home/overshoot; safe square no capture; unsafe multi-token capture lowest ID only/mixed occupancy; no blockade; third/further six ignored with saved prior moves; no legal move/one deliberate selection/multiple pending; bonus deduplicated and win ends before bonus; colour changes preserve pending roll and token positions |
 | SUD01–SUD08 | Sudoku | givens immutable; note/set/erase/undo inverse; local conflict versus wrong nonconflicting entry; server exact solution finish; practice pause/edit rejection/check assistance; continuous duel/async clock; independent own revisions and no opponent entries; replay eligibility/tie floor seconds |
 | DB01–DB04 | Dots & Boxes | canonical reversed edge; repeated/nonadjacent rejection; close one/two boxes, score and retain once; all 40 edges/16 boxes and draw |
 | RP01–RP04 | RPS | all nine choice pairs; best-of 3/5/7 thresholds; tie no score/uncapped rounds; immutable lock/Next readiness/late round |

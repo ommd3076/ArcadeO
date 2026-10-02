@@ -3,6 +3,15 @@ import { validateActionPayload } from "../../shared/protocol/guards";
 import { ErrorCode } from "../../shared/protocol/errors";
 
 describe("Protocol Payload Validation", () => {
+  it("rejects unknown actions, extra fields, arrays and ambiguous secret payloads", () => {
+    expect(validateActionPayload("unknown" as never, {}).valid).toBe(false);
+    expect(validateActionPayload("dice.roll", { die: 6 }).valid).toBe(false);
+    expect(validateActionPayload("match.ready", []).valid).toBe(false);
+    expect(validateActionPayload("secret.lock", { choice: "rock", value: 3 }).valid).toBe(false);
+    expect(validateActionPayload("sos.place", { row: 9, col: 0, letter: "S" }).valid).toBe(false);
+    expect(validateActionPayload("sos.place", { row: 8, col: 8, letter: "S" }).valid).toBe(true);
+    expect(validateActionPayload("cricket.choose-role", { role: "cheat" }).valid).toBe(false);
+  });
   it("validates connect-four.drop", () => {
     expect(validateActionPayload("connect-four.drop", { column: 3 }).valid).toBe(true);
     const res = validateActionPayload("connect-four.drop", { column: -1 });

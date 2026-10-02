@@ -23,6 +23,51 @@ export const LUDO_SAFE_SQUARES: readonly number[] = [0, 8, 13, 21, 26, 34, 39, 4
 
 export const LUDO_SAFE_SQUARES_SET: ReadonlySet<number> = new Set(LUDO_SAFE_SQUARES);
 
+/** Board decorations share the same 15x15 coordinate system as token movement. */
+export const LUDO_HOUSES = {
+  A: { row: 0, col: 0, colour: "#169fdf", label: "Blue" },
+  topRight: { row: 0, col: 9, colour: "#f2ce0a", label: "Yellow" },
+  bottomLeft: { row: 9, col: 0, colour: "#e5252d", label: "Red" },
+  B: { row: 9, col: 9, colour: "#079758", label: "Green" },
+} as const;
+
+export const LUDO_DECORATIVE_LANES = {
+  top: [
+    [1, 7],
+    [2, 7],
+    [3, 7],
+    [4, 7],
+    [5, 7],
+  ],
+  bottom: [
+    [9, 7],
+    [10, 7],
+    [11, 7],
+    [12, 7],
+    [13, 7],
+  ],
+} as const;
+
+export const LUDO_ENTRY_ARROWS = [
+  { row: 6, col: 0, direction: "→", seat: "A" },
+  { row: 0, col: 7, direction: "↓", seat: "topRight" },
+  { row: 8, col: 14, direction: "←", seat: "B" },
+  { row: 14, col: 7, direction: "↑", seat: "bottomLeft" },
+] as const;
+
+export const LUDO_COLOUR_PALETTE = {
+  blue: "#169fdf",
+  green: "#079758",
+  red: "#e5252d",
+  yellow: "#e5bd00",
+  purple: "#8655cf",
+  orange: "#e66a1f",
+  cyan: "#008f9c",
+  pink: "#ce468a",
+} as const;
+export type LudoColourId = keyof typeof LUDO_COLOUR_PALETTE;
+export const LUDO_DEFAULT_COLOURS: Record<Seat, LudoColourId> = { A: "blue", B: "green" };
+
 /**
  * 52 ring coordinates [row, col] on a 15x15 grid, zero-based.
  * Fixed order from GAME-RULES.md:
@@ -136,6 +181,9 @@ export type LudoPhase = "roll" | "choose-token" | "completed";
 export type LudoTokensBySeat = Record<Seat, [number, number, number, number]>;
 
 export interface LudoState {
+  /** Missing on pre-colour matches; resolve it to defaults without changing tokens. */
+  colours?: Record<Seat, LudoColourId>;
+  lastRollNotice?: "none" | "no-legal-move" | "ignored-six";
   tokens: LudoTokensBySeat;
   activeSeat: Seat;
   phase: LudoPhase;
@@ -148,6 +196,7 @@ export interface LudoState {
 }
 
 export type LudoEffect =
+  | { type: "colour-changed"; seat: Seat; colourId: LudoColourId }
   | {
       type: "dice-rolled";
       seat: Seat;
@@ -185,6 +234,8 @@ export type LudoEffect =
     };
 
 export interface LudoView {
+  colours?: Record<Seat, LudoColourId>;
+  lastRollNotice?: "none" | "no-legal-move" | "ignored-six";
   tokens: LudoTokensBySeat;
   activeSeat: Seat;
   phase: LudoPhase;

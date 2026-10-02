@@ -58,7 +58,11 @@ export function parseCookies(cookieHeader: string | null): Record<string, string
     const key = pair.slice(0, idx).trim();
     const val = pair.slice(idx + 1).trim();
     if (key) {
-      cookies[key] = decodeURIComponent(val);
+      try {
+        cookies[key] = decodeURIComponent(val);
+      } catch {
+        // A malformed cookie must not turn an unauthenticated request into a 500.
+      }
     }
   }
   return cookies;
@@ -163,7 +167,8 @@ export async function validateSession(
     preferenceVersion: number;
   }
 
-  const row = await db
+  const primary = typeof db.withSession === "function" ? db.withSession("first-primary") : db;
+  const row = await primary
     .prepare(
       `SELECT
          s.tokenHash, s.accountId, s.csrfHash, s.issuedAt, s.expiresAt, s.revokedAt, s.sessionId,

@@ -5,6 +5,9 @@ import {
   SNAKES_AND_LADDERS_MAX_POSITION,
   SNAKES_AND_LADDERS_START_POSITION,
   SnakesAndLaddersState,
+  REFERENCE_BOARD_VERSION,
+  REFERENCE_LADDERS,
+  REFERENCE_SNAKES,
 } from "../../../../shared/games/snakes-and-ladders/types";
 import {
   createInitialState,
@@ -27,6 +30,7 @@ describe("Snakes & Ladders Engine", () => {
       expect(state.status).toBe("active");
       expect(state.winner).toBeNull();
       expect(state.lastRoll).toBeNull();
+      expect(state.boardVersion).toBe(REFERENCE_BOARD_VERSION);
       expect(isTerminal(state)).toBeNull();
     });
 
@@ -58,7 +62,10 @@ describe("Snakes & Ladders Engine", () => {
 
   describe("Movement & Turn Alternation", () => {
     it("advances token by rolled value and alternates turn", () => {
-      const state0 = createInitialState({ serverTime: 1000, startingSeat: "A" });
+      const state0 = {
+        ...createInitialState({ serverTime: 1000, startingSeat: "A" }),
+        boardVersion: undefined,
+      };
 
       // Player A rolls 4: 0 -> 4 (4 is neither snake nor ladder)
       const res1 = validateAndReduce(
@@ -185,6 +192,69 @@ describe("Snakes & Ladders Engine", () => {
           { type: "turn-changed", previousSeat: "A", nextSeat: "B" },
         ]);
       });
+    }
+  });
+
+  describe("reference board migration", () => {
+    it("matches the eight independently traced ladder endpoints", () => {
+      expect(REFERENCE_LADDERS).toEqual({
+        1: 38,
+        4: 14,
+        9: 31,
+        21: 42,
+        28: 84,
+        51: 67,
+        72: 91,
+        81: 99,
+      });
+    });
+    it("keeps missing versions on the legacy map after JSON recovery", () => {
+      const legacy = JSON.parse(
+        JSON.stringify({
+          positions: { A: 0, B: 0 },
+          activeSeat: "A",
+          status: "active",
+          winner: null,
+          lastRoll: null,
+        }),
+      ) as SnakesAndLaddersState;
+      const result = validateAndReduce(
+        legacy,
+        { action: "dice.roll", payload: {} },
+        { serverTime: 1, actorSeat: "A", randomValues: [2] },
+      );
+      expect(result.success).toBe(true);
+      if (result.success) expect(result.newState.positions.A).toBe(23);
+    });
+
+    for (const [kind, endpoints] of [
+      ["ladder", REFERENCE_LADDERS],
+      ["snake", REFERENCE_SNAKES],
+    ] as const) {
+      for (const [sourceText, destination] of Object.entries(endpoints)) {
+        const source = Number(sourceText);
+        it(`resolves reference ${kind} ${source}→${destination} once`, () => {
+          const state: SnakesAndLaddersState = {
+            ...createInitialState({ serverTime: 1, startingSeat: "A" }),
+            positions: { A: source - 1, B: 0 },
+          };
+          const result = validateAndReduce(
+            state,
+            { action: "dice.roll", payload: {} },
+            { serverTime: 2, actorSeat: "A", randomValues: [1] },
+          );
+          expect(result.success).toBe(true);
+          if (result.success) {
+            expect(result.newState.positions.A).toBe(destination);
+            expect(result.effects).toContainEqual({
+              type: kind === "ladder" ? "ladder-climbed" : "snake-bitten",
+              seat: "A",
+              from: source,
+              to: destination,
+            });
+          }
+        });
+      }
     }
   });
 

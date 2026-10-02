@@ -23,6 +23,8 @@ Exactly two seeded accounts, A and B; display names/usernames are setup values, 
 | P13 | Basic records | Shared wins/draws/history and separate Sudoku practice records derive from distinct server outcomes |
 | P14 | Backend failure recovery | Authority failure blocks input with retry, archive lag does not fabricate or undo a saved result |
 | P15 | Eight locked games | All engine, screen, motion, completion and restore acceptance rows in GAME-RULES/TEST-PLAN fulfilled |
+| P16 | Personal favourites and shared play next | Per-account pins and a small ordered shared list persist; stale writes preserve the other player's saved changes |
+| P17 | Names and compact recap | Personal names preserve canonical account identity; recap comes only from saved shared results and shows no invented play duration |
 
 ## Catalog and start flows
 
@@ -30,7 +32,7 @@ Stable IDs: `ludo`, `sudoku`, `dots-boxes`, `rps`, `hand-cricket`, `sos`, `conne
 
 ### Remote
 
-1. Open Games → named game → Play apart. RPS chooses best-of format; Sudoku chooses its mode/difficulty. Other boards have one V1 ruleset, without configuration menus.
+1. Open Games → named game → Play apart. RPS chooses best-of format; Sudoku chooses its mode/difficulty. Dots & Boxes chooses 5/7/9 dots and SOS chooses 5/7/9 cells before saving the match. Ludo chooses distinct curated pawn colours before play and supports appearance changes during play.
 2. Create a saved invitation to the other fixed account. If an active slot exists, show Resume instead of overwriting it.
 3. Invitee sees the invitation through Home/active matches when opening the app. Accept or Decline; creator may Cancel while waiting. No push notification requirement.
 4. Both confirm Ready. Show whose turn begins; no disconnected person is implicitly ready. Sudoku duel discloses continuous timing and starts both private boards from a common server time.

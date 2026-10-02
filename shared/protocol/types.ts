@@ -52,6 +52,7 @@ export type ActionType =
   | "match.agree-abandon"
   | "dice.roll"
   | "ludo.move"
+  | "ludo.set-colour"
   | "connect-four.drop"
   | "dots-boxes.edge"
   | "sos.place"
@@ -124,6 +125,10 @@ export type ActionPayloadMap = {
   "match.agree-abandon": Record<string, never>;
   "dice.roll": Record<string, never>;
   "ludo.move": LudoMovePayload;
+  "ludo.set-colour": {
+    colourId: "blue" | "green" | "red" | "yellow" | "purple" | "orange" | "cyan" | "pink";
+    seat?: Seat;
+  };
   "connect-four.drop": ConnectFourDropPayload;
   "dots-boxes.edge": DotsBoxesEdgePayload;
   "sos.place": SOSPlacePayload;
@@ -155,6 +160,7 @@ export interface ActionEnvelope<T extends ActionType = ActionType> {
 
 // Viewer Context for filtering
 export interface ViewerContext {
+  serverTime?: number;
   viewerAccountId: AccountId;
   viewerSeat?: Seat;
   isController: boolean;
@@ -169,8 +175,8 @@ export interface FilteredMatchView {
   lifecycle: MatchLifecycle;
   deliveryVersion: number;
   participants: {
-    A: { accountId: AccountId; displayName: string; ready: boolean };
-    B?: { accountId: AccountId; displayName: string; ready: boolean };
+    A: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };
+    B?: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };
   };
   controller: {
     controllingAccountId: AccountId;

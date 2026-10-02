@@ -5,6 +5,7 @@
  * 4 tokens per seat (IDs 0..3), 52-cell shared ring, safe squares,
  * lowest-ID capture on unsafe squares, third-consecutive-six ignored,
  * single bonus roll per turn, exact finish at home (progress 56).
+ * Every legal roll is saved before the owner deliberately selects a pawn.
  */
 
 import {
@@ -25,6 +26,9 @@ import {
   LUDO_SHARED_TRACK_MAX,
   LUDO_START_SQUARES,
   LUDO_YARD_PROGRESS,
+  LUDO_COLOUR_PALETTE,
+  LUDO_DEFAULT_COLOURS,
+  type LudoColourId,
   LudoEffect,
   LudoState,
   LudoTokensBySeat,
@@ -35,7 +39,19 @@ import {
  * Creates the initial Ludo state.
  */
 export function createInitialState(startFacts: SuppliedStartFacts): LudoState {
+  const requested = startFacts.config?.colours as Partial<Record<Seat, LudoColourId>> | undefined;
+  const initialColours = { ...LUDO_DEFAULT_COLOURS };
+  if (requested?.A && Object.prototype.hasOwnProperty.call(LUDO_COLOUR_PALETTE, requested.A))
+    initialColours.A = requested.A;
+  if (
+    requested?.B &&
+    Object.prototype.hasOwnProperty.call(LUDO_COLOUR_PALETTE, requested.B) &&
+    requested.B !== initialColours.A
+  )
+    initialColours.B = requested.B;
   return {
+    colours: initialColours,
+    lastRollNotice: "none",
     tokens: {
       A: [-1, -1, -1, -1],
       B: [-1, -1, -1, -1],
@@ -242,6 +258,46 @@ export function validateAndReduce(
     };
   }
 
+  // Appearance is personal to the acting seat and is independent of the game turn.
+  // Spreading the current state keeps tokens, pending selection and all outcome facts intact.
+  if (action.action === "ludo.set-colour") {
+    const colourId = (action.payload as { colourId?: unknown } | null)?.colourId;
+    if (
+      typeof colourId !== "string" ||
+      !Object.prototype.hasOwnProperty.call(LUDO_COLOUR_PALETTE, colourId)
+    ) {
+      return {
+        success: false,
+        error: createError(ErrorCode.INVALID_ACTION, "Choose a curated Ludo colour"),
+      };
+    }
+    const colours = { ...LUDO_DEFAULT_COLOURS, ...state.colours };
+    const otherSeat: Seat = acceptedFacts.actorSeat === "A" ? "B" : "A";
+    const tooSimilar: Record<string, string> = {
+      blue: "cyan",
+      cyan: "blue",
+      red: "pink",
+      pink: "red",
+      yellow: "orange",
+      orange: "yellow",
+    };
+    if (colourId === colours[otherSeat] || tooSimilar[colourId] === colours[otherSeat]) {
+      return {
+        success: false,
+        error: createError(
+          ErrorCode.INVALID_ACTION,
+          "Choose a colour distinct from the other player's colour",
+        ),
+      };
+    }
+    const chosen = colourId as LudoColourId;
+    return {
+      success: true,
+      newState: { ...state, colours: { ...colours, [acceptedFacts.actorSeat]: chosen } },
+      effects: [{ type: "colour-changed", seat: acceptedFacts.actorSeat, colourId: chosen }],
+    };
+  }
+
   // 2. Turn verification
   if (acceptedFacts.actorSeat !== state.activeSeat) {
     return {
@@ -282,6 +338,7 @@ export function validateAndReduce(
       const newState: LudoState = {
         ...state,
         phase: "roll",
+        lastRollNotice: "ignored-six",
         consecutiveSixes: 2,
         pendingRoll: null,
         legalTokenIds: [],
@@ -310,6 +367,7 @@ export function validateAndReduce(
         const newState: LudoState = {
           ...state,
           phase: "roll",
+          lastRollNotice: "no-legal-move",
           consecutiveSixes: nextStreak,
           pendingRoll: null,
           legalTokenIds: [],
@@ -331,6 +389,7 @@ export function validateAndReduce(
         const newState: LudoState = {
           ...state,
           activeSeat: nextSeat,
+          lastRollNotice: "no-legal-move",
           phase: "roll",
           consecutiveSixes: 0,
           pendingRoll: null,
@@ -355,87 +414,11 @@ export function validateAndReduce(
       }
     }
 
-    // Branch B: Exactly 1 legal move -> auto-select it
-    if (legalTokenIds.length === 1) {
-      const autoTokenId = legalTokenIds[0];
-      const outcome = applyMove(
-        state.tokens,
-        state.activeSeat,
-        autoTokenId,
-        roll,
-        acceptedFacts.serverTime,
-      );
-
-      const effects: LudoEffect[] = [
-        {
-          type: "dice-rolled",
-          seat: state.activeSeat,
-          roll,
-        },
-        ...outcome.effects,
-      ];
-
-      if (outcome.isWin) {
-        const newState: LudoState = {
-          ...state,
-          tokens: outcome.newTokens,
-          status: "completed",
-          phase: "completed",
-          winner: state.activeSeat,
-          pendingRoll: null,
-          legalTokenIds: [],
-          terminalResult: outcome.terminalResult,
-        };
-        return {
-          success: true,
-          newState,
-          effects,
-          terminalResult: outcome.terminalResult,
-        };
-      }
-
-      if (outcome.hasBonus) {
-        const newState: LudoState = {
-          ...state,
-          tokens: outcome.newTokens,
-          phase: "roll",
-          consecutiveSixes: nextStreak,
-          pendingRoll: null,
-          legalTokenIds: [],
-        };
-        return {
-          success: true,
-          newState,
-          effects,
-        };
-      } else {
-        const nextSeat: Seat = state.activeSeat === "A" ? "B" : "A";
-        effects.push({
-          type: "turn-changed",
-          previousSeat: state.activeSeat,
-          nextSeat,
-        });
-        const newState: LudoState = {
-          ...state,
-          tokens: outcome.newTokens,
-          activeSeat: nextSeat,
-          phase: "roll",
-          consecutiveSixes: 0,
-          pendingRoll: null,
-          legalTokenIds: [],
-        };
-        return {
-          success: true,
-          newState,
-          effects,
-        };
-      }
-    }
-
-    // Branch C: Multiple legal moves -> enter choose-token phase
+    // Every legal roll waits for a deliberate token selection, including one legal token.
     const newState: LudoState = {
       ...state,
       phase: "choose-token",
+      lastRollNotice: "none",
       consecutiveSixes: nextStreak,
       pendingRoll: roll,
       legalTokenIds,
@@ -504,6 +487,7 @@ export function validateAndReduce(
       const newState: LudoState = {
         ...state,
         tokens: outcome.newTokens,
+        lastRollNotice: "none",
         status: "completed",
         phase: "completed",
         winner: state.activeSeat,
@@ -523,6 +507,7 @@ export function validateAndReduce(
       const newState: LudoState = {
         ...state,
         tokens: outcome.newTokens,
+        lastRollNotice: "none",
         phase: "roll",
         consecutiveSixes: state.consecutiveSixes,
         pendingRoll: null,
@@ -543,6 +528,7 @@ export function validateAndReduce(
       const newState: LudoState = {
         ...state,
         tokens: outcome.newTokens,
+        lastRollNotice: "none",
         activeSeat: nextSeat,
         phase: "roll",
         consecutiveSixes: 0,
@@ -573,14 +559,13 @@ export function legalActions(state: LudoState, seat: Seat): ActionType[] {
   if (state.status === "completed" || isTerminal(state) !== null) {
     return [];
   }
-  if (seat !== state.activeSeat) {
-    return [];
-  }
+  const appearanceAction: ActionType = "ludo.set-colour";
+  if (seat !== state.activeSeat) return [appearanceAction];
   if (state.phase === "roll") {
-    return ["dice.roll"];
+    return ["dice.roll", appearanceAction];
   }
   if (state.phase === "choose-token") {
-    return ["ludo.move"];
+    return ["ludo.move", appearanceAction];
   }
   return [];
 }
@@ -590,6 +575,8 @@ export function legalActions(state: LudoState, seat: Seat): ActionType[] {
  */
 export function toPublicView(state: LudoState, _viewer?: ViewerContext): LudoView {
   return {
+    colours: { ...LUDO_DEFAULT_COLOURS, ...state.colours },
+    lastRollNotice: state.lastRollNotice ?? "none",
     tokens: {
       A: [...state.tokens.A],
       B: [...state.tokens.B],

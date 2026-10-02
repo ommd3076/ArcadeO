@@ -30,7 +30,7 @@ function countSolutions(boardStr, maxCount = 2) {
       const c = i % 9;
       const b = Math.floor(r / 3) * 3 + Math.floor(c / 3);
       const bit = 1 << ch;
-      if ((rows[r] & bit) || (cols[c] & bit) || (boxes[b] & bit)) {
+      if (rows[r] & bit || cols[c] & bit || boxes[b] & bit) {
         return 0; // Contradiction in given clues
       }
       rows[r] |= bit;
@@ -55,7 +55,7 @@ function countSolutions(boardStr, maxCount = 2) {
         const c = i % 9;
         const b = Math.floor(r / 3) * 3 + Math.floor(c / 3);
         const used = rows[r] | cols[c] | boxes[b];
-        const mask = (~used) & 0x3fe; // Bits 1..9
+        const mask = ~used & 0x3fe; // Bits 1..9
         // Count set bits
         let count = 0;
         let temp = mask;
@@ -108,54 +108,75 @@ function countSolutions(boardStr, maxCount = 2) {
   return solutions;
 }
 
-export function verifyCatalogSample(samplePerBucket = 25) {
-  console.log("Verifying Sudoku puzzle bank...");
-  const manifest = {};
-
+// Independently verifies the SHIPPED catalog, rather than a sample from the source bank.
+export function verifyCatalogSample() {
+  const catalog = JSON.parse(fs.readFileSync("content/sudoku/catalog.json", "utf8"));
+  const solutions = JSON.parse(fs.readFileSync("content/sudoku/solutions.json", "utf8"));
+  const manifest = JSON.parse(fs.readFileSync("content/sudoku/manifest.json", "utf8"));
+  if (
+    catalog.length !== 1000 ||
+    Object.keys(solutions).length !== 1000 ||
+    manifest.totalPuzzles !== 1000
+  )
+    throw new Error("Expected 1000 shipped puzzles and solutions");
+  const ids = new Set(),
+    boards = new Set();
+  const evidence = {};
   for (const [bucket, filePath] of Object.entries(BUCKET_FILES)) {
-    const fullPath = path.resolve(filePath);
-    if (!fs.existsSync(fullPath)) {
-      throw new Error(`Missing puzzle bank file: ${fullPath}`);
+    const bytes = fs.readFileSync(filePath);
+    const hash = crypto.createHash("sha256").update(bytes).digest("hex");
+    const meta = manifest.buckets[bucket];
+    if (hash !== meta.sourceSha256 || bytes.length !== meta.sourceBytes)
+      throw new Error("Source provenance mismatch: " + bucket);
+    const source = new Map(
+      bytes
+        .toString("utf8")
+        .trim()
+        .split(/\r?\n/)
+        .map((line) => {
+          const [id, givens, rating] = line.trim().split(/\s+/);
+          return [id, { givens, rating: Number(rating) }];
+        }),
+    );
+    const puzzles = catalog.filter((p) => p.bucket === bucket);
+    if (puzzles.length !== 250) throw new Error("Expected 250 puzzles: " + bucket);
+    for (let i = 0; i < puzzles.length; i++) {
+      const p = puzzles[i];
+      if (p.number !== i + 1 || p.puzzleId !== bucket + "-" + String(i + 1).padStart(3, "0"))
+        throw new Error("Stable identity mismatch");
+      if (ids.has(p.puzzleId) || boards.has(p.givens) || !/^[0-9]{81}$/.test(p.givens))
+        throw new Error("Duplicate or malformed puzzle");
+      ids.add(p.puzzleId);
+      boards.add(p.givens);
+      const origin = source.get(p.sourceId);
+      if (!origin || origin.givens !== p.givens || origin.rating !== p.rating)
+        throw new Error("Source puzzle mismatch: " + p.puzzleId);
+      if (countSolutions(p.givens, 2) !== 1)
+        throw new Error("Not uniquely solvable: " + p.puzzleId);
+      const solution = solutions[p.puzzleId];
+      if (
+        !/^[1-9]{81}$/.test(solution) ||
+        countSolutions(solution, 2) !== 1 ||
+        [...p.givens].some((g, j) => g !== "0" && g !== solution[j])
+      )
+        throw new Error("Private solution mismatch: " + p.puzzleId);
     }
-
-    const fileContent = fs.readFileSync(fullPath, "utf-8");
-    const lines = fileContent.trim().split("\n").filter(Boolean);
-
-    console.log(`Checking ${bucket} (${lines.length} available puzzles, testing ${samplePerBucket} samples)...`);
-    const fileHash = crypto.createHash("sha256").update(fileContent).digest("hex");
-    const tested = [];
-
-    // Take samplePerBucket distributed puzzles
-    const step = Math.floor(lines.length / samplePerBucket);
-    for (let i = 0; i < samplePerBucket; i++) {
-      const line = lines[i * step].trim();
-      const parts = line.split(/\s+/);
-      const [id, givens, rating] = parts;
-
-      if (!givens || givens.length !== 81) {
-        throw new Error(`Invalid puzzle length at ${bucket} index ${i}: ${givens}`);
-      }
-
-      const count = countSolutions(givens, 2);
-      if (count !== 1) {
-        throw new Error(`Puzzle ${id} in ${bucket} has ${count} solutions (expected exactly 1)`);
-      }
-
-      tested.push({ id, rating: parseFloat(rating) });
-    }
-
-    manifest[bucket] = {
-      fileHash,
-      totalCount: lines.length,
-      sampled: samplePerBucket,
-      valid: true,
+    evidence[bucket] = {
+      verified: puzzles.length,
+      sourceSha256: hash,
+      ratingRange: [
+        Math.min(...puzzles.map((p) => p.rating)),
+        Math.max(...puzzles.map((p) => p.rating)),
+      ],
     };
   }
-
-  console.log("Sudoku catalog verification SUCCESSFUL! Manifest:", JSON.stringify(manifest, null, 2));
-  return manifest;
+  console.log(
+    JSON.stringify(
+      { catalogVersion: manifest.catalogVersion, verified: ids.size, evidence },
+      null,
+      2,
+    ),
+  );
+  return evidence;
 }
-
-if (process.argv[1].endsWith("verify-sudoku-catalog.mjs")) {
-  verifyCatalogSample(25);
-}
+if (process.argv[1]?.endsWith("verify-sudoku-catalog.mjs")) verifyCatalogSample();

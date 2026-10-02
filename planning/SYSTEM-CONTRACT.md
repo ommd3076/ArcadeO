@@ -50,6 +50,7 @@ Together actor derivation uses the saved active seat for turn games and the save
 | `match.resign`, `match.request-abandon`, `match.agree-abandon` | together resign only: resigningSeat A/B; otherwise none | Current lifecycle version; server records actor and outcome |
 | `dice.roll` | none | Turn/version; server supplies saved die, never the client |
 | `ludo.move` | token ID 0–3 | Pending accepted roll plus turn/version |
+| `ludo.set-colour` | curated colour ID; optional Together seat A/B | Serialized current version; remote seat derives from auth, Together controller may select appearance seat; gameplay state is unchanged |
 | `connect-four.drop` | column 0–6 | Turn/version |
 | `dots-boxes.edge` | two dot coordinates | Turn/version; canonical adjacent edge |
 | `sos.place` | cell coordinate, S or O | Turn/version |

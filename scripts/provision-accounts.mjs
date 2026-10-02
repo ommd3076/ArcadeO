@@ -40,14 +40,21 @@ export async function hashPassword(password, saltBytes, iterations = 600000) {
  * Generates SQL seed for accounts A and B.
  */
 export async function generateProvisioningSql(options = {}) {
-  const playerAPassword = options.playerAPassword || process.env.PLAYER_A_PASSWORD || "Arcade-PlayerA-2026!";
-  const playerBPassword = options.playerBPassword || process.env.PLAYER_B_PASSWORD || "Arcade-PlayerB-2026!";
+  const playerAPassword = options.playerAPassword || process.env.ACCOUNT_A_PASSWORD || process.env.PLAYER_A_PASSWORD;
+  const playerBPassword = options.playerBPassword || process.env.ACCOUNT_B_PASSWORD || process.env.PLAYER_B_PASSWORD;
+  if (!playerAPassword || !playerBPassword || playerAPassword.length < 12 || playerBPassword.length < 12) {
+    throw new Error("Explicit passwords of at least 12 characters are required for both accounts");
+  }
 
-  const playerAUser = options.playerAUser || process.env.PLAYER_A_USERNAME || "player_a";
-  const playerBUser = options.playerBUser || process.env.PLAYER_B_USERNAME || "player_b";
+  const playerAUser = options.playerAUser || process.env.ACCOUNT_A_USERNAME || process.env.PLAYER_A_USERNAME || "player_a";
+  const playerBUser = options.playerBUser || process.env.ACCOUNT_B_USERNAME || process.env.PLAYER_B_USERNAME || "player_b";
 
   const playerAName = options.playerAName || process.env.PLAYER_A_NAME || "Player A";
   const playerBName = options.playerBName || process.env.PLAYER_B_NAME || "Player B";
+  if (!playerAUser.trim() || !playerBUser.trim() || playerAUser.trim().toLowerCase() === playerBUser.trim().toLowerCase()) {
+    throw new Error("Two distinct nonempty usernames are required");
+  }
+  const quote = (value) => String(value).replaceAll("'", "''");
 
   const hashedA = await hashPassword(playerAPassword);
   const hashedB = await hashPassword(playerBPassword);
@@ -79,17 +86,9 @@ export async function generateProvisioningSql(options = {}) {
   const sql = `-- Provisioned accounts seed
 INSERT INTO accounts (id, username, displayName, passwordHash, salt, kdfAlgorithm, accentFamily, paletteFamily, preferenceVersion)
 VALUES
-  ('${accountA.id}', '${accountA.username}', '${accountA.displayName}', '${accountA.passwordHash}', '${accountA.salt}', '${accountA.kdfAlgorithm}', '${accountA.accentFamily}', '${accountA.paletteFamily}', ${accountA.preferenceVersion}),
-  ('${accountB.id}', '${accountB.username}', '${accountB.displayName}', '${accountB.passwordHash}', '${accountB.salt}', '${accountB.kdfAlgorithm}', '${accountB.accentFamily}', '${accountB.paletteFamily}', ${accountB.preferenceVersion})
-ON CONFLICT(id) DO UPDATE SET
-  username = excluded.username,
-  displayName = excluded.displayName,
-  passwordHash = excluded.passwordHash,
-  salt = excluded.salt,
-  kdfAlgorithm = excluded.kdfAlgorithm,
-  accentFamily = excluded.accentFamily,
-  paletteFamily = excluded.paletteFamily,
-  preferenceVersion = excluded.preferenceVersion;
+  ('${accountA.id}', '${quote(accountA.username)}', '${quote(accountA.displayName)}', '${accountA.passwordHash}', '${accountA.salt}', '${accountA.kdfAlgorithm}', '${accountA.accentFamily}', '${accountA.paletteFamily}', ${accountA.preferenceVersion}),
+  ('${accountB.id}', '${quote(accountB.username)}', '${quote(accountB.displayName)}', '${accountB.passwordHash}', '${accountB.salt}', '${accountB.kdfAlgorithm}', '${accountB.accentFamily}', '${accountB.paletteFamily}', ${accountB.preferenceVersion})
+ON CONFLICT(id) DO NOTHING;
 `;
 
   return { sql, accountA, accountB };
@@ -100,7 +99,8 @@ const __filename = fileURLToPath(import.meta.url);
 if (process.argv[1] === __filename) {
   console.log("Generating account credentials...");
   generateProvisioningSql().then(({ sql, accountA, accountB }) => {
-    const outputPath = path.resolve(process.cwd(), "migrations", "seed_accounts.sql");
+    const outputPath = path.resolve(process.cwd(), ".local", "accounts.sql");
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, sql, "utf8");
     console.log(`Saved provisioning SQL to ${outputPath}`);
     console.log(`Provisioned Account A: id=${accountA.id}, username=${accountA.username}, palette=${accountA.paletteFamily}, accent=${accountA.accentFamily}`);

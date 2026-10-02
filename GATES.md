@@ -56,3 +56,43 @@ Scope: skills installation, agent definitions and expanded execution documents f
   EVIDENCE: One-off validation checked 69 authored local links, 35 task inputs/dependencies, twelve role paths/copy consistency and no root application package/src/worker/shared/tests. AGENTS is 320 words. Active palette/authority/recovery wording reviewed; historical CONVERGENCE marked superseded. HANDOFF-VALIDATION records planning checks and precise unexecuted domains. No morning guarantee, hardware/deployment or implementation completion claimed.
 
 Current preparation outcome, checked 2026-10-01: handoff ready for an explicitly authorized Antigravity build. Application execution status remains NOT_STARTED.
+
+# Owner correction gates — 2026-10-01
+
+These manual integration gates apply to the authorized owner-correction implementation. Final evidence belongs in planning/execution/STATE.md and planning/execution/reports/owner-corrections-checkpoint.md.
+
+- [x] OC1: Ludo uses saved deliberate pawn selection for every legal roll, a classic reference board, and stable seat identity through colour changes.
+- [x] OC2: New Snakes & Ladders matches use verified reference endpoints and original curved artwork; legacy matches retain their map.
+- [x] OC3: Dots and SOS save 5/7/9 dimensions and score correctly; all three grid boards provide large focusable play areas.
+- [x] OC4: Shared gameplay layout and appearance remain usable on phone and laptop across four variants.
+- [x] OC5: Favourites, play-next, recap and personal preferences persist with correct ownership.
+- [x] OC6: Real Worker and browser flows confirm rules, recovery, privacy, responsive presentation and motion.
+- [x] OC7: Before/after measurements show measured optimization without gameplay regression.
+
+# Owner-correction integration checkpoint — 2026-10-01
+
+OWNS: GATES.md, planning/execution/STATE.md, planning/execution/TASKS.json, planning/execution/reports/owner-corrections-checkpoint.md
+
+Scope: record and close the remaining owner-correction integration evidence before declaring current local visual or performance completion.
+
+- [x] OC8: Real Worker browser journeys pass for saved 5/7/9 grids, Ludo pending selection/reload, library ownership and recap; pure rule/serialization tests verify new/legacy Snakes & Ladders maps.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+- [x] OC9: The eight-game, four-appearance, four-viewport rendering matrix is captured and visually reviewed, including the requested grid focus/zoom, keyboard, 125% text, and reduced-motion states.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+- [x] OC10: Accepted-action motion is observed for Ludo, Snakes & Ladders, Connect Four, Dots & Boxes, and SOS; reload settles immediately and reduced motion suppresses movement.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+- [x] OC11: Before/after performance is measured from the same defined browser scenarios, with payload/cache/traffic reductions and timing/resource limits reported without an unsupported faster-loading claim.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+- [x] OC12: Final local validation is rerun on the integrated current source and reports actual exit status for typecheck, lint, build, unit, contract, component, real Worker integration, and browser suites.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+- [x] OC13: The current review checkpoint and execution queue accurately distinguish historical checks, current implementation evidence, and remaining external release gates.
+  EVIDENCE: Current-build final checkpoint: planning/execution/reports/owner-corrections-checkpoint.md; actual exits and category limits recorded there.
+
+## Current local disposition — 2026-10-02
+
+OC1–OC13 are closed by the final current-build checkpoint. Preparation statuses above are historical. Local owner corrections are verified: 265 unit, 55 source/mocked contracts, 44 server-rendered components, 4 real Workers durability, 26 real HTTP scenarios, 56 full + 3 supplementary browser tests, 208 reviewed matrix screenshots, live five-board motion, and recorded before/after performance. Commands exited 0. Smaller payloads/traffic are measured; cold loading/input medians were slower and are disclosed. Deployment and physical-phone certification remain external gates.

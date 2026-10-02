@@ -1,36 +1,45 @@
-﻿import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
+import { RequireAuth } from "./auth";
 import { Shell } from "./shell";
-import { HomePage } from "./pages/home-page";
-import { GamesPage } from "./pages/games-page";
-import { GameDetailPage } from "./pages/game-detail-page";
-import { MatchPage } from "./pages/match-page";
-import { UsPage } from "./pages/us-page";
 import { LoginPage } from "./pages/login-page";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <Shell />,
+    element: <RequireAuth />,
     children: [
       {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "games",
-        element: <GamesPage />,
-      },
-      {
-        path: "games/:gameId",
-        element: <GameDetailPage />,
-      },
-      {
-        path: "matches/:matchId",
-        element: <MatchPage />,
-      },
-      {
-        path: "us",
-        element: <UsPage />,
+        path: "/",
+        element: <Shell />,
+        children: [
+          {
+            index: true,
+            lazy: async () => ({ Component: (await import("./pages/home-page")).HomePage }),
+          },
+          {
+            path: "games",
+            lazy: async () => ({ Component: (await import("./pages/games-page")).GamesPage }),
+          },
+          {
+            path: "games/:gameId",
+            lazy: async () => ({
+              Component: (await import("./pages/game-detail-page")).GameDetailPage,
+            }),
+          },
+          {
+            path: "matches/:matchId",
+            lazy: async () => ({ Component: (await import("./pages/match-page")).MatchPage }),
+          },
+          {
+            path: "sudoku",
+            lazy: async () => ({
+              Component: (await import("../screens/sudoku-list")).SudokuListScreen,
+            }),
+          },
+          {
+            path: "us",
+            lazy: async () => ({ Component: (await import("./pages/us-page")).UsPage }),
+          },
+        ],
       },
     ],
   },
