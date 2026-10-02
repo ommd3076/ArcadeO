@@ -39,13 +39,13 @@ describe("Sudoku Screen & Board Integration (Task S03)", () => {
       ),
     );
 
-    expect(html).toContain("Sudoku Vault");
+    expect(html).toContain("Choose your Sudoku");
     expect(html).toContain("Practice");
     expect(html).toContain("Duel");
     expect(html).toContain("Challenge");
     expect(html).toContain("easy");
     expect(html).toContain("expert");
-    expect(html).toContain("Start Puzzle");
+    expect(html).toContain("Start puzzle");
   });
 
   it("renders SudokuBoard with 9x9 grid, givens, number pad, and practice controls", () => {
