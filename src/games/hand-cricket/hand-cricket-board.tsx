@@ -63,6 +63,8 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
     lockedSeats,
     lastDelivery,
   } = view;
+  const playUntilBothOut =
+    view.completionRule === "both-out" || (mode === "together" && view.rulesVersion === 2);
 
   // Unconditional Hooks: compute all derived values before ANY conditional return
   const allowedNumbers = useMemo(() => {
@@ -95,20 +97,23 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
       title: isOut
         ? `WICKET! ${batterSeat === "A" ? playerAName : playerBName} is OUT on ${seatAChoice}!`
         : `+${lastDelivery.scoredRuns} Runs Scored!`,
-      subtitle: `Batter played ${lastDelivery.runs.bat}, Bowler played ${lastDelivery.runs.bowl}`,
+      subtitle: isOut
+        ? innings === 1
+          ? `Same numbers. ${bowlerSeat === "A" ? playerAName : playerBName} bats next.`
+          : "Same numbers. Both batting turns are complete."
+        : `${batterSeat === "A" ? playerAName : playerBName} keeps batting.`,
       winnerSeat: isOut ? bowlerSeat : "draw",
       seatAChoiceLabel: `${roles.bat === "A" ? "Bat: " : "Bowl: "}${seatAChoice}`,
       seatBChoiceLabel: `${roles.bat === "B" ? "Bat: " : "Bowl: "}${seatBChoice}`,
     };
-  }, [lastDelivery, roles, playerAName, playerBName]);
+  }, [lastDelivery, roles, innings, playerAName, playerBName]);
 
   const firstChooserSeat: Seat = useMemo(() => {
-    if (view.expectedChooser) return view.expectedChooser;
     if (roles) {
       return view.rulesVersion === 1 ? (deliveryId % 2 === 1 ? "A" : "B") : roles.bat;
     }
     return deliveryId % 2 === 1 ? "A" : "B";
-  }, [view.expectedChooser, view.rulesVersion, roles, deliveryId]);
+  }, [view.rulesVersion, roles, deliveryId]);
 
   const selectionPrompt = useMemo(() => {
     const maxChoice = allowedNumbers[allowedNumbers.length - 1] ?? 10;
@@ -251,9 +256,14 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
               color: "var(--color-primary, #38bdf8)",
             }}
           >
-            {innings === 1 ? "1st Innings" : "2nd Innings (Chase)"} • Ball #{deliveryId}
+            {playUntilBothOut
+              ? `${currentBatter} batting`
+              : innings === 1
+                ? "1st Innings"
+                : "2nd Innings (Chase)"}{" "}
+            • Ball #{deliveryId}
           </span>
-          {target !== null && (
+          {!playUntilBothOut && target !== null && (
             <span
               style={{
                 display: "inline-flex",
@@ -287,7 +297,15 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
             </div>
           </div>
 
-          {innings === 2 && target !== null && (
+          {playUntilBothOut && (
+            <div style={{ textAlign: "right", fontSize: "13px", color: "var(--color-muted-text)" }}>
+              <strong style={{ display: "block", color: "var(--color-text)" }}>
+                {currentBowler}
+              </strong>
+              {innings === 1 ? "Yet to bat" : `${firstInningsRuns} runs · Out`}
+            </div>
+          )}
+          {!playUntilBothOut && innings === 2 && target !== null && (
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
@@ -309,10 +327,16 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
       {/* 2. Reusable Secret Handoff for Delivery Numbers (1..10 or 1..6) */}
       <div style={{ width: "100%" }}>
         <SecretHandoff<number>
+          key={deliveryId}
           forceMasked={forceMasked}
           onMaskChange={onMaskChange}
           mode={mode}
           roundNumber={deliveryId}
+          roundLabel="Ball"
+          revealLabel="Reveal ball"
+          nextRoundLabel={
+            lastDelivery?.outcome === "out" && innings === 1 ? "Switch batting" : "Next ball"
+          }
           gameTitle="Hand Cricket"
           seatA={{ name: playerAName, accent: playerAAccent }}
           seatB={{ name: playerBName, accent: playerBAccent }}
