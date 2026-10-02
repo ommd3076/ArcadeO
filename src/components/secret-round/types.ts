@@ -37,6 +37,9 @@ export type RemoteHandoffStep = "choosing" | "locked-waiting" | "revealed-outcom
 export interface SecretHandoffProps<T = string | number> {
   mode: "together" | "remote";
   roundNumber?: number;
+  roundLabel?: string;
+  nextRoundLabel?: string;
+  revealLabel?: string;
   gameTitle?: string;
 
   // Players info

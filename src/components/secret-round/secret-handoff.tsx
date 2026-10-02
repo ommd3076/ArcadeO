@@ -19,6 +19,9 @@ import { useSecretConcealment } from "./use-secret-concealment";
 export function SecretHandoff<T = string | number>({
   mode,
   roundNumber,
+  roundLabel = "Round",
+  nextRoundLabel = "Next Round",
+  revealLabel = "Reveal Outcome",
   gameTitle: _gameTitle,
   seatA,
   seatB,
@@ -326,7 +329,7 @@ export function SecretHandoff<T = string | number>({
             color: "var(--color-muted-text)",
           }}
         >
-          {roundNumber ? `Round ${roundNumber}` : "Secret Handoff"}
+          {roundNumber ? `${roundLabel} ${roundNumber}` : "Secret Handoff"}
         </div>
 
         <div
@@ -409,7 +412,7 @@ export function SecretHandoff<T = string | number>({
               marginBottom: "4px",
             }}
           >
-            {roundNumber ? `Round ${roundNumber} Outcome` : "Round Outcome"}
+            {roundNumber ? `${roundLabel} ${roundNumber} Outcome` : `${roundLabel} Outcome`}
           </div>
           <h2
             style={{
@@ -557,7 +560,7 @@ export function SecretHandoff<T = string | number>({
               }
               style={{ minHeight: "48px" }}
             >
-              {isSubmittingNext ? "Advancing..." : "Next Round"}
+              {isSubmittingNext ? "Advancing..." : nextRoundLabel}
             </Button>
           )}
         </div>
@@ -627,7 +630,8 @@ export function SecretHandoff<T = string | number>({
                 margin: "0 auto",
               }}
             >
-              Ensure {otherPlayerInfo.name} is looking away before continuing.
+              Tap Ready below to show your choices. Make sure {otherPlayerInfo.name} is looking away
+              before continuing.
             </p>
           </div>
 
@@ -724,13 +728,15 @@ export function SecretHandoff<T = string | number>({
             role="radiogroup"
             aria-label={selectionPrompt}
             style={{
+              width: "100%",
+              minWidth: 0,
               display: "grid",
               gridTemplateColumns:
                 options.length === 10
-                  ? "repeat(5, 1fr)"
+                  ? "repeat(5, minmax(0, 1fr))"
                   : options.length <= 3
-                    ? `repeat(${options.length}, 1fr)`
-                    : "repeat(3, 1fr)",
+                    ? `repeat(${options.length}, minmax(0, 1fr))`
+                    : "repeat(3, minmax(0, 1fr))",
               gap: "var(--space-md)",
             }}
           >
@@ -745,12 +751,15 @@ export function SecretHandoff<T = string | number>({
                   aria-label={opt.ariaLabel ?? opt.label}
                   onClick={() => setSelectedChoice(opt.id)}
                   style={{
+                    width: "100%",
+                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
                     padding: "var(--space-md)",
+                    minWidth: 0,
                     minHeight: "56px",
                     borderRadius: "var(--radius-lg)",
                     backgroundColor: isSelected ? "var(--color-raised)" : "var(--color-surface)",
@@ -968,13 +977,15 @@ export function SecretHandoff<T = string | number>({
             role="radiogroup"
             aria-label={selectionPrompt}
             style={{
+              width: "100%",
+              minWidth: 0,
               display: "grid",
               gridTemplateColumns:
                 options.length === 10
-                  ? "repeat(5, 1fr)"
+                  ? "repeat(5, minmax(0, 1fr))"
                   : options.length <= 3
-                    ? `repeat(${options.length}, 1fr)`
-                    : "repeat(3, 1fr)",
+                    ? `repeat(${options.length}, minmax(0, 1fr))`
+                    : "repeat(3, minmax(0, 1fr))",
               gap: "var(--space-md)",
             }}
           >
@@ -989,12 +1000,15 @@ export function SecretHandoff<T = string | number>({
                   aria-label={opt.ariaLabel ?? opt.label}
                   onClick={() => setSelectedChoice(opt.id)}
                   style={{
+                    width: "100%",
+                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
                     padding: "var(--space-md)",
+                    minWidth: 0,
                     minHeight: "56px",
                     borderRadius: "var(--radius-lg)",
                     backgroundColor: isSelected ? "var(--color-raised)" : "var(--color-surface)",
@@ -1110,7 +1124,7 @@ export function SecretHandoff<T = string | number>({
             }
             style={{ minHeight: "48px", minWidth: "220px" }}
           >
-            {isSubmittingReveal ? "Revealing..." : "Reveal Outcome"}
+            {isSubmittingReveal ? "Revealing..." : revealLabel}
           </Button>
         </Surface>
       );
@@ -1180,7 +1194,7 @@ export function SecretHandoff<T = string | number>({
                   color: "var(--color-muted-text)",
                 }}
               >
-                Round {roundNumber}
+                {roundLabel} {roundNumber}
               </span>
             )}
           </div>
@@ -1207,13 +1221,15 @@ export function SecretHandoff<T = string | number>({
             role="radiogroup"
             aria-label={selectionPrompt}
             style={{
+              width: "100%",
+              minWidth: 0,
               display: "grid",
               gridTemplateColumns:
                 options.length === 10
-                  ? "repeat(5, 1fr)"
+                  ? "repeat(5, minmax(0, 1fr))"
                   : options.length <= 3
-                    ? `repeat(${options.length}, 1fr)`
-                    : "repeat(3, 1fr)",
+                    ? `repeat(${options.length}, minmax(0, 1fr))`
+                    : "repeat(3, minmax(0, 1fr))",
               gap: "var(--space-md)",
             }}
           >
@@ -1228,12 +1244,15 @@ export function SecretHandoff<T = string | number>({
                   aria-label={opt.ariaLabel ?? opt.label}
                   onClick={() => setSelectedChoice(opt.id)}
                   style={{
+                    width: "100%",
+                    boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "6px",
                     padding: "var(--space-md)",
+                    minWidth: 0,
                     minHeight: "56px",
                     borderRadius: "var(--radius-lg)",
                     backgroundColor: isSelected ? "var(--color-raised)" : "var(--color-surface)",
