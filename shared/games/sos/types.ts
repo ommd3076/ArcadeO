@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Private Arcade V1 — SOS Game Types
  *
  * Server-authoritative, deterministic pure types for SOS.
@@ -11,7 +11,9 @@ export const SOS_BOARD_SIZE = 5;
 export const SOS_TOTAL_CELLS = 25;
 export type GridSize = 5 | 7 | 9;
 export function gridSize(value: unknown): GridSize {
-  return value === 7 || value === 9 ? value : 5;
+  if (value === undefined || value === null) return 5;
+  if (value === 5 || value === 7 || value === 9) return value;
+  throw new Error(`Invalid grid size: ${String(value)}. Expected 5, 7, or 9.`);
 }
 
 export type SOSLetter = "S" | "O";

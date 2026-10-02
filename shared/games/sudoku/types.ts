@@ -46,6 +46,7 @@ export interface PlayerSudokuState {
 
 export interface SudokuState {
   replay?: boolean;
+  interrupted?: boolean;
   puzzleId: string;
   givens: string; // 81 characters '0'..'9'
   solution: string; // 81 characters '1'..'9' (server private solution)

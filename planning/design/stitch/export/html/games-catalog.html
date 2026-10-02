@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Games Catalog · Private Arcade</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms and Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-primary-container": "#546832",
+            "surface-variant": "#353438",
+            "outline-variant": "#45483d",
+            "primary-container": "#cfe6a3",
+            "secondary-fixed-dim": "#dbc673",
+            "inverse-on-surface": "#303033",
+            "on-tertiary-fixed-variant": "#124e53",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "on-primary": "#253505",
+            "inverse-surface": "#e5e1e6",
+            "on-primary-fixed": "#131f00",
+            "surface-container": "#1f1f22",
+            "surface-bright": "#39393c",
+            "secondary": "#dbc673",
+            "primary-fixed": "#d4eba8",
+            "on-secondary-container": "#d0bb69",
+            "surface-tint": "#b8cf8e",
+            "surface-dim": "#131316",
+            "background": "#131316",
+            "surface": "#131316",
+            "on-error-container": "#ffdad6",
+            "outline": "#8f9284",
+            "on-secondary": "#3a3000",
+            "tertiary-fixed": "#b5ecf1",
+            "on-tertiary": "#00363a",
+            "error-container": "#93000a",
+            "on-secondary-fixed": "#221b00",
+            "surface-container-low": "#1b1b1e",
+            "surface-container-highest": "#353438",
+            "primary-fixed-dim": "#b8cf8e",
+            "primary": "#f3ffd6",
+            "on-tertiary-fixed": "#002022",
+            "on-surface": "#e5e1e6",
+            "on-secondary-fixed-variant": "#544600",
+            "on-tertiary-container": "#33696e",
+            "surface-container-lowest": "#0e0e11",
+            "on-surface-variant": "#c5c8b9",
+            "on-background": "#e5e1e6",
+            "tertiary": "#ebfdff",
+            "secondary-fixed": "#f8e28c",
+            "inverse-primary": "#52652f",
+            "on-error": "#690005",
+            "tertiary-container": "#b0e7ec",
+            "error": "#ffb4ab",
+            "tertiary-fixed-dim": "#99d0d5",
+            "surface-container-high": "#2a2a2d",
+            "secondary-container": "#594b00"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin": "1.25rem",
+            "space-md": "1rem",
+            "space-3xl": "3rem",
+            "space-lg": "1.25rem",
+            "gutter-sm": "0.75rem",
+            "space-2xs": "0.25rem",
+            "space-2xl": "2rem",
+            "space-xl": "1.5rem",
+            "space-xs": "0.5rem",
+            "space-sm": "0.75rem",
+            "margin-mobile": "1rem",
+            "gutter": "1rem"
+          },
+          "fontFamily": {
+            "stat-counter": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-micro": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0C0C0F;
+      color: #E5E1E6;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Container Context (~390px frame centered) -->
+<main class="w-full max-w-[430px] min-h-screen bg-surface-container-lowest relative pb-[7rem] overflow-x-hidden flex flex-col">
+<!-- Top Navigation / Shared TopAppBar Component -->
+<header class="flex justify-between items-center w-full px-margin-mobile py-space-sm max-w-md mx-auto border-b border-outline-variant/10 bg-background">
+<!-- Leading: Daniel & Sarah online duo badge -->
+<div class="flex items-center gap-space-xs cursor-pointer group active:scale-95 transition-transform duration-150">
+<div class="relative flex -space-x-2 items-center">
+<!-- Daniel Avatar -->
+<div class="w-8 h-8 rounded-full border border-surface-container-lowest bg-surface-container-high flex items-center justify-center text-primary font-headline-sm text-[12px] font-bold shadow-sm">
+            D
+          </div>
+<!-- Sarah Avatar -->
+<div class="w-8 h-8 rounded-full border border-surface-container-lowest bg-secondary-fixed/30 flex items-center justify-center text-secondary-fixed font-headline-sm text-[12px] font-bold shadow-sm">
+            S
+          </div>
+<!-- Real-time Connected Indicator -->
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-surface-container-lowest shadow-[0_0_8px_#cfe6a3]"></span>
+</div>
+<div class="flex flex-col text-left pl-1">
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase">DUO ARCADE</span>
+<span class="font-headline-sm text-[13px] text-on-surface flex items-center gap-1 font-semibold">
+            D &amp; S <span class="w-1.5 h-1.5 rounded-full bg-primary-container inline-block"></span>
+</span>
+</div>
+</div>
+<!-- Center Headline Anchor (from Shared TopAppBar) -->
+<div class="hidden">
+<h1 class="font-headline-md text-headline-md text-on-surface">Hi Daniel! Welcome back</h1>
+</div>
+<!-- Trailing: Notifications button with dot -->
+<button aria-label="Notifications" class="relative w-10 h-10 rounded-full flex items-center justify-center border border-white/[0.08] bg-surface-container-low hover:bg-surface-container active:scale-95 transition-all text-on-surface">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary-container"></span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<div class="px-margin-mobile pt-space-lg flex flex-col flex-grow">
+<!-- Catalog Screen Header: Editorial Typography -->
+<section class="mb-space-md">
+<div class="flex items-center gap-2 mb-1.5">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high border border-white/[0.06] text-primary-fixed-dim font-label-micro text-label-micro uppercase tracking-wider">
+<span class="material-symbols-outlined text-[11px]" data-icon="sync">sync</span>
+            Synchronized
+          </span>
+<span class="text-outline text-label-micro uppercase font-label-micro tracking-wider">SEASON 02</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight font-extrabold flex items-baseline justify-between">
+<span>Games</span>
+<span class="font-stat-counter text-[20px] text-outline/60 font-light">08</span>
+</h1>
+<p class="font-body-md text-body-md text-outline mt-1 font-normal">
+          8 classic board &amp; notebook games for two
+        </p>
+</section>
+<!-- Horizontal Filter Chips Carousel -->
+<section class="mb-space-lg -mx-margin-mobile px-margin-mobile">
+<div class="flex items-center gap-space-xs overflow-x-auto no-scrollbar py-1">
+<!-- All (8) - Active State -->
+<button class="flex-shrink-0 px-space-md h-8 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center gap-1.5 transition-transform active:scale-95 shadow-sm">
+<span>All</span>
+<span class="px-1.5 py-0.2 rounded-full bg-on-primary-container/20 text-on-primary text-[10px] font-bold">8</span>
+</button>
+<!-- Board Games -->
+<button class="flex-shrink-0 px-space-md h-8 rounded-full bg-surface-container-low border border-white/[0.08] hover:border-white/[0.14] text-outline hover:text-on-surface font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[14px]" data-icon="grid_view">grid_view</span>
+<span>Board Games</span>
+</button>
+<!-- Quick Duels -->
+<button class="flex-shrink-0 px-space-md h-8 rounded-full bg-surface-container-low border border-white/[0.08] hover:border-white/[0.14] text-outline hover:text-on-surface font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[14px]" data-icon="bolt">bolt</span>
+<span>Quick Duels</span>
+</button>
+<!-- Co-op & Solos -->
+<button class="flex-shrink-0 px-space-md h-8 rounded-full bg-surface-container-low border border-white/[0.08] hover:border-white/[0.14] text-outline hover:text-on-surface font-label-lg text-label-lg flex items-center gap-1.5 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[14px]" data-icon="diversity_3">diversity_3</span>
+<span>Co-op &amp; Solos</span>
+</button>
+</div>
+</section>
+<!-- Games Catalog: 2-Column Bento Grid -->
+<section class="grid grid-cols-2 gap-space-sm mb-space-2xl">
+<!-- 1. LUDO -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-primary-container/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<!-- Top Badge & Subtitle -->
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary-fixed-dim font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Remote &amp; Together
+              </span>
+<span class="w-2 h-2 rounded-full bg-primary-container animate-pulse"></span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Classic Board</span>
+</div>
+<!-- Tactile Visual: 4-color stylized quadrant & 3D pawns -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-2xl bg-surface-container-lowest p-1.5 border border-white/[0.06] grid grid-cols-2 gap-1.5 shadow-inner">
+<!-- Ruby Red Box -->
+<div class="rounded-lg bg-rose-500/20 border border-rose-500/40 flex items-center justify-center">
+<div class="w-3.5 h-3.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]"></div>
+</div>
+<!-- Emerald Green Box -->
+<div class="rounded-lg bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center">
+<div class="w-3.5 h-3.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]"></div>
+</div>
+<!-- Golden Yellow Box -->
+<div class="rounded-lg bg-amber-400/20 border border-amber-400/40 flex items-center justify-center">
+<div class="w-3.5 h-3.5 rounded-full bg-amber-300 shadow-[0_0_8px_rgba(252,211,77,0.6)]"></div>
+</div>
+<!-- Cyan Blue Box -->
+<div class="rounded-lg bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center">
+<div class="w-3.5 h-3.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)]"></div>
+</div>
+<!-- Central 3D Dice Cue -->
+<div class="absolute inset-0 m-auto w-6 h-6 rounded-md bg-[#1F1F26] border border-white/[0.15] flex items-center justify-center shadow-lg text-[10px] font-bold text-primary">
+                ⚅
+              </div>
+</div>
+</div>
+<!-- Card Footer & Turn Indicator -->
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors">Ludo</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-primary-container font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Daniel's turn
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 2. SUDOKU -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-secondary-fixed/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-secondary-fixed font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Practice · Duel · Async
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Numbers &amp; Logic</span>
+</div>
+<!-- Tactile Visual: 3x3 numeric grid with pencil marks -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="w-20 h-20 rounded-xl bg-surface-container-lowest p-1.5 border border-white/[0.08] grid grid-cols-3 grid-rows-3 gap-1">
+<div class="rounded bg-surface-container text-outline text-[11px] font-stat-counter flex items-center justify-center">5</div>
+<div class="rounded bg-surface-container text-outline/50 text-[10px] flex items-center justify-center font-stat-counter">·</div>
+<div class="rounded bg-surface-container text-on-surface text-[11px] font-stat-counter flex items-center justify-center">9</div>
+<div class="rounded bg-surface-container text-outline/50 text-[10px] flex items-center justify-center font-stat-counter">·</div>
+<div class="rounded bg-secondary-fixed/20 border border-secondary-fixed/60 text-secondary-fixed text-[11px] font-bold flex items-center justify-center shadow-[0_0_8px_rgba(248,226,140,0.3)]">7</div>
+<div class="rounded bg-surface-container text-outline/50 text-[10px] flex items-center justify-center font-stat-counter">·</div>
+<div class="rounded bg-surface-container text-on-surface text-[11px] font-stat-counter flex items-center justify-center">2</div>
+<div class="rounded bg-surface-container text-outline/50 text-[10px] flex items-center justify-center font-stat-counter">·</div>
+<div class="rounded bg-surface-container text-outline text-[11px] font-stat-counter flex items-center justify-center">4</div>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary-fixed transition-colors">Sudoku</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-secondary-fixed font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span> Sarah challenged
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 3. DOTS & BOXES -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-primary-container/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary-fixed-dim font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Turn-based
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Territory Grid</span>
+</div>
+<!-- Tactile Visual: 4x4 minimalist dot grid with neon lime & lavender captures -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-xl bg-surface-container-lowest p-2 border border-white/[0.06] flex flex-col justify-between">
+<!-- Dots rows & Neon lines -->
+<div class="flex justify-between items-center relative">
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+<span class="flex-grow h-0.5 bg-primary-container mx-0.5 shadow-[0_0_6px_#cfe6a3]"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+<span class="flex-grow h-0.5 bg-white/20 mx-0.5"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+</div>
+<div class="flex justify-between items-center my-auto">
+<div class="w-6 h-6 rounded bg-primary-container/15 border border-primary-container/50 flex items-center justify-center text-primary-container text-[10px] font-bold">D</div>
+<div class="w-0.5 h-6 bg-pink-400/60 shadow-[0_0_6px_rgba(244,114,182,0.5)]"></div>
+<div class="w-6 h-6 rounded bg-pink-400/15 border border-pink-400/50 flex items-center justify-center text-pink-300 text-[10px] font-bold">S</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+<span class="flex-grow h-0.5 bg-pink-400 mx-0.5 shadow-[0_0_6px_#f472b6]"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+<span class="flex-grow h-0.5 bg-primary-container mx-0.5 shadow-[0_0_6px_#cfe6a3]"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-white/70"></span>
+</div>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors">Dots &amp; Boxes</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-outline font-semibold">Tie 9 – 9</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 4. ROCK PAPER SCISSORS -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-tertiary-container/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-tertiary font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Simultaneous Choice
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Secret Duel</span>
+</div>
+<!-- Tactile Visual: 3D Gesture icons + VS Badge -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-xl bg-surface-container-lowest p-2 border border-white/[0.06] flex items-center justify-around shadow-inner">
+<div class="flex flex-col items-center">
+<span class="text-xl filter drop-shadow">✊</span>
+<span class="text-[9px] font-label-micro text-outline mt-0.5 font-bold">D</span>
+</div>
+<div class="px-1.5 py-0.5 rounded-full bg-surface-container-high border border-white/[0.1] text-[9px] font-bold text-tertiary">
+                VS
+              </div>
+<div class="flex flex-col items-center">
+<div class="w-6 h-6 rounded-md bg-surface-container flex items-center justify-center border border-white/[0.1] shadow-sm">
+<span class="material-symbols-outlined text-[13px] text-secondary-fixed" data-icon="lock">lock</span>
+</div>
+<span class="text-[9px] font-label-micro text-outline mt-0.5 font-bold">S</span>
+</div>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-tertiary transition-colors">Rock Paper Scissors</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-tertiary font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> Ready to reveal
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 5. HAND CRICKET -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-secondary-fixed/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-secondary-fixed font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Innings Duel
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Runs &amp; Wickets</span>
+</div>
+<!-- Tactile Visual: Bat, seam ball & numeric delivery dial -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-xl bg-surface-container-lowest p-2 border border-white/[0.06] flex items-center justify-center shadow-inner">
+<!-- Cricket ball with stitch seam -->
+<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-rose-800 to-rose-600 border border-white/[0.15] flex items-center justify-center shadow-[0_0_12px_rgba(225,29,72,0.4)] relative">
+<div class="w-full h-[1px] bg-white/40 rotate-45"></div>
+<!-- Number delivery -->
+<span class="absolute text-[13px] font-stat-counter font-bold text-white drop-shadow">4</span>
+</div>
+<!-- Mini Runs Badge Pill -->
+<span class="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-md bg-[#1F1F26] border border-white/[0.1] text-secondary-fixed text-[9px] font-bold font-label-micro">
+                48/2
+              </span>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary transition-colors">Hand Cricket</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-primary-container font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Daniel bowling
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 6. SOS -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-primary-container/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary-fixed-dim font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Turn-based
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Word Strategy</span>
+</div>
+<!-- Tactile Visual: Notebook 3x3 SOS with diagonal neon strikethrough -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-xl bg-surface-container-lowest p-1.5 border border-white/[0.06] grid grid-cols-3 grid-rows-3 gap-1 shadow-inner">
+<div class="rounded bg-surface-container flex items-center justify-center text-[12px] font-bold text-primary">S</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[10px] text-outline/30">·</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[11px] text-outline/50">O</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[10px] text-outline/30">·</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[12px] font-bold text-primary">O</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[10px] text-outline/30">·</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[11px] text-outline/50">S</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[10px] text-outline/30">·</div>
+<div class="rounded bg-surface-container flex items-center justify-center text-[12px] font-bold text-primary">S</div>
+<!-- Diagonal Neon Line across diagonal SOS -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+<div class="w-[84px] h-[2px] bg-primary-container -rotate-45 shadow-[0_0_8px_#cfe6a3]"></div>
+</div>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors">SOS</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-outline font-semibold">Ready to start</span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 7. CONNECT FOUR -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-secondary-fixed/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-secondary-fixed font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                4 in a Row
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Vertical Gravity</span>
+</div>
+<!-- Tactile Visual: Slotted blue board with yellow & crimson discs -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="w-20 h-20 rounded-xl bg-blue-950/80 p-2 border border-blue-500/30 grid grid-cols-4 grid-rows-4 gap-1.5 shadow-inner">
+<!-- Row 1 -->
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<!-- Row 2 -->
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed shadow-[0_0_6px_rgba(248,226,140,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-surface-container-lowest/80 mx-auto"></div>
+<!-- Row 3 -->
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed shadow-[0_0_6px_rgba(248,226,140,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed shadow-[0_0_6px_rgba(248,226,140,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.6)] mx-auto"></div>
+<!-- Row 4 -->
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed shadow-[0_0_6px_rgba(248,226,140,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary-fixed shadow-[0_0_6px_rgba(248,226,140,0.6)] mx-auto"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.6)] mx-auto"></div>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-secondary-fixed transition-colors">Connect Four</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-secondary-fixed font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-fixed"></span> Sarah's turn
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+<!-- 8. SNAKES & LADDERS -->
+<article class="group relative bg-[#16161B] rounded-[24px] border border-white/[0.08] hover:border-primary-container/40 p-3.5 flex flex-col justify-between min-h-[235px] transition-all duration-200 cursor-pointer overflow-hidden shadow-lg">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-primary-fixed-dim font-label-micro text-label-micro uppercase tracking-wider border border-white/[0.04]">
+                Roll &amp; Race
+              </span>
+</div>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-1">Race Board</span>
+</div>
+<!-- Tactile Visual: Mini board with serpentine coiling snake & wooden ladder -->
+<div class="my-auto py-2 flex items-center justify-center">
+<div class="relative w-20 h-20 rounded-xl bg-surface-container-lowest p-2 border border-white/[0.06] overflow-hidden flex items-center justify-center shadow-inner">
+<!-- Isometric grid tiles representation -->
+<div class="absolute inset-1 grid grid-cols-3 grid-rows-3 gap-0.5 opacity-30">
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+<div class="border border-white/20"></div>
+</div>
+<!-- Coiling Green Snake Graphic -->
+<svg class="absolute w-14 h-14 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="6" viewbox="0 0 100 100">
+<path d="M 20 80 C 40 80, 30 50, 60 50 C 80 50, 70 20, 85 20"></path>
+</svg>
+<!-- Slanted Ladder -->
+<div class="absolute w-4 h-14 border-x-2 border-amber-300/80 rotate-12 flex flex-col justify-around py-1 shadow-sm">
+<div class="w-full h-0.5 bg-amber-300/80"></div>
+<div class="w-full h-0.5 bg-amber-300/80"></div>
+<div class="w-full h-0.5 bg-amber-300/80"></div>
+<div class="w-full h-0.5 bg-amber-300/80"></div>
+</div>
+<!-- Pair of Dice cues -->
+<span class="absolute bottom-1 right-1 text-[11px] font-bold text-primary bg-[#1F1F26] px-1 py-0.2 rounded border border-white/10">6·4</span>
+</div>
+</div>
+<div class="z-10 pt-1 border-t border-white/[0.04]">
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors">Snakes &amp; Ladders</h2>
+<div class="flex items-center justify-between mt-1">
+<span class="font-label-micro text-label-micro text-primary-container font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> Daniel's roll
+              </span>
+<span class="material-symbols-outlined text-[16px] text-outline group-hover:text-on-surface group-hover:translate-x-0.5 transition-all" data-icon="arrow_forward">arrow_forward</span>
+</div>
+</div>
+</article>
+</section>
+<!-- Intimate Duo Summary Card (Pastel Deck Accent) -->
+<section class="mb-space-lg p-space-lg rounded-[24px] bg-[#CFE6A3] text-[#1D2915] flex items-center justify-between shadow-md">
+<div>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-[#1D2915]/80 font-bold block mb-1">REAL-TIME SYNC</span>
+<h3 class="font-headline-md text-[18px] font-bold tracking-tight">Active Duels Ongoing</h3>
+<p class="font-body-md text-[13px] text-[#1D2915]/90 mt-0.5 font-medium">3 turns waiting for your move</p>
+</div>
+<button class="w-11 h-11 rounded-full bg-[#1D2915] text-[#CFE6A3] flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="bolt">bolt</span>
+</button>
+</section>
+</div>
+<!-- Floating Bottom Navigation Pill Dock (Shared Component) -->
+<!-- Executing JSON specifications: destination_count: 3, icons: ["home", "sports_esports", "favorite"] -->
+<!-- Contextual Mapping: Active is "sports_esports" (Games screen) -->
+<nav aria-label="Primary Mobile Navigation" class="fixed bottom-space-xl left-1/2 -translate-x-1/2 z-50 flex justify-around items-center px-gutter-sm max-w-[280px] w-full rounded-full h-[60px] bg-surface-container/85 backdrop-blur-md border border-outline-variant/30 shadow-2xl shadow-black/80">
+<!-- Destination 1: Home (Inactive) -->
+<a aria-label="Home" class="flex items-center justify-center w-11 h-11 text-outline transition-colors duration-200 hover:text-on-surface active:scale-90" href="#home">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+</a>
+<!-- Destination 2: Games (Active - sports_esports) -->
+<a aria-current="page" aria-label="Games" class="flex items-center justify-center w-11 h-11 bg-on-surface text-surface-container-lowest rounded-full transition-all duration-200 active:scale-90 shadow-md" href="#games">
+<span class="material-symbols-outlined text-[24px]" data-icon="sports_esports" style="font-variation-settings: 'FILL' 1;">sports_esports</span>
+</a>
+<!-- Destination 3: Us / Profile / Favorite (Inactive) -->
+<a aria-label="Us" class="flex items-center justify-center w-11 h-11 text-outline transition-colors duration-200 hover:text-on-surface active:scale-90" href="#us">
+<span class="material-symbols-outlined text-[24px]" data-icon="favorite">favorite</span>
+</a>
+</nav>
+</main>
+</body></html>

@@ -398,6 +398,7 @@ export function validateAndReduce(
               replay: Boolean(state.replay),
               puzzleId: state.puzzleId,
               elapsedMs,
+              interrupted: Boolean(state.interrupted),
               winner: actorSeat,
             },
           };

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { test, expect, type Page } from "@playwright/test";
-import { login, create, view, action } from "./helpers";
+import { login, create, view, action, captureScreenshot, writeJsonWithRetry } from "./helpers";
 
 const evidence = path.resolve("planning/review/evidence/owner-corrections");
 const games = [
@@ -117,10 +117,10 @@ test.describe("owner visual matrix on real Worker", () => {
           await waitForBoard(page, game, tag);
           for (const size of sizes) {
             await page.setViewportSize(size);
-            await page.screenshot({
-              path: path.join(evidence, `${tag}-${appearance.tag}-${size.width}.png`),
-              fullPage: true,
-            });
+            await captureScreenshot(
+              page,
+              path.join(evidence, `${tag}-${appearance.tag}-${size.width}.png`),
+            );
             const layout = await page.evaluate(() => ({
               scrollWidth: document.documentElement.scrollWidth,
               clientWidth: document.documentElement.clientWidth,
@@ -139,19 +139,13 @@ test.describe("owner visual matrix on real Worker", () => {
         if (["dots-boxes", "sos", "connect-four"].includes(game)) {
           await page.getByRole("button", { name: "Focus", exact: true }).click();
           await expect(page.getByRole("button", { name: "Exit focus" })).toBeVisible();
-          await page.screenshot({
-            path: path.join(evidence, `${tag}-focus-320.png`),
-            fullPage: true,
-          });
+          await captureScreenshot(page, path.join(evidence, `${tag}-focus-320.png`));
           await page.getByRole("button", { name: "Exit focus" }).click();
         }
         if (["dots-boxes", "sos"].includes(game)) {
           await page.getByRole("button", { name: "Zoom board" }).click();
           await expect(page.getByRole("button", { name: "Reset board zoom" })).toBeVisible();
-          await page.screenshot({
-            path: path.join(evidence, `${tag}-zoom-320.png`),
-            fullPage: true,
-          });
+          await captureScreenshot(page, path.join(evidence, `${tag}-zoom-320.png`));
           await page.getByRole("button", { name: "Reset board zoom" }).click();
         }
         await page.keyboard.press("Tab");
@@ -169,10 +163,7 @@ test.describe("owner visual matrix on real Worker", () => {
           });
           return originals;
         });
-        await page.screenshot({
-          path: path.join(evidence, `${tag}-text125-320.png`),
-          fullPage: true,
-        });
+        await captureScreenshot(page, path.join(evidence, `${tag}-text125-320.png`));
         const scaledWidth = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(scaledWidth, `${game} text scaling horizontal overflow`).toBeLessThanOrEqual(322);
         observations.push({ textScale: 125, scrollWidth: scaledWidth });
@@ -189,15 +180,9 @@ test.describe("owner visual matrix on real Worker", () => {
         expect(
           await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches),
         ).toBe(true);
-        await page.screenshot({
-          path: path.join(evidence, `${tag}-reduced-motion-320.png`),
-          fullPage: true,
-        });
+        await captureScreenshot(page, path.join(evidence, `${tag}-reduced-motion-320.png`));
         await page.emulateMedia({ reducedMotion: "no-preference" });
-        fs.writeFileSync(
-          path.join(evidence, `${tag}-matrix.json`),
-          JSON.stringify(observations, null, 2),
-        );
+        await writeJsonWithRetry(path.join(evidence, `${tag}-matrix.json`), observations);
       } finally {
         await cleanup(page, id);
         await chooseAppearance(page, initialFamily, initialMode);
@@ -225,7 +210,7 @@ test("accepted action motion video and live Animation observations", async ({ br
   }> = [];
   try {
     for (const game of motionGames) {
-      const id = await create(page, game, "together");
+      let id = await create(page, game, "together");
       try {
         await page.goto(`/matches/${id}`);
         await waitForBoard(page, game);
@@ -286,11 +271,14 @@ test("accepted action motion video and live Animation observations", async ({ br
           let saved = await view(page, id);
           let climbed = false,
             bitten = false;
-          for (
-            let rolls = 0;
-            rolls < 100 && !(climbed && bitten) && saved.lifecycle === "active";
-            rolls++
-          ) {
+          for (let rolls = 0; rolls < 120 && !(climbed && bitten); rolls++) {
+            if (saved.lifecycle !== "active") {
+              await cleanup(page, id);
+              id = await create(page, game, "together");
+              await page.goto(`/matches/${id}`);
+              await waitForBoard(page, game);
+              saved = await view(page, id);
+            }
             const previous = saved;
             await expect(page.getByTestId("snl-roll-button")).toBeEnabled();
             await page.getByTestId("snl-roll-button").click();
@@ -308,6 +296,12 @@ test("accepted action motion video and live Animation observations", async ({ br
           }
           expect(climbed, "SNL ladder observed through accepted UI rolls").toBe(true);
           expect(bitten, "SNL snake observed through accepted UI rolls").toBe(true);
+          if (saved.lifecycle !== "active") {
+            await cleanup(page, id);
+            id = await create(page, game, "together");
+            await page.goto(`/matches/${id}`);
+            await waitForBoard(page, game);
+          }
         }
         if (game === "dots-boxes") {
           for (const edge of ["edge-h-1-0", "edge-v-0-0", "edge-v-0-1"]) {
@@ -390,11 +384,19 @@ test("accepted action motion video and live Animation observations", async ({ br
     }
   } finally {
     await context.close();
-    fs.writeFileSync(
-      path.join(evidence, "accepted-motion-observations.json"),
-      JSON.stringify(results, null, 2),
-    );
+    await writeJsonWithRetry(path.join(evidence, "accepted-motion-observations.json"), results);
   }
   const video = page.video();
-  if (video) await video.saveAs(path.join(evidence, "accepted-motion.webm"));
+  if (video) {
+    const videoPath = path.join(evidence, "accepted-motion.webm");
+    for (let attempt = 1; attempt <= 10; attempt++) {
+      try {
+        await video.saveAs(videoPath);
+        break;
+      } catch (err: unknown) {
+        if (attempt === 10) throw err;
+        await new Promise((resolve) => setTimeout(resolve, 100 * attempt));
+      }
+    }
+  }
 });

@@ -19,6 +19,7 @@ import type {
   SessionError,
   SocketServerMessage,
 } from "./types";
+import { generateUuid } from "../../shared/utils/uuid";
 
 function getStorageKey(accountId: AccountId, matchId: string): string {
   return `pa_pending_${accountId}_${matchId}`;
@@ -38,10 +39,7 @@ function isDocumentVisible(): boolean {
 }
 
 function generateActionId(): string {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
-  return "act_" + Math.random().toString(36).slice(2, 11) + "_" + Date.now().toString(36);
+  return generateUuid();
 }
 
 export class MatchSession {
@@ -61,6 +59,12 @@ export class MatchSession {
   private reconnectAttempts = 0;
   private isDisposed = false;
   private isUsingPolling = false;
+
+  private lastContactTimestamp = Date.now();
+  private lastPingTimestamp: number | null = null;
+  private pongTimeoutTimer: any = null;
+  private reconciliationPromise: Promise<void> | null = null;
+  private reconciliationGeneration = 0;
 
   private actionTimer: ReturnType<typeof setTimeout> | null = null;
   private pendingResolver: {
@@ -138,6 +142,14 @@ export class MatchSession {
 
   public getState(): Readonly<MatchSessionState> {
     return this.state;
+  }
+
+  public getLastContactTimestamp(): number {
+    return this.lastContactTimestamp;
+  }
+
+  public getLastPingTimestamp(): number | null {
+    return this.lastPingTimestamp;
   }
 
   public setConnectionState(connectionState: ConnectionState): void {
@@ -315,7 +327,17 @@ export class MatchSession {
     this.heartbeatTimer = setInterval(() => {
       if (this.ws && this.ws.readyState === 1) {
         try {
+          this.lastPingTimestamp = Date.now();
           this.ws.send(JSON.stringify({ type: "ping" }));
+          this.clearPongTimeout();
+          this.pongTimeoutTimer = setTimeout(() => {
+            // Pong deadline expired (10s without response)
+            if (this.ws && !this.isDisposed) {
+              try {
+                this.ws.close();
+              } catch {}
+            }
+          }, 10000);
         } catch {
           // Socket write error
         }
@@ -323,11 +345,19 @@ export class MatchSession {
     }, this.options.heartbeatIntervalMs);
   }
 
+  private clearPongTimeout(): void {
+    if (this.pongTimeoutTimer) {
+      clearTimeout(this.pongTimeoutTimer);
+      this.pongTimeoutTimer = null;
+    }
+  }
+
   private stopHeartbeat(): void {
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
       this.heartbeatTimer = null;
     }
+    this.clearPongTimeout();
   }
 
   private startPollingFallback(): void {
@@ -389,6 +419,7 @@ export class MatchSession {
   }
 
   private handleSocketMessage(msg: SocketServerMessage): void {
+    this.lastContactTimestamp = Date.now();
     if ("status" in msg) {
       if (msg.status === "accepted") {
         this.handleAcceptedReply(msg);
@@ -420,6 +451,7 @@ export class MatchSession {
         break;
 
       case "pong":
+        this.clearPongTimeout();
         break;
     }
   }
@@ -492,9 +524,10 @@ export class MatchSession {
         : false,
     };
 
+    const effectiveDeliveryVersion = msg.view.deliveryVersion ?? msg.acceptedVersion;
     this.updateState({
       view: msg.view,
-      deliveryVersion: msg.acceptedVersion,
+      deliveryVersion: effectiveDeliveryVersion,
       acceptedEvent: { eventId: msg.eventId, effects: msg.effects ?? [] },
       controllerStatus: newController,
       pendingAction,
@@ -563,8 +596,9 @@ export class MatchSession {
   }
 
   private handleAcceptedReply(reply: AcceptedReply): void {
+    const effectiveDeliveryVersion = reply.view?.deliveryVersion ?? reply.acceptedVersion;
     const animate =
-      reply.acceptedVersion > this.state.deliveryVersion &&
+      effectiveDeliveryVersion > this.state.deliveryVersion &&
       this.state.pendingAction?.status === "in-flight";
     if (this.state.pendingAction && this.state.pendingAction.actionId === reply.actionId) {
       if (this.pendingResolver) {
@@ -574,10 +608,10 @@ export class MatchSession {
       this.clearPendingAction();
     }
 
-    if (reply.view && reply.acceptedVersion >= this.state.deliveryVersion) {
+    if (reply.view && effectiveDeliveryVersion >= this.state.deliveryVersion) {
       this.updateState({
         view: reply.view,
-        deliveryVersion: reply.acceptedVersion,
+        deliveryVersion: effectiveDeliveryVersion,
         ...(animate
           ? { acceptedEvent: { eventId: reply.eventId, effects: reply.effects ?? [] } }
           : {}),
@@ -790,6 +824,30 @@ export class MatchSession {
 
   public async reconcile(): Promise<void> {
     if (this.isDisposed) return;
+    this.reconciliationGeneration++;
+    const currentGen = this.reconciliationGeneration;
+
+    if (this.reconciliationPromise) {
+      try {
+        await this.reconciliationPromise;
+      } catch {}
+      if (currentGen < this.reconciliationGeneration) {
+        return;
+      }
+    }
+
+    this.reconciliationPromise = this.doReconcile(currentGen);
+    try {
+      await this.reconciliationPromise;
+    } finally {
+      if (this.reconciliationGeneration === currentGen) {
+        this.reconciliationPromise = null;
+      }
+    }
+  }
+
+  private async doReconcile(generation: number): Promise<void> {
+    if (this.isDisposed) return;
 
     if (this.state.pendingAction?.isSecret) this.state.pendingAction.payload = {} as any;
     // 1. Conceal unrevealed secret choices first
@@ -812,7 +870,9 @@ export class MatchSession {
         await this.fetchSnapshot();
       }
     } finally {
-      this.updateState({ syncStatus: "idle" });
+      if (this.reconciliationGeneration === generation) {
+        this.updateState({ syncStatus: "idle" });
+      }
     }
   }
 

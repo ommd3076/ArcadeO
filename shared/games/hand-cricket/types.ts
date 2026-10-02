@@ -29,6 +29,7 @@ export interface CricketDeliveryResult {
 }
 
 export interface CricketState {
+  rulesVersion?: number; // 1 (1..6) or 2 (1..10)
   mode?: "remote" | "together";
   revealed?: boolean;
   phase: CricketPhase;
@@ -110,6 +111,10 @@ export type CricketEffect =
     };
 
 export interface CricketView {
+  rulesVersion?: number;
+  allowedNumbers?: number[];
+  expectedChooser?: Seat;
+  expectedRole?: CricketRole;
   revealed?: boolean;
   phase: CricketPhase;
   innings: 1 | 2;

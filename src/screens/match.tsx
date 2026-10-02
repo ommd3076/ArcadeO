@@ -1,4 +1,5 @@
 import { apiFetch } from "../app/auth";
+import { generateUuid } from "../../shared/utils/uuid";
 import { useTheme, resolvePlayerAccent } from "../theme";
 import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -195,7 +196,9 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     try {
       await sendAction("secret.reveal", {});
     } catch (err) {
+      setActionError((err as Error).message);
       console.error("Failed to reveal RPS outcome:", err);
+      throw err;
     }
   };
 
@@ -203,7 +206,9 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     try {
       await sendAction("secret.next", {});
     } catch (err) {
+      setActionError((err as Error).message);
       console.error("Failed to advance RPS round:", err);
+      throw err;
     }
   };
 
@@ -269,7 +274,9 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     try {
       await sendAction("secret.reveal", {});
     } catch (err) {
+      setActionError((err as Error).message);
       console.error("Failed to reveal cricket delivery:", err);
+      throw err;
     }
   };
 
@@ -277,7 +284,9 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     try {
       await sendAction("secret.next", {});
     } catch (err) {
+      setActionError((err as Error).message);
       console.error("Failed to advance cricket delivery:", err);
+      throw err;
     }
   };
 
@@ -329,10 +338,26 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   // Rematch or Return Home
   const handleRematch = async () => {
     try {
-      const creationId =
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `rematch-${Date.now()}`;
+      const creationId = generateUuid();
+      let gameOptions: Record<string, unknown> = {};
+
+      if (view?.gameId === "sudoku") {
+        gameOptions = { puzzleId: (view.gameState as SudokuView)?.puzzleId };
+      } else if (view?.gameId === "rock-paper-scissors") {
+        gameOptions = {
+          format: `best-of-${((view.gameState as RPSView)?.targetWins ?? 2) * 2 - 1}`,
+        };
+      } else if (view?.gameId === "dots-boxes") {
+        gameOptions = { gridSize: (view.gameState as DotsBoxesView)?.gridSize ?? 5 };
+      } else if (view?.gameId === "sos") {
+        gameOptions = { gridSize: (view.gameState as SOSView)?.gridSize ?? 5 };
+      } else if (view?.gameId === "snakes-and-ladders") {
+        gameOptions = { boardVersion: (view.gameState as SnakesAndLaddersView)?.boardVersion ?? 2 };
+      } else if (view?.gameId === "ludo") {
+        gameOptions = { colours: (view.gameState as LudoView)?.colours };
+      } else if (view?.gameId === "hand-cricket") {
+        gameOptions = { rulesVersion: (view.gameState as CricketView)?.rulesVersion ?? 2 };
+      }
 
       const res = await apiFetch("/api/v1/matches", {
         method: "POST",
@@ -340,12 +365,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         body: JSON.stringify({
           creationId,
           gameId: view?.gameId ?? "connect-four",
-          gameOptions:
-            view?.gameId === "sudoku"
-              ? { puzzleId: (view.gameState as SudokuView).puzzleId }
-              : view?.gameId === "rock-paper-scissors"
-                ? { format: `best-of-${(view.gameState as RPSView).targetWins * 2 - 1}` }
-                : {},
+          gameOptions,
           mode: view?.mode ?? "together",
         }),
       });

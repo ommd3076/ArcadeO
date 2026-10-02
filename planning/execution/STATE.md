@@ -1,4 +1,12 @@
-# Current checkpoint — Hand Cricket and UI planning
+# Current checkpoint — engine baseline and UI handoff
+
+Owner update, 2026-10-02: commit/push the current engine implementation and Stitch sources to main, then start the whole UI and animation implementation on codex/ui in an owner-created GPT-6 Luna chat. Fresh checkpoint validation: 269 unit, 61 mocked contracts, 46 server-rendered components, 4 actual Worker durability tests, 26 real HTTP scenarios, 59 Chromium browser tests, build/typecheck/lint/format and 1,000 Sudoku content checks all passed. No UI redesign or deployment was performed by this checkpointing pass.
+
+Read [engine baseline and remaining scope](../review/ENGINE-BASELINE-2026-10-02.md) and [Stitch source inventory](../review/STITCH-EXPORT-INVENTORY.md). Passing checks do not certify every new engine-plan requirement: offline Together authority, durable disconnect eligibility and interrupted-duel record exclusion remain follow-ups. The UI must consume actual engine capabilities rather than fabricate them.
+
+The older planning/verification text below is preserved as historical context.
+
+## Earlier Hand Cricket planning checkpoint
 
 Owner update, 2026-10-02: Hand Cricket pass-and-play, masking/unmasking and a clock showing roughly `1129:29` need renewed investigation. Numbers 1–10 are confirmed for the new cricket rules. Current authorization is **planning only**. No application repair or new runtime check was performed for this planning pass.
 

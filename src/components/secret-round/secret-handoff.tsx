@@ -30,6 +30,7 @@ export function SecretHandoff<T = string | number>({
   isSeatBLocked = false,
   isResolved = false,
   isRevealed = false,
+  readiness,
   outcome = null,
   onLockChoice,
   onReveal,
@@ -209,10 +210,10 @@ export function SecretHandoff<T = string | number>({
   const handleTogetherRevealClick = async () => {
     try {
       if (onReveal) await onReveal();
+      setTogetherStep("revealed-outcome");
     } catch {
       return;
     }
-    setTogetherStep("revealed-outcome");
   };
 
   const handleNextRoundClick = async () => {
@@ -526,24 +527,39 @@ export function SecretHandoff<T = string | number>({
         {outcome.detailsNode && <div style={{ marginTop: "4px" }}>{outcome.detailsNode}</div>}
 
         <div style={{ marginTop: "var(--space-md)" }}>
-          <Button
-            variant="primary"
-            size="lg"
-            fullWidth
-            pill
-            onClick={handleNextRoundClick}
-            disabled={isSubmittingNext}
-            rightIcon={
-              isSubmittingNext ? (
-                <RotateCw className="arcade-spin" size={18} />
-              ) : (
-                <ArrowRight size={18} />
-              )
-            }
-            style={{ minHeight: "48px" }}
-          >
-            {isSubmittingNext ? "Advancing..." : "Next Round"}
-          </Button>
+          {mode === "remote" && localSeat && readiness?.[localSeat] ? (
+            <Button
+              variant="secondary"
+              size="lg"
+              fullWidth
+              pill
+              disabled={true}
+              leftIcon={<CheckCircle2 size={18} />}
+              style={{ minHeight: "48px" }}
+            >
+              You&apos;re ready · Waiting for{" "}
+              {localSeat === "A" ? playerBInfo.name : playerAInfo.name}...
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              pill
+              onClick={handleNextRoundClick}
+              disabled={isSubmittingNext}
+              rightIcon={
+                isSubmittingNext ? (
+                  <RotateCw className="arcade-spin" size={18} />
+                ) : (
+                  <ArrowRight size={18} />
+                )
+              }
+              style={{ minHeight: "48px" }}
+            >
+              {isSubmittingNext ? "Advancing..." : "Next Round"}
+            </Button>
+          )}
         </div>
       </Surface>
     );
@@ -710,7 +726,11 @@ export function SecretHandoff<T = string | number>({
             style={{
               display: "grid",
               gridTemplateColumns:
-                options.length <= 3 ? `repeat(${options.length}, 1fr)` : "repeat(3, 1fr)",
+                options.length === 10
+                  ? "repeat(5, 1fr)"
+                  : options.length <= 3
+                    ? `repeat(${options.length}, 1fr)`
+                    : "repeat(3, 1fr)",
               gap: "var(--space-md)",
             }}
           >
@@ -950,7 +970,11 @@ export function SecretHandoff<T = string | number>({
             style={{
               display: "grid",
               gridTemplateColumns:
-                options.length <= 3 ? `repeat(${options.length}, 1fr)` : "repeat(3, 1fr)",
+                options.length === 10
+                  ? "repeat(5, 1fr)"
+                  : options.length <= 3
+                    ? `repeat(${options.length}, 1fr)`
+                    : "repeat(3, 1fr)",
               gap: "var(--space-md)",
             }}
           >
@@ -1185,7 +1209,11 @@ export function SecretHandoff<T = string | number>({
             style={{
               display: "grid",
               gridTemplateColumns:
-                options.length <= 3 ? `repeat(${options.length}, 1fr)` : "repeat(3, 1fr)",
+                options.length === 10
+                  ? "repeat(5, 1fr)"
+                  : options.length <= 3
+                    ? `repeat(${options.length}, 1fr)`
+                    : "repeat(3, 1fr)",
               gap: "var(--space-md)",
             }}
           >

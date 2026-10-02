@@ -42,6 +42,11 @@ export interface MatchSnapshotRow {
   turnSeat: Seat | null;
   turnId: number | null;
   roundId: number | null;
+  pauseId?: string | null;
+  savedAt?: number | null;
+  expiresAt?: number | null;
+  resumeReadiness?: string | null;
+  authorityEpoch?: number | null;
   gameState: string; // JSON
   readiness: string; // JSON: { A: boolean; B: boolean }
   participants: string; // JSON: MatchParticipants
@@ -69,6 +74,11 @@ export interface ActionReceiptRow {
   eventId: string | null;
   canonicalPayloadDigest: string | null;
   createdAt: number;
+  actionType?: string | null;
+  actorSeat?: Seat | null;
+  roundId?: number | null;
+  controllerGeneration?: number | null;
+  authorityEpoch?: number | null;
 }
 
 export interface PrivateRoundChoiceRow {
@@ -99,6 +109,11 @@ export interface SnapshotData {
   turnSeat: Seat | null;
   turnId: number | null;
   roundId: number | null;
+  pauseId?: string | null;
+  savedAt?: number | null;
+  expiresAt?: number | null;
+  resumeReadiness?: { A: boolean; B?: boolean } | null;
+  authorityEpoch?: number | null;
   gameState: unknown;
   readiness: { A: boolean; B: boolean };
   participants: MatchParticipants;

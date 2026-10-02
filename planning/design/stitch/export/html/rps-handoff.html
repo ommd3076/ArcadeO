@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Arcade - RPS Handoff</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            canvas: '#0C0C0F',
+            card: '#16161B',
+            'card-elevated': '#1F1F26',
+            mint: '#CFE6A3',
+            'mint-dark': '#1D2915',
+            'warm-yellow': '#F4DE88',
+            'yellow-ink': '#2E2305',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0C0C0F;
+      color: #F3F4F6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Subtle pulsing glow for secret shield */
+    @keyframes pulse-glow {
+      0%, 100% {
+        box-shadow: 0 0 25px -5px rgba(207, 230, 163, 0.18), 0 20px 30px -10px rgba(0, 0, 0, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 35px 2px rgba(207, 230, 163, 0.28), 0 20px 35px -10px rgba(0, 0, 0, 0.8);
+      }
+    }
+    .shield-glow {
+      animation: pulse-glow 3.5s ease-in-out infinite;
+    }
+    /* Shimmer effect on pass card */
+    @keyframes subtle-shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+    .shimmer-mask {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+      animation: subtle-shimmer 4s infinite linear;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-canvas flex justify-center items-start antialiased selection:bg-mint selection:text-mint-dark">
+
+  <!-- Mobile Container (Max 430px) -->
+  <div class="w-full max-w-[420px] min-h-screen bg-[#0C0C0F] flex flex-col justify-between p-4 sm:p-5 relative overflow-hidden">
+    
+    <!-- Ambient Background Radial Accents -->
+    <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-80 bg-mint/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#F4DE88]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <!-- Header Section -->
+    <header class="relative z-10 pt-2 pb-3">
+      <!-- Top Navigation Bar -->
+      <div class="flex items-center justify-between mb-4">
+        <!-- Back Button -->
+        <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#16161B] border border-white/10 text-xs font-semibold text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span>Games</span>
+        </button>
+
+        <!-- Center Match Title -->
+        <div class="text-center">
+          <h1 class="text-sm font-bold tracking-tight text-white flex items-center justify-center gap-1.5">
+            <span>Rock Paper Scissors</span>
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-mint"></span>
+          </h1>
+          <p class="text-[11px] font-medium text-gray-400">Round 2 of 3 · Together Mode</p>
+        </div>
+
+        <!-- Help / Rules Button -->
+        <button class="w-8 h-8 rounded-full bg-[#16161B] border border-white/10 flex items-center justify-center text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all" title="Together Mode Rules">
+          <span class="material-symbols-outlined text-[18px]">help_outline</span>
+        </button>
+      </div>
+
+      <!-- Player Score Bar Card -->
+      <div class="w-full bg-card border border-white/[0.08] rounded-2xl p-3 flex items-center justify-between shadow-lg shadow-black/40">
+        <!-- Daniel (Player 1) -->
+        <div class="flex items-center gap-2.5">
+          <div class="relative">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-mint/30 to-mint/10 border border-mint/40 flex items-center justify-center font-display font-bold text-mint text-sm">
+              D
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-canvas rounded-full flex items-center justify-center">
+              <span class="w-2.5 h-2.5 rounded-full bg-mint"></span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs font-bold text-white">Daniel</span>
+              <span class="px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider rounded bg-white/10 text-gray-300">You</span>
+            </div>
+            <div class="flex items-center gap-1 mt-0.5">
+              <span class="text-xs font-display font-bold text-white">1 pt</span>
+              <span class="inline-flex items-center text-[10px] font-semibold text-mint bg-mint/15 px-1.5 py-0.5 rounded-full border border-mint/30">
+                <span class="material-symbols-outlined text-[11px] mr-0.5 fill">lock</span> Locked ✓
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VS Divider Badge -->
+        <div class="flex flex-col items-center px-1">
+          <span class="text-[10px] font-black font-display tracking-widest text-gray-500 uppercase">VS</span>
+          <span class="text-[9px] text-gray-600 font-medium">B3</span>
+        </div>
+
+        <!-- Sarah (Player 2) -->
+        <div class="flex items-center gap-2.5 flex-row-reverse text-right">
+          <div class="relative">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#F4DE88]/30 to-[#F4DE88]/10 border border-[#F4DE88]/30 flex items-center justify-center font-display font-bold text-warm-yellow text-sm">
+              S
+            </div>
+            <div class="absolute -bottom-0.5 -left-0.5 w-3.5 h-3.5 bg-canvas rounded-full flex items-center justify-center">
+              <span class="w-2.5 h-2.5 rounded-full bg-warm-yellow animate-ping opacity-75"></span>
+              <span class="w-2 rounded-full bg-warm-yellow absolute"></span>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center justify-end gap-1.5">
+              <span class="text-xs font-bold text-white">Sarah</span>
+            </div>
+            <div class="flex items-center justify-end gap-1 mt-0.5">
+              <span class="text-xs font-display font-bold text-gray-400">0 pts</span>
+              <span class="text-[10px] font-medium text-gray-400 bg-white/5 px-1.5 py-0.5 rounded-full border border-white/5">
+                Waiting...
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Game Privacy Cover / Handoff Shield -->
+    <main class="relative z-10 flex-1 flex flex-col justify-center my-3">
+      <div class="w-full bg-card border border-white/[0.09] rounded-[24px] p-5 sm:p-6 text-center relative overflow-hidden shield-glow flex flex-col items-center">
+        
+        <!-- Subtle Pattern / Security Watermark Grid -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 16px 16px;"></div>
+        
+        <!-- Top Status Pill -->
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[11px] font-semibold text-gray-300 mb-5">
+          <span class="material-symbols-outlined text-[13px] text-mint">verified_user</span>
+          <span>End-to-End Privacy Shield</span>
+        </div>
+
+        <!-- Tactile 3D Lock Graphic Asset -->
+        <div class="relative mb-5 flex items-center justify-center">
+          <!-- Background Glow Halo -->
+          <div class="absolute w-28 h-28 bg-mint/20 rounded-full blur-xl"></div>
+          
+          <!-- Dimensional Tactile Padlock Component -->
+          <div class="relative w-24 h-24 rounded-3xl bg-gradient-to-b from-[#24242F] to-[#15151B] p-1 border border-white/15 shadow-[0_12px_28px_rgba(0,0,0,0.8),inset_0_2px_4px_rgba(255,255,255,0.2)] flex items-center justify-center">
+            
+            <!-- Metallic Shackle Ring -->
+            <div class="absolute -top-5 left-1/2 -translate-x-1/2 w-14 h-12 rounded-t-full border-[7px] border-slate-300/80 bg-transparent shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]"></div>
+            
+            <!-- Lock Core Face -->
+            <div class="w-full h-full rounded-[20px] bg-gradient-to-b from-[#1E1E26] via-[#141419] to-[#0E0E12] flex flex-col items-center justify-center relative overflow-hidden border border-black/50">
+              
+              <!-- Shimmer light highlight -->
+              <div class="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
+
+              <!-- Vault Icon with Lime Accent Glow -->
+              <div class="w-10 h-10 rounded-full bg-canvas/80 border border-mint/40 flex items-center justify-center shadow-[inset_0_2px_6px_rgba(0,0,0,0.8),0_0_15px_rgba(207,230,163,0.3)]">
+                <span class="material-symbols-outlined fill text-mint text-xl leading-none">lock</span>
+              </div>
+              
+              <!-- Micro sealed indicator dot -->
+              <div class="flex items-center gap-1 mt-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-mint shadow-[0_0_6px_#CFE6A3]"></span>
+                <span class="text-[9px] font-bold tracking-wider uppercase text-mint font-display">SEALED</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Heading -->
+        <h2 class="text-2xl sm:text-[26px] font-display font-bold tracking-tight text-white mb-1.5 leading-snug">
+          Move Locked &amp; Hidden
+        </h2>
+
+        <!-- Status confirmation text -->
+        <p class="text-xs sm:text-sm text-gray-300 mb-5 max-w-xs font-normal">
+          Daniel has safely locked his secret gesture into the couple vault.
+        </p>
+
+        <!-- Prominent Handoff Instruction Card (Warm Yellow #F4DE88 accent with dark ink #2E2305) -->
+        <div class="w-full bg-[#F4DE88] text-[#2E2305] rounded-2xl p-4 sm:p-5 mb-5 relative overflow-hidden shadow-lg shadow-black/30 text-left border border-[#ecd273]">
+          <!-- Animated light shimmer -->
+          <div class="shimmer-mask"></div>
+
+          <div class="flex items-start gap-3.5 relative z-10">
+            <!-- Physical Device Hand-off Icon -->
+            <div class="w-10 h-10 rounded-xl bg-[#2E2305]/10 flex items-center justify-center flex-shrink-0 mt-0.5 border border-[#2E2305]/15">
+              <span class="material-symbols-outlined text-[24px] text-[#2E2305]">phonelink_ring</span>
+            </div>
+
+            <div class="flex-1">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base font-display font-extrabold tracking-tight text-[#2E2305] leading-tight">
+                  Pass phone to Sarah
+                </h3>
+                <span class="text-[10px] font-bold uppercase tracking-wider bg-[#2E2305]/15 px-2 py-0.5 rounded-full">
+                  Secret
+                </span>
+              </div>
+              <p class="text-xs font-medium text-[#2E2305]/85 mt-1 leading-snug">
+                Keep your choice secret! Hand the device over to Sarah now so she can play her move.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Action Trigger -->
+        <div class="w-full space-y-2">
+          <!-- Mint Pill Button (#CFE6A3 with dark forest ink #1D2915, 52px height) -->
+          <button class="w-full h-[52px] rounded-full bg-mint text-mint-dark font-display font-bold text-base flex items-center justify-center gap-2 hover:bg-[#d8edb3] active:scale-[0.98] transition-all shadow-[0_8px_20px_rgba(207,230,163,0.22)] border border-mint/40 cursor-pointer">
+            <span>I am Sarah · Continue</span>
+            <span class="material-symbols-outlined font-bold text-[20px]">arrow_forward</span>
+          </button>
+
+          <!-- Micro-caption -->
+          <p class="text-[11px] font-medium text-gray-400 flex items-center justify-center gap-1">
+            <span class="material-symbols-outlined text-[13px] text-gray-500">touch_app</span>
+            <span>Tap only when Sarah is holding the phone.</span>
+          </p>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer Telemetry & Match Memory -->
+    <footer class="relative z-10 pt-1 pb-2 space-y-2">
+      <!-- Round 1 Outcome Card -->
+      <div class="w-full bg-[#141419] border border-white/[0.06] rounded-xl px-3.5 py-2 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-mint"></span>
+          <span class="text-gray-400 font-medium">Round 1 Outcome:</span>
+          <span class="text-white font-semibold flex items-center gap-1">
+            Daniel won with Rock 🪨 over Scissors ✂️
+          </span>
+        </div>
+        <span class="text-[11px] font-bold text-mint font-display">1 - 0</span>
+      </div>
+
+      <!-- Privacy & Protection Micro-Badge -->
+      <div class="flex items-center justify-center gap-1.5 text-[10px] text-gray-400 tracking-tight">
+        <span class="material-symbols-outlined text-[12px] text-gray-400">shield_lock</span>
+        <span>Protected against accidental peek &amp; screen refresh</span>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>

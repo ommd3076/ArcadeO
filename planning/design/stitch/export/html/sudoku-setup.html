@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Sudoku Duel Setup - Private Arcade</title>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary": "#00363a",
+            "on-error": "#690005",
+            "background": "#131316",
+            "surface-container-high": "#2a2a2d",
+            "on-tertiary-fixed": "#002022",
+            "inverse-surface": "#e5e1e6",
+            "surface-container-highest": "#353438",
+            "surface-bright": "#39393c",
+            "secondary": "#dbc673",
+            "on-background": "#e5e1e6",
+            "surface-dim": "#131316",
+            "tertiary-fixed-dim": "#99d0d5",
+            "on-tertiary-container": "#33696e",
+            "surface-container": "#1f1f22",
+            "primary-container": "#cfe6a3",
+            "on-tertiary-fixed-variant": "#124e53",
+            "secondary-fixed": "#f8e28c",
+            "outline": "#8f9284",
+            "on-primary-fixed": "#131f00",
+            "on-surface-variant": "#c5c8b9",
+            "inverse-on-surface": "#303033",
+            "inverse-primary": "#52652f",
+            "on-primary": "#253505",
+            "outline-variant": "#45483d",
+            "secondary-fixed-dim": "#dbc673",
+            "tertiary-container": "#b0e7ec",
+            "surface-container-low": "#1b1b1e",
+            "surface-container-lowest": "#0e0e11",
+            "primary": "#f3ffd6",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "on-surface": "#e5e1e6",
+            "on-secondary-container": "#d0bb69",
+            "error": "#ffb4ab",
+            "surface": "#131316",
+            "error-container": "#93000a",
+            "tertiary-fixed": "#b5ecf1",
+            "on-secondary": "#3a3000",
+            "on-error-container": "#ffdad6",
+            "on-primary-container": "#546832",
+            "primary-fixed-dim": "#b8cf8e",
+            "secondary-container": "#594b00",
+            "primary-fixed": "#d4eba8",
+            "on-secondary-fixed": "#221b00",
+            "on-secondary-fixed-variant": "#544600",
+            "tertiary": "#ebfdff",
+            "surface-variant": "#353438",
+            "surface-tint": "#b8cf8e"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.25rem",
+            "space-2xl": "2rem",
+            "gutter": "1rem",
+            "space-xl": "1.5rem",
+            "margin": "1.25rem",
+            "space-sm": "0.75rem",
+            "space-3xl": "3rem",
+            "gutter-sm": "0.75rem",
+            "space-2xs": "0.25rem",
+            "space-xs": "0.5rem"
+          },
+          "fontFamily": {
+            "label-micro": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "mono": ["JetBrains Mono", "monospace"]
+          },
+          "fontSize": {
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0C0C0F;
+      color: #E5E1E6;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior-y: none;
+    }
+
+    /* Custom tactile bevel and isometric shadows for 3D tiles */
+    .isometric-cube {
+      transform: perspective(600px) rotateX(16deg) rotateY(-18deg) rotateZ(3deg);
+      box-shadow: -6px 8px 18px rgba(0,0,0,0.65), 0 0 0 1px rgba(255,255,255,0.08);
+    }
+    
+    .tile-shadow {
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 3px 6px rgba(0,0,0,0.5);
+    }
+
+    .pulse-ring {
+      animation: pulse-ring 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 0; }
+      100% { transform: scale(0.95); opacity: 0; }
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen bg-[#0C0C0F] text-on-surface antialiased flex flex-col justify-between selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Viewport Container (Locked centered frame for desktop/mobile perfection) -->
+<div class="relative w-full max-w-md mx-auto min-h-screen bg-[#0C0C0F] flex flex-col justify-between overflow-x-hidden border-x border-white/[0.04]">
+<!-- Top Safe Area & Navigation -->
+<header class="sticky top-0 z-30 bg-[#0C0C0F]/90 backdrop-blur-xl px-margin-mobile pt-3 pb-2.5 flex items-center justify-between border-b border-white/[0.05]">
+<!-- Return to Games Navigation (Tactile Back Pill) -->
+<a class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low border border-white/[0.08] text-on-surface-variant hover:text-on-surface hover:bg-surface-container active:scale-95 transition-all duration-150" href="javascript:void(0)">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="font-label-lg text-label-lg tracking-tight font-medium">Games</span>
+</a>
+<!-- Presence & Partner Status Pill -->
+<div class="flex items-center gap-2">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#16161B] border border-white/[0.08] shadow-sm">
+<div class="relative flex items-center justify-center w-2 h-2">
+<span class="pulse-ring absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary-container"></span>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-widest text-on-surface-variant">Sarah · Connected</span>
+<!-- Mini Avatar ring -->
+<div class="w-4 h-4 rounded-full bg-secondary-fixed text-on-secondary-fixed flex items-center justify-center text-[9px] font-bold ring-1 ring-white/20">
+            S
+          </div>
+</div>
+<!-- Subtle Sound / Settings Toggle -->
+<button aria-label="Game Settings" class="w-8 h-8 rounded-full bg-surface-container-low border border-white/[0.08] flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-90 transition-transform" type="button">
+<span class="material-symbols-outlined text-[17px]">volume_up</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Main Content -->
+<main class="flex-1 px-margin-mobile pt-4 pb-36 space-y-5">
+<!-- 2. Title & Visual Hero Card with Tactile Isometric Grid -->
+<section class="relative overflow-hidden rounded-[24px] bg-[#16161B] border border-white/[0.08] p-5 shadow-2xl">
+<!-- Ambient radial glow behind tile -->
+<div class="absolute -right-8 -top-8 w-44 h-44 rounded-full bg-primary-container/10 blur-3xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<div class="space-y-1 z-10">
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-white/[0.04] border border-white/[0.06] mb-1">
+<span class="material-symbols-outlined text-primary-container text-[13px]" style="font-variation-settings: 'FILL' 1;">grid_4x4</span>
+<span class="font-label-micro text-label-micro text-primary-container tracking-wider uppercase">Private Duel</span>
+</div>
+<h1 class="font-display-hero-mobile text-display-hero-mobile font-semibold tracking-tight text-on-surface">
+              Sudoku
+            </h1>
+<p class="font-body-md text-body-md text-on-surface-variant text-xs leading-relaxed max-w-[190px]">
+              Classic 9×9 Japanese number logic built for two minds.
+            </p>
+</div>
+<!-- Tactile 3D Isometric Mini Sudoku Tile Grid Display -->
+<div class="relative pr-2">
+<div class="isometric-cube grid grid-cols-3 gap-1 p-2 rounded-xl bg-[#0E0E11] border border-white/[0.12] w-24 h-24">
+<!-- Cell 1 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-[#22222A] text-on-surface font-mono font-semibold text-xs border-t border-white/20">
+                7
+              </div>
+<!-- Cell 2 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-surface-container-high/60 text-outline-variant font-mono text-[10px]">
+                ·
+              </div>
+<!-- Cell 3 (Mint accent highlight) -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-primary-container text-on-primary-container font-mono font-bold text-xs ring-1 ring-primary-container/60">
+                3
+              </div>
+<!-- Cell 4 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-surface-container-high/60 text-outline-variant font-mono text-[10px]">
+                ·
+              </div>
+<!-- Cell 5 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-[#22222A] text-on-surface font-mono font-semibold text-xs border-t border-white/20">
+                9
+              </div>
+<!-- Cell 6 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-surface-container-high/60 text-outline-variant font-mono text-[10px]">
+                ·
+              </div>
+<!-- Cell 7 (Sarah Accent Yellow) -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-secondary-fixed text-on-secondary-fixed font-mono font-bold text-xs">
+                5
+              </div>
+<!-- Cell 8 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-surface-container-high/60 text-outline-variant font-mono text-[10px]">
+                ·
+              </div>
+<!-- Cell 9 -->
+<div class="tile-shadow flex items-center justify-center rounded-lg bg-[#22222A] text-on-surface font-mono font-semibold text-xs border-t border-white/20">
+                1
+              </div>
+</div>
+</div>
+</div>
+<!-- Subtle turn record footer -->
+<div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-on-surface-variant font-medium">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[15px] text-primary-container">history</span>
+            Head-to-head Series:
+          </span>
+<span class="font-mono text-on-surface font-semibold tracking-wide">
+            Daniel <span class="text-primary-container">14</span> : <span class="text-secondary">11</span> Sarah
+          </span>
+</div>
+</section>
+<!-- 3. Mode Selection Segmented Control -->
+<section class="space-y-2">
+<div class="flex items-center justify-between px-1">
+<label class="font-label-micro text-label-micro uppercase tracking-widest text-on-surface-variant">
+            Game Mode
+          </label>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-primary-container">
+            Synchronous
+          </span>
+</div>
+<!-- Segmented Capsule Container -->
+<div class="p-1 rounded-[22px] bg-[#16161B] border border-white/[0.08] grid grid-cols-3 gap-1 shadow-inner" role="tablist">
+<!-- Tab 1: Practice -->
+<button aria-selected="false" class="py-2.5 px-2 rounded-[18px] text-center text-on-surface-variant hover:text-on-surface transition-all duration-150 flex flex-col items-center" role="tab" type="button">
+<span class="font-label-lg text-label-lg font-medium">Practice</span>
+<span class="text-[9px] text-outline opacity-80 mt-0.5">Solo classic</span>
+</button>
+<!-- Tab 2: Live Duel (Active Selected) -->
+<button aria-selected="true" class="py-2.5 px-2 rounded-[18px] bg-surface-container text-on-surface border border-primary-container/50 shadow-md relative flex flex-col items-center" role="tab" type="button">
+<div class="absolute -top-1 right-2 flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-60"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
+</div>
+<span class="font-label-lg text-label-lg font-semibold text-primary">Live Duel</span>
+<span class="text-[9px] text-primary-container font-medium mt-0.5">Simultaneous</span>
+</button>
+<!-- Tab 3: Challenge -->
+<button aria-selected="false" class="py-2.5 px-2 rounded-[18px] text-on-surface-variant hover:text-on-surface transition-all duration-150 flex flex-col items-center" role="tab" type="button">
+<span class="font-label-lg text-label-lg font-medium">Challenge</span>
+<span class="text-[9px] text-outline opacity-80 mt-0.5">Async beat time</span>
+</button>
+</div>
+<!-- Active Mode Pill Context Descriptor -->
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-surface-container-low/70 border border-white/[0.04]">
+<span class="material-symbols-outlined text-[15px] text-primary-container" style="font-variation-settings: 'FILL' 1;">sync</span>
+<p class="text-xs text-on-surface-variant leading-tight">
+<strong class="text-on-surface font-medium">Live Duel:</strong> Identical board, mirrored countdown, real-time cell fill telemetry.
+          </p>
+</div>
+</section>
+<!-- 4. Difficulty Selection -->
+<section class="space-y-2">
+<div class="flex items-center justify-between px-1">
+<label class="font-label-micro text-label-micro uppercase tracking-widest text-on-surface-variant">
+            Difficulty Tier
+          </label>
+<span class="font-mono text-xs text-on-surface-variant">32 Givens</span>
+</div>
+<!-- 4 Horizontal Chips -->
+<div class="grid grid-cols-4 gap-2">
+<!-- Easy -->
+<button class="py-2.5 px-1.5 rounded-xl bg-[#16161B] border border-white/[0.08] text-center hover:border-white/20 active:scale-95 transition-all" type="button">
+<span class="block font-label-lg text-label-lg text-on-surface-variant">Easy</span>
+<span class="block text-[9px] text-outline mt-0.5">+20 XP</span>
+</button>
+<!-- Medium (Active Selected) -->
+<button class="py-2.5 px-1.5 rounded-xl bg-surface-container border border-primary-container text-center ring-1 ring-primary-container/30 active:scale-95 transition-all relative overflow-hidden" type="button">
+<div class="flex items-center justify-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-lg text-label-lg font-semibold text-primary">Medium</span>
+</div>
+<span class="inline-block mt-0.5 px-1.5 py-0.2 rounded-full bg-primary-container/20 text-primary font-mono text-[9px] font-semibold">
+              +35 XP
+            </span>
+</button>
+<!-- Hard -->
+<button class="py-2.5 px-1.5 rounded-xl bg-[#16161B] border border-white/[0.08] text-center hover:border-white/20 active:scale-95 transition-all" type="button">
+<span class="block font-label-lg text-label-lg text-on-surface-variant">Hard</span>
+<span class="block text-[9px] text-outline mt-0.5">+50 XP</span>
+</button>
+<!-- Expert -->
+<button class="py-2.5 px-1.5 rounded-xl bg-[#16161B] border border-white/[0.08] text-center hover:border-white/20 active:scale-95 transition-all" type="button">
+<span class="block font-label-lg text-label-lg text-on-surface-variant">Expert</span>
+<span class="block text-[9px] text-outline mt-0.5">+80 XP</span>
+</button>
+</div>
+</section>
+<!-- 5. Freely Selectable Puzzle Number & Records -->
+<section class="rounded-[22px] bg-[#16161B] border border-white/[0.08] p-4 space-y-3.5 shadow-md">
+<div class="flex items-center justify-between">
+<div>
+<span class="font-label-micro text-label-micro uppercase tracking-widest text-outline">Verified Handcrafted</span>
+<div class="flex items-baseline gap-1.5 mt-0.5">
+<h2 class="font-mono text-2xl font-bold tracking-tight text-on-surface">#042</h2>
+<span class="font-mono text-xs text-outline">/ 250</span>
+</div>
+</div>
+<!-- Stepper Controls & Randomizer -->
+<div class="flex items-center gap-1.5">
+<button aria-label="Previous puzzle" class="w-9 h-9 rounded-full bg-surface-container border border-white/[0.08] flex items-center justify-center text-on-surface active:scale-90 active:bg-surface-container-high transition-transform" type="button">
+<span class="material-symbols-outlined text-[19px]">chevron_left</span>
+</button>
+<button aria-label="Next puzzle" class="w-9 h-9 rounded-full bg-surface-container border border-white/[0.08] flex items-center justify-center text-on-surface active:scale-90 active:bg-surface-container-high transition-transform" type="button">
+<span class="material-symbols-outlined text-[19px]">chevron_right</span>
+</button>
+<button aria-label="Shuffle random puzzle" class="w-9 h-9 rounded-full bg-surface-container border border-white/[0.08] flex items-center justify-center text-on-surface-variant hover:text-primary-container active:scale-90 transition-transform ml-1" title="Shuffle" type="button">
+<span class="material-symbols-outlined text-[17px]">shuffle</span>
+</button>
+</div>
+</div>
+<!-- Duo Milestone Records & Solved Status Bar -->
+<div class="grid grid-cols-2 gap-2 pt-1">
+<!-- Sarah's Record Card -->
+<div class="px-3 py-2 rounded-xl bg-surface-container-low border border-white/[0.04] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-secondary-fixed/20 text-secondary-fixed flex items-center justify-center text-[10px] font-bold">
+                S
+              </div>
+<span class="text-xs text-on-surface-variant">Sarah's Best</span>
+</div>
+<span class="font-mono text-xs font-semibold text-secondary-fixed">04:18</span>
+</div>
+<!-- Daniel's Record Card -->
+<div class="px-3 py-2 rounded-xl bg-surface-container-low border border-white/[0.04] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-primary-container/20 text-primary-container flex items-center justify-center text-[10px] font-bold">
+                D
+              </div>
+<span class="text-xs text-on-surface-variant">Daniel</span>
+</div>
+<span class="inline-flex items-center gap-1 font-mono text-xs font-semibold text-primary-container">
+<span>Solved</span>
+<span class="material-symbols-outlined text-[13px]">check_circle</span>
+</span>
+</div>
+</div>
+<!-- Jump to picker button -->
+<div class="flex justify-between items-center text-xs pt-0.5">
+<button class="text-on-surface-variant hover:text-primary-container flex items-center gap-1 font-label-micro uppercase tracking-wider transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">pin</span> Jump to Puzzle #
+          </button>
+<span class="text-outline text-[11px] font-mono">Curated logic seeds</span>
+</div>
+</section>
+<!-- 6. Duel Rules & Info Card with Tactile Wager Callout -->
+<section class="rounded-[22px] bg-[#16161B] border border-[#26262E] p-4 space-y-3">
+<div class="flex items-center justify-between border-b border-white/[0.06] pb-2.5">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-surface-container flex items-center justify-center text-primary-container border border-white/[0.06]">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm font-semibold text-on-surface">
+              Live Duel Rules
+            </h3>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-widest text-outline">Synchronous</span>
+</div>
+<!-- Detailed Rules List -->
+<div class="space-y-2.5 text-xs text-on-surface-variant">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-[16px] mt-0.5 shrink-0">view_compact_alt</span>
+<div>
+<span class="font-medium text-on-surface">Identical Board:</span> Both players tackle the exact same 32 starting numbers simultaneously.
+            </div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-[16px] mt-0.5 shrink-0">speed</span>
+<div>
+<span class="font-medium text-on-surface">Live Progress Bar:</span> Sarah's completion percentage displays in real-time at the screen top.
+            </div>
+</div>
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary-container text-[16px] mt-0.5 shrink-0">verified_user</span>
+<div>
+<span class="font-medium text-on-surface">Zero Conflict Victory:</span> The first to complete 81 cells with 3 or fewer mistakes wins the set.
+            </div>
+</div>
+</div>
+<!-- Custom Intimate Wager Callout Pill -->
+<div class="mt-3 pt-3 border-t border-white/[0.06] flex items-center justify-between px-3 py-2.5 rounded-xl bg-surface-container-high/40 border border-white/[0.05]">
+<div class="flex items-center gap-2">
+<span class="text-base">💆</span>
+<div class="text-left">
+<span class="block text-[10px] uppercase font-label-micro tracking-wider text-secondary-fixed">Duo Wager Active</span>
+<span class="text-xs text-on-surface font-medium">20-min shoulder massage</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface text-xs underline font-medium" type="button">
+            Edit
+          </button>
+</div>
+</section>
+</main>
+<!-- 7. Fixed Bottom Action Area (Backdrop blurred docking, elevated CTA zone) -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-[#0C0C0F]/90 backdrop-blur-2xl border-t border-white/[0.07] px-4 pt-3 pb-6 max-w-md mx-auto">
+<div class="space-y-2">
+<!-- Primary Action Button: Solid Mint Pill Button -->
+<button class="w-full h-[52px] rounded-full bg-primary-container text-[#1D2915] font-semibold text-base flex items-center justify-center gap-2 shadow-lg shadow-primary-container/10 active:scale-[0.98] active:opacity-90 transition-all duration-150" type="button">
+<span>Invite Sarah to Duel</span>
+<span class="material-symbols-outlined text-[19px]">swords</span>
+</button>
+<!-- Secondary Action Button: Resume Saved Puzzle -->
+<button class="w-full h-[44px] rounded-full bg-[#16161B] border border-white/[0.12] text-on-surface hover:bg-surface-container active:scale-[0.98] transition-all duration-150 flex items-center justify-center gap-2 text-xs" type="button">
+<span class="material-symbols-outlined text-outline text-[16px]">play_circle</span>
+<span class="text-on-surface font-medium">Resume Saved Puzzle #038</span>
+<span class="text-outline text-[11px] font-mono">· 44 turns left (2:15)</span>
+</button>
+</div>
+<!-- Safe Area Thumb Pad Bar Indicator -->
+<div class="w-24 h-1 bg-white/20 rounded-full mx-auto mt-3"></div>
+</div>
+</div>
+<!-- Lightweight Inline Vanilla JS for Micro-Interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Difficulty Chip Selection Logic
+      const diffButtons = document.querySelectorAll('button[class*="rounded-xl"]');
+      // Subtle tactile touch listener
+      const interactiveButtons = document.querySelectorAll('button, a');
+      interactiveButtons.forEach(btn => {
+        btn.addEventListener('touchstart', () => {
+          if (navigator.vibrate) navigator.vibrate(8);
+        }, { passive: true });
+      });
+    });
+  </script>
+</body></html>

@@ -440,7 +440,7 @@ export function toPublicView(state: RPSState, viewer?: ViewerContext): RPSView {
           }
         : { ...state.scores },
     roundId: state.roundId,
-    phase: state.phase,
+    phase: state.phase === "terminal" && isTogether && !state.revealed ? "resolved" : state.phase,
     lockedSeats: [...state.lockedSeats],
     roundResult: shouldHideRoundResult ? null : state.roundResult ? { ...state.roundResult } : null,
     revealed: state.revealed,

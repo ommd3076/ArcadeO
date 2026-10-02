@@ -33,7 +33,8 @@ interface SnakesLaddersBoardProps {
  * Calculates board percentage coordinates { x, y } (0..100) for position 1..100.
  */
 function getCellCenterPercent(pos: number): { x: number; y: number } {
-  if (pos < 1 || pos > 100) return { x: 50, y: 50 };
+  if (pos <= 0) return { x: 5, y: 105 };
+  if (pos > 100) return { x: 5, y: 5 };
   const zeroBased = pos - 1;
   const rowFromBottom = Math.floor(zeroBased / 10); // 0 (bottom) to 9 (top)
   const colInRow = zeroBased % 10;
