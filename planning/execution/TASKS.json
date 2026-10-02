@@ -1,7 +1,8 @@
 {
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
-  "executionStatus": "OVERNIGHT_FINISH_PREPARED",
+  "executionStatus": "OVERNIGHT_FINISH_RUNNING",
+  "currentExecutor": "Codex native GPT-6.1 Sol High lead with twelve bounded GPT-6 Luna High submissions, at most three active specialists",
   "currentExecutionQueue": "planning/execution/OVERNIGHT-TASKS-2026-10-03.json",
   "currentAcceptanceLedger": "planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json",
   "currentHandCricketRepair": {
@@ -30,7 +31,7 @@
   "requestedModel": "GPT-6.1 Sol (owner-selected specialists)",
   "maxActiveSpecialists": 3,
   "statuses": ["PENDING", "RUNNING", "READY_FOR_REVIEW", "VERIFIED", "BLOCKED"],
-  "statusMeaning": "Earlier task/checkpoint results are historical evidence. Owner-reported Hand Cricket/privacy/timing problems reopen functional acceptance; the current follow-up is planning only. See ownerReportedFollowUp and STATE.md. Deployment/hardware gates remain separate.",
+  "statusMeaning": "Earlier task/checkpoint results and prior planning-only follow-ups are historical. The owner-authorized Overnight Finish implementation is running in the linked 2026-10-03 queue; current readiness comes from that queue and fresh integrated evidence. Deployment and physical-phone certification remain separate gates.",
   "externalReleaseTasks": ["D01", "D02"],
   "sharedWriter": "arcade-orchestrator",
   "tasks": [

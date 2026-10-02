@@ -4,7 +4,7 @@
   "count": 300,
   "visualCells": 256,
   "targetedCases": 44,
-  "status": "PREPARED_NOT_RUN",
+  "status": "IN_PROGRESS",
   "evidencePolicy": "No pass from arithmetic or file existence. Every cell links actual assertions and inspected relevant evidence. Physical-device/deployment certification is separate.",
   "journeyRequirement": "17 supported game/mode journeys; remote no-reload UI-only gates separate from API-assisted completions.",
   "cells": [
@@ -3646,4 +3646,3 @@
     }
   ]
 }
-
