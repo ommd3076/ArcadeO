@@ -75,6 +75,28 @@ export function expireAuthSessionIfCurrent(expectedEpoch: number): boolean {
   return commitAuthSessionIfCurrent(null, expectedEpoch);
 }
 
+/** Clear only the session identity the server confirmed is no longer valid. */
+export function expireAuthSessionAfterServerRevocation(
+  requestEpoch: number,
+  requestCsrfToken: string | null,
+): boolean {
+  if (requestCsrfToken && currentSession?.csrfToken === requestCsrfToken) {
+    publish(null);
+    return true;
+  }
+
+  // A logged-out bootstrap may still be pending when an unauthenticated
+  // request returns 401. Bump only the unchanged epoch in that case.
+  if (currentSession === null && authSessionEpoch === requestEpoch) {
+    publish(null);
+    return true;
+  }
+
+  // A different CSRF token means a newer authenticated session replaced the
+  // identity this request carried; its result cannot clear that session.
+  return false;
+}
+
 function AuthStateView({
   loading,
   message,
@@ -177,9 +199,10 @@ export async function apiFetch(
 ): Promise<Response> {
   const { timeoutMs = API_REQUEST_TIMEOUT_MS, signal: callerSignal, ...requestInit } = init;
   const requestAuthEpoch = authSessionEpoch;
+  const requestCsrfToken = currentSession?.csrfToken ?? null;
   const headers = new Headers(requestInit.headers);
-  if (!/^(GET|HEAD)$/i.test(requestInit.method ?? "GET") && currentSession) {
-    headers.set("X-CSRF-Token", currentSession.csrfToken);
+  if (!/^(GET|HEAD)$/i.test(requestInit.method ?? "GET") && requestCsrfToken) {
+    headers.set("X-CSRF-Token", requestCsrfToken);
   }
 
   const controller = new AbortController();
@@ -226,7 +249,9 @@ export async function apiFetch(
         cache: "no-store",
       }),
     );
-    if (response.status === 401) expireAuthSessionIfCurrent(requestAuthEpoch);
+    if (response.status === 401) {
+      expireAuthSessionAfterServerRevocation(requestAuthEpoch, requestCsrfToken);
+    }
 
     const hasNoBody =
       requestInit.method?.toUpperCase() === "HEAD" ||
@@ -307,9 +332,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session]);
   const logout = async () => {
     const logoutEpoch = authSessionEpoch;
+    const logoutCsrfToken = currentSession?.csrfToken ?? null;
     const response = await apiFetch("/api/v1/auth/logout", { method: "POST" });
     if (!response.ok) throw new Error("Sign out failed. Please retry.");
-    expireAuthSessionIfCurrent(logoutEpoch);
+    expireAuthSessionAfterServerRevocation(logoutEpoch, logoutCsrfToken);
   };
   if (error)
     return <AuthStateView loading={false} message={error} onRetry={() => void refresh()} />;
