@@ -1,5 +1,7 @@
 # Private Arcade V1 — Antigravity plan and handoff
 
+> Historical handoff. The owner explicitly authorized a new Codex implementation continuation on 2026-10-03. Read [OVERNIGHT-FINISH-2026-10-03.md](OVERNIGHT-FINISH-2026-10-03.md) and its current task/acceptance queues. The planning-only/build-failed statements below describe an older checkpoint and must not stop this authorized continuation.
+
 ## Owner correction and present boundary
 
 The owner clarified on 2026-10-01: this Codex task was to plan and prepare the Antigravity handoff, not implement the application. Implementation and test execution have stopped. Existing working-tree changes are preserved for review; they have not been reverted, committed or deployed. The checkout already contained substantial tracked and untracked implementation before this run. Do not use a blanket reset or delete untracked files: that would erase preexisting work as well as this run's edits.

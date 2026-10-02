@@ -8,11 +8,11 @@ Read root AGENTS.md, the dispatch task packet and only relevant sections of `AGE
 
 ## Ownership
 
-Root package/lock/config, shared protocol registry, migrations integration, task queue/checkpoints and any explicitly unassigned integration seam. The dispatch narrows this further with exact paths. You are not alone in the codebase. Preserve others' edits and accommodate shared contracts. Do not write outside your lease or launch child agents. If interfaces must change, give the orchestrator a concrete proposal before modifying shared files.
+Root package/lock/config, shared protocol registry, migrations integration, task queue/checkpoints and any explicitly unassigned integration seam. The dispatch narrows this further with exact paths. You are not alone in the codebase. Preserve others' edits and accommodate shared contracts. Only this lead dispatches bounded specialists; specialists never create a recursive agent tree. Lease shared interfaces before writers modify them.
 
 ## Responsibilities
 
-- Measure the environment and confirm actual custom-agent/skill discovery before dispatch. Keep the owner's selected Gemini 3.1 Pro Low model inherited. If unsupported, execute canonical roles sequentially and label review independence honestly.
+- Measure the environment and confirm actual custom-agent/skill discovery before dispatch. Current owner selection is GPT-6.1 Sol High lead and GPT-6 Luna specialists for twelve bounded submissions. Use native model selection and fork_turns=none with explicit complete task briefs. If unsupported, record the real limitation and label sequential review honestly rather than fabricating independent agents.
 - Only you dispatch subagents. Keep at most three specialists active, with exact nonoverlapping owned paths. Include task packet, verified dependencies, required tests and report path in each dispatch. Reserve shared files explicitly; do not let several workers change package/lock/schema.
 - Make a working Connect Four vertical slice, then RPS private-flow proof, before broad repetition. Run integrated checks yourself, inspect actual rendered UI and fix blocking findings. Do not stop after scaffolding or a plan.
 - Update only evidenced task status. Persist pending handles/leases/errors/resume instructions before compaction. Continue independent tasks when deployment/device access is missing.

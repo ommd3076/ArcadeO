@@ -28,4 +28,4 @@ Standard is A's colorful black/white theme with mint/cyan/yellow; Romantic is B'
 
 No root Git convention is evidenced. Use descriptive Conventional Commits. PRs explain behavior/scope, actual validation/limits and relevant screenshots/issues. Never commit credentials, public solutions, session dumps or choices.
 
-Implementation was explicitly authorized for the 2026-10-01 review/repair. Preserve existing edits and frozen scope. Current review evidence and continuation are under planning/review/. Deployment remains separately authorized; actual phone certification requires hardware.
+Current owner authorization (2026-10-03): execute the Overnight Finish brief and its 60-task/300-case queues in a new GPT-6.1 Sol High chat with GPT-6 Luna specialists, twelve submissions and at most three active. Different-account phone/PC Remote play, saved recovery and small-control/navigation/motion polish are release gates. No automatic disconnect loss or saved expiry; interrupted Duels are history-only. Preserve edits/scope. Deployment remains separately authorized; phone certification requires hardware.

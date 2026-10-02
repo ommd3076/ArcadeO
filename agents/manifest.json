@@ -1,14 +1,17 @@
 {
   "version": 1,
-  "host": "Google Antigravity",
-  "requestedModel": "Gemini 3.1 Pro Low",
-  "modelPolicy": "inherit",
+  "host": "Codex (current); Antigravity entrypoints retained for future handoff",
+  "requestedModel": "gpt-6.1-sol",
+  "leadReasoning": "high",
+  "executorModel": "gpt-6-luna",
+  "requiredSpecialistSubmissions": 12,
+  "modelPolicy": "owner-selected lead/executor; compatible effort inherited for specialists",
   "maxActiveSpecialists": 3,
   "orchestrator": "arcade-orchestrator",
   "canSpawn": [
     "arcade-orchestrator"
   ],
-  "status": "definitions-created-not-host-launched",
+  "status": "codex-overnight-prepared-not-launched",
   "nativeRoot": ".agents/agents",
   "skillRoot": ".agents/skills",
   "fallback": "sequential canonical role execution; no independent review claim",

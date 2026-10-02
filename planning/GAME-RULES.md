@@ -1,5 +1,11 @@
 # V1 game rules
 
+## Current owner correction — 2026-10-03
+
+Connection loss never assigns a loss, and saved matches never automatically expire. A deliberately saved/resumed Sudoku Duel is history-only for competitive wins/streaks/best times; normal refresh/background/offline preserves continuous timing. Together Cricket v2 retains batting until OUT, swaps after the first OUT and compares totals after both batting turns; preserve Remote/legacy rules and completed saves. Current code's actual version dispatch governs compatibility rather than the historical rulesVersion:1 wording below.
+
+LibreLudo is reference-only: its entire-stack capture/third-six turn loss/local animation-driven state are not this game's rules. Preserve one lowest-ID capture, ignored repeated-six rerolls and deliberate selection.
+
 Status: implementation baseline, 2026-09-30. Owner decisions override the original context where explicitly recorded below. Remaining details are architect-selected defaults, not additional owner approvals. Each match pins `rulesVersion: 1` and its board/puzzle version; future changes affect new matches only.
 
 ## Shared rules

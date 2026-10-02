@@ -1,5 +1,19 @@
 # Product requirements document — Private Arcade V1
 
+## Current owner acceptance requirements — 2026-10-03
+
+O01: Different A/B accounts create/accept/Ready/play synchronously from phone/PC without reloads or cross-account takeover. O02: Sudoku Duel retains independently playable private boards and own-account device transfer.
+
+O03: Phone Back/Leave/Resume remains reachable and distinguishes save from resign/abandon. O04: Saved entries are discoverable/resumable in Home/setup/Vault; no automatic saved expiry or disconnect loss. O05: Deliberately saved Duels are history-only for competitive records.
+
+O06: Every visible color/format/library control is real, labeled, readable, themed, accessible and correctly persisted. O07: Accepted-event motion communicates actor/result/next action, settles on interruption and supports reduced motion without exposing secrets.
+
+O08: Full loading/auth/not-found/retry/offline/pending/error states. O09: Mobile safe areas, keyboard, landscape, app-local Back and 200% text are exercised. O10: Measured loading/input/frames/resource cleanup and public-only PWA behavior.
+
+O11: Preserve eight games, accepted rules/geometry/two accounts and qualify LibreLudo as reference-only. O12: Twelve real bounded specialist submissions, final real-runtime/browser evidence, checked-in local release candidate and documented remaining account/device/deployment gates.
+
+The [current plan](review/OVERNIGHT-FINISH-2026-10-03.md) and acceptance ledger supersede contradictory historical proposals; do not add billing/store features from dictated navigation wording.
+
 Revision 2, 2026-09-30. This is the operative product specification together with PRODUCT.md and GAME-RULES.md. Earlier planning claims do not prove executable behavior. Requirement IDs below are used in the test and execution records.
 
 ## People, modes and constraints

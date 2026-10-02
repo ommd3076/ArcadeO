@@ -1,5 +1,9 @@
 # Implementation handoff index
 
+## Current execution — 2026-10-03
+
+Read [Overnight Finish](review/OVERNIGHT-FINISH-2026-10-03.md), [60-task queue](execution/OVERNIGHT-TASKS-2026-10-03.json) and [300-case acceptance ledger](execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json) for the owner-authorized new-chat continuation. The earlier 35-task/Antigravity handoff below is historical. The current first gate is different-account phone/PC live Remote play, then saved-state integration, detailed UI/motion, optimization and release preparation. Existing test passes do not certify these reported failures.
+
 Updated 2026-10-01. Application code exists and the owner authorized review, repairs and local verification. The prior COMPLETE/VERIFIED reports are historical claims, not current certification. Current evidence and exact remaining checks are tracked in [review](review/REVIEW.md), [checkpoint](execution/STATE.md) and the execution queue.
 
 ## Read progressively

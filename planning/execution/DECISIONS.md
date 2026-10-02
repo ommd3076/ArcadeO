@@ -1,5 +1,15 @@
 # Execution decision ledger
 
+## Direct owner answers — 2026-10-03
+
+- Different accounts A/B were used in the failed phone/PC Remote match.
+- Keep matches resumable after disconnect; no automatic loss.
+- Keep deliberately saved games until finished or explicitly abandoned; no 72-hour expiry.
+- Deliberately saved/resumed Sudoku Duels retain history/completion but exclude competitive wins/streaks/best times.
+- Prepare and implement in a new GPT-6.1 Sol High chat with GPT-6 Luna specialists; twelve bounded submissions, maximum three active.
+- LibreLudo URL: https://github.com/priyanshurav/libreludo. Architect adoption decision: pinned non-shipped reference only, preserve own engine and original assets.
+- Dictated phone-navigation wording is interpreted as Back/leave-game controls, not a billing feature.
+
 Frozen owner outcomes live in PRODUCT/PRD/GAME-RULES/DESIGN, not here. This records small architect defaults and later technical measurements so workers do not reopen them.
 
 | ID | Default / rationale | Status |

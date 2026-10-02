@@ -1,5 +1,13 @@
 # Private Arcade
 
+## Owner correction — 2026-10-03
+
+The current implementation brief is [Overnight Finish](planning/review/OVERNIGHT-FINISH-2026-10-03.md). Two DIFFERENT accounts on phone/PC must play Remote synchronously without a takeover loop or reloads. Phone Back/Leave/Resume and small real controls are release requirements.
+
+Connection loss never awards a loss; accepted progress remains resumable. Deliberately saved matches have no automatic expiry. A deliberately saved/resumed Sudoku Duel retains history/completion but is excluded from competitive wins, streaks and best times. Ordinary refresh/background/offline retains continuous competitive timing. Offline inputs pause.
+
+The owner authorized implementation in a new GPT-6.1 Sol High chat with GPT-6 Luna specialist executions/reviews. Use twelve bounded submissions, at most three active specialists. Preserve eight games, two accounts, Standard/Romantic identity and accepted saved rules. Deployment and physical-phone certification remain separate gates.
+
 ## Product scope
 
 Build a private, installable arcade for exactly two predetermined people. They can play apart on two devices or together on one phone/laptop, without changing accounts every turn. The experience should feel personal, calm, tactile and fast: familiar notebook/board games presented with modern typography, rounded surfaces and clear motion.

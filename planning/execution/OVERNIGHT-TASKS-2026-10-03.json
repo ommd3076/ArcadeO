@@ -1,0 +1,867 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-03",
+  "scope": "Complete existing Private Arcade V1 finishing; direct owner authorizes new-chat execution.",
+  "executionStatus": "RUNNING",
+  "leadModel": "gpt-6.1-sol",
+  "leadReasoning": "high",
+  "executorModel": "gpt-6-luna",
+  "executorReasoning": "inherit",
+  "maxActiveSpecialists": 3,
+  "requiredSpecialistSubmissions": 12,
+  "targetMorningLocal": "2026-10-03T07:00:00+05:30",
+  "deadlinePolicy": "Target only; never fabricate completion or skip gates.",
+  "plan": "planning/review/OVERNIGHT-FINISH-2026-10-03.md",
+  "acceptance": "planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json",
+  "baselineCommit": "4fa98e3ab531db489d8db2c85d029248025003e5",
+  "ownerDecisions": {
+    "reportedRemoteAccounts": "different accounts A/B",
+    "offline": "pause submissions",
+    "disconnectLoss": false,
+    "savedExpiry": false,
+    "interruptedDuel": "history only; exclude competitive wins/streaks/best times",
+    "ludoReference": "reference only",
+    "lead": "gpt-6.1-sol high",
+    "executors": "gpt-6-luna"
+  },
+  "assignments": [
+    {
+      "id": "A01",
+      "role": "system-designer",
+      "kind": "review",
+      "depends": [],
+      "owns": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "status": "VERIFIED",
+      "agentHandle": "/root/a01",
+      "taskIds": [
+        "A01-T1",
+        "A01-T2",
+        "A01-T3",
+        "A01-T4",
+        "A01-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A01.md"
+    },
+    {
+      "id": "A02",
+      "role": "backend-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A01"
+      ],
+      "owns": [
+        "worker/matches/match-do.ts",
+        "worker/matches/types.ts",
+        "src/sync/match-session.ts",
+        "src/sync/types.ts",
+        "scripts/dev.mjs",
+        "scripts/preview.mjs",
+        "tests/unit/sync/cross-device.test.ts",
+        "tests/integration/matches/cross-device-controller.test.ts",
+        "planning/execution/reports/overnight-A02.md"
+      ],
+      "status": "RUNNING",
+      "agentHandle": "/root/a02",
+      "taskIds": [
+        "A02-T1",
+        "A02-T2",
+        "A02-T3",
+        "A02-T4",
+        "A02-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A02.md"
+    },
+    {
+      "id": "A03",
+      "role": "frontend-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A01"
+      ],
+      "owns": [
+        "src/screens/match.tsx",
+        "src/screens/match.css",
+        "src/screens/game-detail.tsx",
+        "src/screens/sudoku-list.tsx",
+        "src/app/pages/home-page.tsx",
+        "src/app/pages/game-detail-page.tsx",
+        "src/components/back-header.tsx",
+        "tests/e2e/navigation/navigation-screens.test.tsx",
+        "tests/e2e/qa-journeys/journeys.test.tsx",
+        "planning/execution/reports/overnight-A03.md"
+      ],
+      "status": "RUNNING",
+      "agentHandle": "/root/a03",
+      "taskIds": [
+        "A03-T1",
+        "A03-T2",
+        "A03-T3",
+        "A03-T4",
+        "A03-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A03.md"
+    },
+    {
+      "id": "A04",
+      "role": "consistency-reviewer",
+      "kind": "review",
+      "depends": [
+        "A01"
+      ],
+      "owns": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "status": "VERIFIED",
+      "agentHandle": "/root/a04",
+      "taskIds": [
+        "A04-T1",
+        "A04-T2",
+        "A04-T3",
+        "A04-T4",
+        "A04-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A04.md"
+    },
+    {
+      "id": "A05",
+      "role": "sudoku-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A02",
+        "A04"
+      ],
+      "owns": [
+        "shared/games/sudoku/",
+        "worker/sudoku/",
+        "worker/api/records.ts",
+        "worker/matches/match-do.ts",
+        "tests/unit/games/sudoku/",
+        "tests/integration/sudoku/",
+        "tests/integration/records/",
+        "planning/execution/reports/overnight-A05.md"
+      ],
+      "lease": "MatchDO released by A02; additive migration/protocol are lead-owned unless expressly leased.",
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A05-T1",
+        "A05-T2",
+        "A05-T3",
+        "A05-T4",
+        "A05-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A05.md"
+    },
+    {
+      "id": "A06",
+      "role": "backend-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A02"
+      ],
+      "owns": [
+        "worker/auth/rate-limit.ts",
+        "worker/config.ts",
+        "worker/index.ts",
+        "worker/api/auth.ts",
+        "src/app/auth.tsx",
+        "tests/integration/auth/",
+        "tests/unit/provisioning.test.ts",
+        "planning/execution/reports/overnight-A06.md"
+      ],
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A06-T1",
+        "A06-T2",
+        "A06-T3",
+        "A06-T4",
+        "A06-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A06.md"
+    },
+    {
+      "id": "A07",
+      "role": "frontend-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A03"
+      ],
+      "owns": [
+        "src/screens/game-detail.tsx",
+        "src/screens/match.tsx",
+        "src/components/game-primitives.tsx",
+        "src/components/button.tsx",
+        "src/components/icon-button.tsx",
+        "src/app/pages/library-controls.tsx",
+        "src/app/pages/us-page.tsx",
+        "src/app/pages/games-page.tsx",
+        "src/app/pages/login-page.tsx",
+        "src/theme/",
+        "tests/unit/theme/",
+        "planning/execution/reports/overnight-A07.md"
+      ],
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A07-T1",
+        "A07-T2",
+        "A07-T3",
+        "A07-T4",
+        "A07-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A07.md"
+    },
+    {
+      "id": "A08",
+      "role": "motion-reviewer",
+      "kind": "implementation",
+      "depends": [
+        "A02",
+        "A07",
+        "A09"
+      ],
+      "owns": [
+        "src/components/accepted-motion.ts",
+        "src/components/secret-round/",
+        "src/components/sheet.tsx",
+        "src/components/connection-status.tsx",
+        "src/games/connect-four/",
+        "src/games/dots-boxes/",
+        "src/games/sos/",
+        "src/games/snakes-ladders/",
+        "src/games/rps/",
+        "src/games/hand-cricket/",
+        "src/games/sudoku/",
+        "src/screens/match.tsx",
+        "src/screens/match.css",
+        "planning/execution/reports/overnight-A08.md"
+      ],
+      "lease": "Theme token changes require A07 lease release and lead approval; no concurrent Ludo board writer.",
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A08-T1",
+        "A08-T2",
+        "A08-T3",
+        "A08-T4",
+        "A08-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A08.md"
+    },
+    {
+      "id": "A09",
+      "role": "game-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A01",
+        "A04"
+      ],
+      "owns": [
+        "src/games/ludo/",
+        "shared/games/ludo/",
+        "tests/unit/games/ludo/",
+        "tests/e2e/ludo/",
+        "assets/libreludo/",
+        "planning/execution/reports/overnight-A09.md"
+      ],
+      "lease": "Reference checkout is unshipped; root manages notices/inventory. No shared hook/geometry changes without lead interface agreement.",
+      "status": "RUNNING",
+      "agentHandle": "/root/a09",
+      "taskIds": [
+        "A09-T1",
+        "A09-T2",
+        "A09-T3",
+        "A09-T4",
+        "A09-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A09.md"
+    },
+    {
+      "id": "A10",
+      "role": "frontend-engineer",
+      "kind": "implementation",
+      "depends": [
+        "A07",
+        "A08"
+      ],
+      "owns": [
+        "src/service-worker.ts",
+        "src/app/service-worker-registration.ts",
+        "scripts/build-public.mjs",
+        "scripts/build-icons.mjs",
+        "tests/browser/performance.spec.ts",
+        "planning/execution/reports/overnight-A10.md"
+      ],
+      "lease": "Package/Vite/Wrangler/public font changes are lead-owned; requests must be concrete and justified.",
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A10-T1",
+        "A10-T2",
+        "A10-T3",
+        "A10-T4",
+        "A10-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A10.md"
+    },
+    {
+      "id": "A11",
+      "role": "qa-engineer",
+      "kind": "verification",
+      "depends": [
+        "A05",
+        "A06",
+        "A08",
+        "A09",
+        "A10"
+      ],
+      "owns": [
+        "tests/browser/",
+        "tests/runtime/",
+        "tests/workers/",
+        "tests/integration/qa-adversarial/",
+        "scripts/test-runtime.mjs",
+        "scripts/browser-server.mjs",
+        "scripts/verify-dev.mjs",
+        "planning/execution/reports/overnight-A11.md"
+      ],
+      "lease": "A10 releases performance.spec.ts first; root owns shared runner/config and acceptance ledger.",
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A11-T1",
+        "A11-T2",
+        "A11-T3",
+        "A11-T4",
+        "A11-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A11.md"
+    },
+    {
+      "id": "A12",
+      "role": "release-reviewer",
+      "kind": "review",
+      "depends": [
+        "A11"
+      ],
+      "owns": [
+        "planning/execution/reports/overnight-A12.md"
+      ],
+      "status": "PENDING",
+      "agentHandle": null,
+      "taskIds": [
+        "A12-T1",
+        "A12-T2",
+        "A12-T3",
+        "A12-T4",
+        "A12-T5"
+      ],
+      "report": "planning/execution/reports/overnight-A12.md"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "A01-T1",
+      "assignment": "A01",
+      "description": "Reconcile current source and three owner policy corrections with authored contracts.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+    },
+    {
+      "id": "A01-T2",
+      "assignment": "A01",
+      "description": "Specify viewer/session control and accepted readiness invariants for all actual modes.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+    },
+    {
+      "id": "A01-T3",
+      "assignment": "A01",
+      "description": "Review typed motion cancellation, transport-error and interrupted-record interfaces.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+    },
+    {
+      "id": "A01-T4",
+      "assignment": "A01",
+      "description": "Identify exact root/schema/protocol leases and blocking migration compatibility requirements.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+    },
+    {
+      "id": "A01-T5",
+      "assignment": "A01",
+      "description": "Return a bounded requirements/repro matrix and implementation-ready interface recommendations.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A01.md"
+      ],
+      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+    },
+    {
+      "id": "A02-T1",
+      "assignment": "A02",
+      "description": "Make phone LAN development Origin/WebSocket/cookie configuration coherent without weakening production.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A02-T2",
+      "assignment": "A02",
+      "description": "Return canonical accepted invitation/readiness and normalize viewer capability on every latest-view response.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A02-T3",
+      "assignment": "A02",
+      "description": "Repair independent A/B Sudoku control/takeover notices and stale-generation reconciliation.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A02-T4",
+      "assignment": "A02",
+      "description": "Remove automatic disconnect forfeits and saved expiry while retaining projection/alarm recovery.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A02-T5",
+      "assignment": "A02",
+      "description": "Add mode-correct controller/reconnect/uncertain-action regressions including the reported different-account setup.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A03-T1",
+      "assignment": "A03",
+      "description": "Expose invitation Accept/Decline and accepted two-player Ready states with accurate names.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A03-T2",
+      "assignment": "A03",
+      "description": "Wire Leave-and-save and mode-correct Resume through existing authoritative actions; list saved entries.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A03-T3",
+      "assignment": "A03",
+      "description": "Gate all game controls by lifecycle/legal actions and real pending/offline/control status.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A03-T4",
+      "assignment": "A03",
+      "description": "Provide reachable sticky phone Back/Leave and safe app-history/deep-link fallback.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A03-T5",
+      "assignment": "A03",
+      "description": "Use the safe UUID helper in owned action paths and explicit pending/takeover/recovery feedback.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A04-T1",
+      "assignment": "A04",
+      "description": "Check all eight engines and supported board variants against current owner rules and existing saved versions.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+    },
+    {
+      "id": "A04-T2",
+      "assignment": "A04",
+      "description": "Verify Together Cricket batting-until-OUT compatibility and secret handoff invariants.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+    },
+    {
+      "id": "A04-T3",
+      "assignment": "A04",
+      "description": "Verify Ludo one-capture/six/deliberate-selection semantics and accepted path/effect completeness.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+    },
+    {
+      "id": "A04-T4",
+      "assignment": "A04",
+      "description": "Review simultaneous moves, secret locks, terminal immutability and rematch behavior.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+    },
+    {
+      "id": "A04-T5",
+      "assignment": "A04",
+      "description": "Return precise code/rule findings and useful fixtures without unrequested engine replacement.",
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A04.md"
+      ],
+      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+    },
+    {
+      "id": "A05-T1",
+      "assignment": "A05",
+      "description": "Repair saved Practice, sender Challenge, receiver Challenge and Duel resume acknowledgments by actual mode.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A05-T2",
+      "assignment": "A05",
+      "description": "Make deliberately interrupted Duel outcomes history-only with a monotonic interrupted fact.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A05-T3",
+      "assignment": "A05",
+      "description": "Project interruption through versioned results/outbox and coordinate an additive D1 migration.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A05-T4",
+      "assignment": "A05",
+      "description": "Exclude interrupted Duel wins/streaks/best times while preserving history/completion/known legacy metadata.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A05-T5",
+      "assignment": "A05",
+      "description": "Replace unsupported Together-Sudoku fixtures and verify timer/privacy/duplicate projection recovery.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A06-T1",
+      "assignment": "A06",
+      "description": "Use atomic bounded-window login failure increments under concurrent requests.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A06-T2",
+      "assignment": "A06",
+      "description": "Qualify local auth/session/CSRF/revocation paths and reject production wildcard misconfiguration.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A06-T3",
+      "assignment": "A06",
+      "description": "Normalize HTTP startup/error feedback while retaining API/SPA and private-data boundaries.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A06-T4",
+      "assignment": "A06",
+      "description": "Verify non-overwriting two-account provisioning and document safe production secret configuration.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A06-T5",
+      "assignment": "A06",
+      "description": "Exercise 401/403/404/409/429/503 and malformed response/rate-limit paths with meaningful regressions.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A07-T1",
+      "assignment": "A07",
+      "description": "Replace Ludo color/account selects with labeled swatches and named controls; preserve conflicts/persistence.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A07-T2",
+      "assignment": "A07",
+      "description": "Polish real format/library inputs and all disabled/pending/focus/error states without fake options.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A07-T3",
+      "assignment": "A07",
+      "description": "Audit small details, labels/names, accessible targets, contrast and all four appearance combinations.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A07-T4",
+      "assignment": "A07",
+      "description": "Refine tracker hierarchy/tennis spacing/radii on current screens without changing accepted identity.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A07-T5",
+      "assignment": "A07",
+      "description": "Verify fixed navigation, long content, keyboard, landscape and 200-percent text/large-grid reachability.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A08-T1",
+      "assignment": "A08",
+      "description": "Implement consistent accepted-event cancellation/settlement on reconcile/navigation/background/offline/live reduced motion.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A08-T2",
+      "assignment": "A08",
+      "description": "Repair secret reveal timer interruption, round resets and instant privacy masking/reduced-motion outcome.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A08-T3",
+      "assignment": "A08",
+      "description": "Finish meaningful accepted feedback for seven non-Ludo boards with bounded timings and no UI authority.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A08-T4",
+      "assignment": "A08",
+      "description": "Stabilize sheet focus/interruptible exit, real loading indicators and recovered error feedback.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A08-T5",
+      "assignment": "A08",
+      "description": "Inspect interrupted/rapid/duplicate motion with actual local backend and sampled frames; coordinate final Ludo adapter integration.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A09-T1",
+      "assignment": "A09",
+      "description": "Inspect/pin LibreLudo revision/license as a reference-only snapshot and retain provenance.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A09-T2",
+      "assignment": "A09",
+      "description": "Build original lightweight numbered pawns and stable mixed-stack layout up to eight tokens.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A09-T3",
+      "assignment": "A09",
+      "description": "Animate accepted travel along existing ring/home coordinates with capped movement and settle.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A09-T4",
+      "assignment": "A09",
+      "description": "Add dice-element, one-token capture-return, home/bonus/no-move and restrained final feedback.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A09-T5",
+      "assignment": "A09",
+      "description": "Verify rules/geometry/color/stack/fast-tap/reconnect cases without importing upstream runtime or artwork.",
+      "status": "RUNNING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A10-T1",
+      "assignment": "A10",
+      "description": "Precache only required public shell/current fonts and preserve lazy route/game loading.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A10-T2",
+      "assignment": "A10",
+      "description": "Implement stale-chunk/cold-offline/startup recovery without private caches or active-game forced reload.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A10-T3",
+      "assignment": "A10",
+      "description": "Measure comparable cold/warm loading, input response, accepted-motion frames and chunk budgets.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A10-T4",
+      "assignment": "A10",
+      "description": "Audit route/socket/listener/timer/poll lifetime and remove evidenced resource leaks.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A10-T5",
+      "assignment": "A10",
+      "description": "Deliver measured before/after evidence plus safe PWA/asset/config release preparation requests.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A11-T1",
+      "assignment": "A11",
+      "description": "Prove A/B Remote invitation/readiness/moves/completion via two simultaneous UI-only contexts with no reloads.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A11-T2",
+      "assignment": "A11",
+      "description": "Exercise all seventeen game/mode journeys, independent Sudoku control and HTTP-fallback/reconnect cases.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A11-T3",
+      "assignment": "A11",
+      "description": "Implement/run actual failure/lifecycle/record/privacy races with isolated workerd/SQLite state.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A11-T4",
+      "assignment": "A11",
+      "description": "Exercise 256 game/theme/width/motion cells and 44 targeted scenarios; attach real assertions/evidence.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A11-T5",
+      "assignment": "A11",
+      "description": "Run complete current-source checks and distinguish mocks/SSR/API-assisted/local/device/deployed outcomes.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A12-T1",
+      "assignment": "A12",
+      "description": "Audit each owner requirement against current source, real evidence and the task/acceptance ledgers.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A12-T2",
+      "assignment": "A12",
+      "description": "Inspect actual all-theme mobile/laptop UI and sampled important/interrupted motion for unfinished details.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A12-T3",
+      "assignment": "A12",
+      "description": "Review security/privacy/licensing/bundle/account-specific deployment configuration and remaining external gates.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A12-T4",
+      "assignment": "A12",
+      "description": "Return unresolved critical/important findings to exact owners and recheck their remediation.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "A12-T5",
+      "assignment": "A12",
+      "description": "Produce independent release verdict and concrete morning/next-agent continuation input; lead publishes final report/commits.",
+      "status": "PENDING",
+      "evidence": [],
+      "notes": ""
+    }
+  ]
+}

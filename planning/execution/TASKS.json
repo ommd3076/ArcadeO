@@ -1,7 +1,9 @@
 {
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
-  "executionStatus": "PLANNING_OWNER_REPORTED_DEFECTS",
+  "executionStatus": "OVERNIGHT_FINISH_PREPARED",
+  "currentExecutionQueue": "planning/execution/OVERNIGHT-TASKS-2026-10-03.json",
+  "currentAcceptanceLedger": "planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json",
   "currentHandCricketRepair": {
     "date": "2026-10-02",
     "status": "VERIFIED",

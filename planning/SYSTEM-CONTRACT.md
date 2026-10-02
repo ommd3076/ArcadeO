@@ -1,5 +1,15 @@
 # V1 system contract
 
+## Current policy and capability correction — 2026-10-03
+
+Direct owner decisions: offline submissions pause; network absence never forfeits; saved matches remain resumable until finish/explicit abandon. Remove automatic disconnect/saved-expiry outcomes, retain authoritative outbox/auth cleanup. Existing terminal results stay immutable.
+
+Together has one shared device/session controller. Remote turn games use authenticated seat and legal turn, with no shared-device takeover requirement. Sudoku maintains account-keyed controller sessions/generations; one account's takeover must not pause the other. Viewer capabilities and readiness come from every current accepted view, not creation metadata/global controller labels.
+
+Saved Practice/unpublished Challenge resume by their sole active participant; Async receiver resumes independently of completed sender; Remote/Duel require appropriate participant readiness; Together uses its controller. Deliberate Duel interruption is monotonic and flows through authoritative outcome/projection/records to exclude competitive wins/streaks/best times while retaining history.
+
+Use the [current overnight brief](review/OVERNIGHT-FINISH-2026-10-03.md) for transport/UI/runtime acceptance. Local LAN configuration must work while production retains Secure cookies/exact Origin. No new offline authority subsystem is authorized.
+
 Status: implementation baseline, 2026-09-30. Product questions are resolved. Library/runtime measurements remain implementation gates. This document defines boundaries; it does not claim a deployed system.
 
 ## Architecture and dependencies
