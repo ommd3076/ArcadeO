@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DatabaseSync } from "node:sqlite";
 import fs from "node:fs";
 import { generateProvisioningSql } from "../../scripts/provision-accounts.mjs";
-import { getCsrfSecret } from "../../worker/config";
+import { assertOriginConfiguration, getCsrfSecret, isAllowedOrigin } from "../../worker/config";
 import { parseCookies } from "../../worker/auth/session";
 
 describe("Explicit configuration and preserving provisioning", () => {
@@ -13,6 +13,34 @@ describe("Explicit configuration and preserving provisioning", () => {
     await expect(
       generateProvisioningSql({ playerAPassword: "", playerBPassword: "" }),
     ).rejects.toThrow();
+  });
+
+  it("rejects wildcard, inferred, non-HTTPS, and non-origin production configuration", () => {
+    for (const ALLOWED_ORIGIN of [
+      undefined,
+      "*",
+      "http://arcade.example",
+      "https://arcade.example/path",
+    ]) {
+      expect(() =>
+        assertOriginConfiguration({ ENVIRONMENT: "production", ALLOWED_ORIGIN }),
+      ).toThrow(/exact HTTPS origin/);
+    }
+    expect(() =>
+      assertOriginConfiguration({
+        ENVIRONMENT: "production",
+        ALLOWED_ORIGIN: "https://arcade.example",
+      }),
+    ).not.toThrow();
+    expect(
+      isAllowedOrigin(
+        new Request("https://arcade.example/api/v1/auth/login", {
+          method: "POST",
+          headers: { Origin: "https://attacker.example" },
+        }),
+        { ENVIRONMENT: "production", ALLOWED_ORIGIN: "*" },
+      ),
+    ).toBe(false);
   });
   it("escapes names and preserves existing passwords/preferences on repeat setup", async () => {
     const db = new DatabaseSync(":memory:");
@@ -25,9 +53,11 @@ describe("Explicit configuration and preserving provisioning", () => {
     const first = await generateProvisioningSql(options);
     db.exec(first.sql);
     db.exec("UPDATE accounts SET paletteFamily='romantic', preferenceVersion=9 WHERE id='A'");
+    db.exec("UPDATE accounts SET displayName='Owner B', preferenceVersion=6 WHERE id='B'");
     const second = await generateProvisioningSql({
       ...options,
       playerAPassword: "different-explicit-long-password",
+      playerBPassword: "different-explicit-long-password-B",
     });
     db.exec(second.sql);
     const account = db
@@ -41,6 +71,18 @@ describe("Explicit configuration and preserving provisioning", () => {
       paletteFamily: "romantic",
       preferenceVersion: 9,
     });
+    const accountB = db
+      .prepare(
+        "SELECT passwordHash, displayName, paletteFamily, preferenceVersion FROM accounts WHERE id='B'",
+      )
+      .get();
+    expect(accountB).toMatchObject({
+      passwordHash: first.accountB.passwordHash,
+      displayName: "Owner B",
+      paletteFamily: "romantic",
+      preferenceVersion: 6,
+    });
+    expect(db.prepare("SELECT COUNT(*) AS count FROM accounts").get()).toMatchObject({ count: 2 });
     db.close();
   });
 });

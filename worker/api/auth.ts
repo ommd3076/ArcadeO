@@ -30,8 +30,8 @@ function jsonResponse(data: unknown, status = 200, headers: HeadersInit = {}): R
   });
 }
 
-function checkOrigin(request: Request, allowedOrigin?: string): boolean {
-  return isAllowedOrigin(request, { ALLOWED_ORIGIN: allowedOrigin });
+function checkOrigin(request: Request, env: AuthEnv): boolean {
+  return isAllowedOrigin(request, env);
 }
 
 function getClientIp(request: Request): string {
@@ -70,7 +70,7 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
 
   // POST /login
   if (subpath === "login" && request.method === "POST") {
-    if (!checkOrigin(request, env.ALLOWED_ORIGIN)) {
+    if (!checkOrigin(request, env)) {
       return jsonResponse({ error: "Forbidden: origin mismatch", code: "ORIGIN_MISMATCH" }, 403);
     }
 
@@ -200,7 +200,7 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
 
   // POST /logout
   if (subpath === "logout" && request.method === "POST") {
-    if (!checkOrigin(request, env.ALLOWED_ORIGIN)) {
+    if (!checkOrigin(request, env)) {
       return jsonResponse({ error: "Forbidden: origin mismatch", code: "ORIGIN_MISMATCH" }, 403);
     }
 

@@ -5,7 +5,7 @@ import { handleChallengesRequest } from "./api/challenges";
 import { handleProfileRequest } from "./api/profile";
 import { handleRecordsRequest } from "./api/records";
 import { handleLibraryRequest } from "./api/library";
-import { getCsrfSecret, isAllowedOrigin } from "./config";
+import { assertOriginConfiguration, getCsrfSecret, isAllowedOrigin } from "./config";
 import { extractSessionToken, validateSession } from "./auth/session";
 
 export interface Env {
@@ -22,47 +22,125 @@ export { MatchDurableObject } from "./matches/match-do";
 
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {
+    let response: Response;
     try {
-      const response = await routeRequest(request, env);
-      if (response.status === 101) return response;
-      if (new URL(request.url).pathname.startsWith("/api/")) {
-        response.headers.set("Cache-Control", "no-store");
-        response.headers.set("X-Content-Type-Options", "nosniff");
-      }
-      return response;
+      response = await routeRequest(request, env);
     } catch {
-      return Response.json(
-        { error: "Service temporarily unavailable", code: "UNAVAILABLE" },
-        {
-          status: 503,
-          headers: { "Cache-Control": "no-store" },
-        },
-      );
+      response = isApiRequest(request)
+        ? jsonError("The service is temporarily unavailable. Retry shortly.", "UNAVAILABLE", 503)
+        : new Response("The arcade could not load this page. Retry your connection.", {
+            status: 503,
+            headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+          });
     }
+
+    if (response.status === 101) return response;
+    if (isApiRequest(request)) {
+      response.headers.set("Cache-Control", "no-store");
+      response.headers.set("X-Content-Type-Options", "nosniff");
+      if (!response.headers.has("Content-Type")) {
+        response.headers.set("Content-Type", "application/json; charset=utf-8");
+      }
+    }
+    return response;
   },
 };
+
+function isApiRequest(request: Request): boolean {
+  const pathname = new URL(request.url).pathname;
+  return pathname === "/api" || pathname.startsWith("/api/");
+}
+
+function jsonError(error: string, code: string, status: number): Response {
+  return Response.json({ error, code }, { status, headers: { "Cache-Control": "no-store" } });
+}
+
+function isDocumentRequest(request: Request): boolean {
+  return request.method === "GET" && request.headers.get("Accept")?.includes("text/html") === true;
+}
+
+function isKnownAppRoute(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/games" ||
+    pathname.startsWith("/games/") ||
+    pathname.startsWith("/matches/") ||
+    pathname === "/sudoku" ||
+    pathname === "/us" ||
+    pathname.startsWith("/us/")
+  );
+}
+
+function looksLikeMissingAsset(pathname: string): boolean {
+  const finalSegment = pathname.slice(pathname.lastIndexOf("/") + 1);
+  return pathname.startsWith("/assets/") || /\.[a-z0-9]{1,12}$/i.test(finalSegment);
+}
+
+async function fetchPublicAsset(request: Request, env: Env): Promise<Response> {
+  if (!env.ASSETS) {
+    return new Response("Build the public assets first", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+    });
+  }
+  return env.ASSETS.fetch(request);
+}
+
+async function fetchAppShell(request: Request, env: Env, status = 200): Promise<Response> {
+  if (!env.ASSETS) {
+    return new Response("Build the public assets first", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-store" },
+    });
+  }
+  // Ask the static binding for `/`, whose directory index it resolves itself.
+  // `/index.html` is redirected to `/` by Wrangler's assets binding and would
+  // recurse through this Worker when `run_worker_first` is enabled.
+  const shellUrl = new URL("/", request.url);
+  const shellRequest = new Request(shellUrl, request);
+  const shell = await env.ASSETS.fetch(shellRequest);
+  if (!shell.ok) return shell;
+  return new Response(shell.body, {
+    status,
+    statusText: status === 404 ? "Not Found" : shell.statusText,
+    headers: shell.headers,
+  });
+}
 
 async function routeRequest(request: Request, env: Env): Promise<Response> {
   const url = new URL(request.url);
 
-  // Health check
+  // Health is useful before secrets/bindings are configured and reveals no auth state.
   if (url.pathname === "/api/health" || url.pathname === "/api/v1/health") {
-    return new Response(JSON.stringify({ status: "healthy", timestamp: Date.now() }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    return Response.json(
+      { status: "healthy", timestamp: Date.now() },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
-  if (!url.pathname.startsWith("/api/")) {
-    return env.ASSETS
-      ? env.ASSETS.fetch(request)
-      : new Response("Build the public assets first", { status: 503 });
+  if (!isApiRequest(request)) {
+    if (isKnownAppRoute(url.pathname) && isDocumentRequest(request)) {
+      return fetchAppShell(request, env);
+    }
+    // Let the browser router render its authored not-found/recovery page while
+    // preserving the HTTP 404 for an unknown document path.
+    if (isDocumentRequest(request) && !looksLikeMissingAsset(url.pathname)) {
+      return fetchAppShell(request, env, 404);
+    }
+    return fetchPublicAsset(request, env);
   }
-  getCsrfSecret(env);
+
+  try {
+    assertOriginConfiguration(env);
+  } catch {
+    return jsonError("The service origin is not configured safely.", "CONFIGURATION_ERROR", 503);
+  }
+  const csrfSecret = getCsrfSecret(env);
   if (!["GET", "HEAD", "OPTIONS"].includes(request.method) && !isAllowedOrigin(request, env)) {
-    return Response.json({ error: "Origin mismatch", code: "ORIGIN_MISMATCH" }, { status: 403 });
+    return jsonError("This request origin is not allowed.", "ORIGIN_MISMATCH", 403);
   }
 
-  // Catalog & Games endpoints
   if (
     url.pathname.startsWith("/api/v1/games") ||
     url.pathname.startsWith("/api/games") ||
@@ -70,48 +148,42 @@ async function routeRequest(request: Request, env: Env): Promise<Response> {
     url.pathname.startsWith("/api/sudoku/catalog")
   ) {
     const token = extractSessionToken(request);
-    if (!token || !(await validateSession(env.DB, token, getCsrfSecret(env)))) {
-      return Response.json({ error: "Unauthorized", code: "AUTH_REQUIRED" }, { status: 401 });
+    if (!token || !(await validateSession(env.DB, token, csrfSecret))) {
+      return jsonError("Sign in to continue.", "AUTH_REQUIRED", 401);
     }
     const catalogRes = await handleCatalogRequest(request);
     if (catalogRes) return catalogRes;
   }
 
-  // Auth endpoints
   if (url.pathname.startsWith("/api/v1/auth/") || url.pathname.startsWith("/api/auth/")) {
     const authRes = await handleAuthRequest(request, env);
     if (authRes) return authRes;
   }
 
-  // Challenges endpoints
   if (url.pathname.startsWith("/api/v1/challenges") || url.pathname.startsWith("/api/challenges")) {
     const challengeRes = await handleChallengesRequest(request, env);
     if (challengeRes) return challengeRes;
   }
 
-  // Matches endpoints
   if (url.pathname.startsWith("/api/v1/matches") || url.pathname.startsWith("/api/matches")) {
     const matchRes = await handleMatchesRequest(request, env);
     if (matchRes) return matchRes;
   }
 
-  // Profile & Preferences endpoints
   if (url.pathname.startsWith("/api/v1/library") || url.pathname.startsWith("/api/library")) {
     const libraryRes = await handleLibraryRequest(request, env);
     if (libraryRes) return libraryRes;
   }
 
-  // Profile & Preferences endpoints
   if (url.pathname.startsWith("/api/v1/profile") || url.pathname.startsWith("/api/profile")) {
     const profileRes = await handleProfileRequest(request, env);
     if (profileRes) return profileRes;
   }
 
-  // Records & Statistics endpoints
   if (url.pathname.startsWith("/api/v1/records") || url.pathname.startsWith("/api/records")) {
     const recordsRes = await handleRecordsRequest(request, env);
     if (recordsRes) return recordsRes;
   }
 
-  return Response.json({ error: "Not Found", code: "NOT_FOUND" }, { status: 404 });
+  return jsonError("That API route was not found.", "NOT_FOUND", 404);
 }

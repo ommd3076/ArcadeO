@@ -12,6 +12,7 @@ import {
   bytesToHex,
 } from "../../../worker/auth";
 import { handleAuthRequest, type AuthEnv } from "../../../worker/api/auth";
+import { checkLoginRateLimit, recordLoginFailure } from "../../../worker/auth/rate-limit";
 import { generateProvisioningSql } from "../../../scripts/provision-accounts.mjs";
 
 describe("Worker Auth Foundation (F02)", () => {
@@ -238,6 +239,63 @@ describe("Worker Auth Foundation (F02)", () => {
       const blockedData = (await blockedRes?.json()) as any;
       expect(blockedData.code).toBe("RATE_LIMITED");
       expect(blockedData.blockedUntil).toBeGreaterThan(Date.now());
+    });
+
+    it("increments bounded-window counters atomically when failed logins race", async () => {
+      const d1 = env.DB;
+      const failures = 17;
+      await Promise.all(
+        Array.from({ length: failures }, () => recordLoginFailure(d1, "Player_A", "192.0.2.40")),
+      );
+
+      const account = await d1
+        .prepare("SELECT windowStart, failures, blockedUntil FROM login_limits WHERE key = ?")
+        .bind("account:player_a")
+        .first<any>();
+      const ip = await d1
+        .prepare("SELECT windowStart, failures, blockedUntil FROM login_limits WHERE key = ?")
+        .bind("ip:192.0.2.40")
+        .first<any>();
+
+      expect(account.failures).toBe(failures);
+      expect(account.blockedUntil).toBeGreaterThan(Date.now());
+      expect(ip.failures).toBe(failures);
+      expect(ip.blockedUntil).toBe(0);
+      await expect(checkLoginRateLimit(d1, "player_a", "192.0.2.40")).resolves.toMatchObject({
+        allowed: false,
+        reason: "account",
+      });
+    });
+
+    it("uses an exact production HTTPS origin and Secure host-only cookies", async () => {
+      const productionEnv = {
+        ...env,
+        ENVIRONMENT: "production",
+        ALLOWED_ORIGIN: "https://arcade.example",
+      };
+      const req = new Request("https://arcade.example/api/v1/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Origin: "https://arcade.example",
+        },
+        body: JSON.stringify({ username: "player_a", password: "PlayerA-Secret!" }),
+      });
+      const res = await handleAuthRequest(req, productionEnv);
+      expect(res?.status).toBe(200);
+      const cookie = res?.headers.get("Set-Cookie") ?? "";
+      expect(cookie).toContain("__Host-arcade-session=");
+      expect(cookie).toContain("Secure");
+      expect(cookie).toContain("HttpOnly");
+      expect(cookie).toContain("SameSite=Lax");
+      expect(cookie).toContain("Path=/");
+      expect(cookie).not.toContain("Domain=");
+
+      const wildcardEnv = { ...productionEnv, ALLOWED_ORIGIN: "*" };
+      const rejected = await handleAuthRequest(req, wildcardEnv);
+      expect(rejected?.status).toBe(403);
+      const rejectedData = (await rejected?.json()) as any;
+      expect(rejectedData.code).toBe("ORIGIN_MISMATCH");
     });
 
     it("retrieves active session, verifies CSRF token derivation, and handles unauthenticated state", async () => {
