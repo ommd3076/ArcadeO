@@ -2,21 +2,34 @@
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
   "executionStatus": "PLANNING_OWNER_REPORTED_DEFECTS",
+  "currentHandCricketRepair": {
+    "date": "2026-10-02",
+    "status": "VERIFIED",
+    "authorization": "Direct owner request to correct Together batting/bowling logic supersedes the historical planning-only checkpoint for this repair.",
+    "owner": "Codex lead, sequential execution",
+    "owns": [
+      "shared/games/hand-cricket/",
+      "src/games/hand-cricket/",
+      "src/components/secret-round/",
+      "src/screens/match.tsx",
+      "worker/api/catalog.ts",
+      "tests/unit/games/hand-cricket/",
+      "tests/browser/hand-cricket.spec.ts",
+      "tests/browser/journeys.spec.ts",
+      "planning/GAME-RULES.md",
+      "planning/execution/STATE.md",
+      "planning/review/HAND-CRICKET-RULES-REPAIR-2026-10-02.md"
+    ],
+    "scope": "Same batter across scoring balls; equal numbers dismiss and swap roles; both V2 Together bat until OUT before totals are compared. Preserve saved scores/locks, completed results, remote/legacy rules and server authority.",
+    "report": "planning/review/HAND-CRICKET-RULES-REPAIR-2026-10-02.md",
+    "validation": "274 unit, 61 mocked contracts, 46 server-rendered components, 4 Chromium journeys against isolated bundled workerd/SQLite DO/D1, build, lint and targeted formatting passed. Browser journeys exercise both first batters, multiple scoring balls, refresh, privacy handoff, keyboard Ready, reduced motion, role swap, no premature chase finish, saved totals/wickets, Remote Cricket and RPS regression."
+  },
   "targetHost": "Antigravity Windows environment",
   "requestedModel": "GPT-6.1 Sol (owner-selected specialists)",
   "maxActiveSpecialists": 3,
-  "statuses": [
-    "PENDING",
-    "RUNNING",
-    "READY_FOR_REVIEW",
-    "VERIFIED",
-    "BLOCKED"
-  ],
+  "statuses": ["PENDING", "RUNNING", "READY_FOR_REVIEW", "VERIFIED", "BLOCKED"],
   "statusMeaning": "Earlier task/checkpoint results are historical evidence. Owner-reported Hand Cricket/privacy/timing problems reopen functional acceptance; the current follow-up is planning only. See ownerReportedFollowUp and STATE.md. Deployment/hardware gates remain separate.",
-  "externalReleaseTasks": [
-    "D01",
-    "D02"
-  ],
+  "externalReleaseTasks": ["D01", "D02"],
   "sharedWriter": "arcade-orchestrator",
   "tasks": [
     {
@@ -24,15 +37,9 @@
       "title": "Environment and host discovery",
       "role": "arcade-orchestrator",
       "dependsOn": [],
-      "owns": [
-        "planning/execution/STATE.md",
-        "planning/execution/reports/F00.md"
-      ],
+      "owns": ["planning/execution/STATE.md", "planning/execution/reports/F00.md"],
       "packet": "planning/tasks/foundation.md",
-      "reads": [
-        "PRODUCT.md",
-        "agents/README.md"
-      ],
+      "reads": ["PRODUCT.md", "agents/README.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -62,9 +69,7 @@
       "id": "F01",
       "title": "Tooling and shared interfaces",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "F00"
-      ],
+      "dependsOn": ["F00"],
       "owns": [
         "package.json",
         "package-lock.json",
@@ -77,11 +82,7 @@
         "README.md"
       ],
       "packet": "planning/tasks/foundation.md",
-      "reads": [
-        "planning/TDD.md",
-        "planning/API-CONTRACT.md",
-        "planning/DATA-MODEL.md"
-      ],
+      "reads": ["planning/TDD.md", "planning/API-CONTRACT.md", "planning/DATA-MODEL.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -113,9 +114,7 @@
       "id": "F02",
       "title": "Auth and database foundation",
       "role": "backend-engineer",
-      "dependsOn": [
-        "F01"
-      ],
+      "dependsOn": ["F01"],
       "owns": [
         "worker/auth/**",
         "worker/api/auth.ts",
@@ -124,11 +123,7 @@
         "tests/integration/auth/**"
       ],
       "packet": "planning/tasks/foundation.md",
-      "reads": [
-        "planning/SYSTEM-CONTRACT.md",
-        "planning/TRD.md",
-        "planning/DATA-MODEL.md"
-      ],
+      "reads": ["planning/SYSTEM-CONTRACT.md", "planning/TRD.md", "planning/DATA-MODEL.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -160,21 +155,10 @@
       "id": "F03",
       "title": "Theme and navigation foundation",
       "role": "ux-designer",
-      "dependsOn": [
-        "F01"
-      ],
-      "owns": [
-        "src/theme/**",
-        "src/components/**",
-        "src/app/**",
-        "tests/unit/theme/**"
-      ],
+      "dependsOn": ["F01"],
+      "owns": ["src/theme/**", "src/components/**", "src/app/**", "tests/unit/theme/**"],
       "packet": "planning/tasks/foundation.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/UI-CONTRACT.md",
-        "assets/ui-references/README.md"
-      ],
+      "reads": ["DESIGN.md", "planning/UI-CONTRACT.md", "assets/ui-references/README.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -206,18 +190,10 @@
       "id": "G01",
       "title": "Connect Four engine",
       "role": "game-engineer",
-      "dependsOn": [
-        "F01"
-      ],
-      "owns": [
-        "shared/games/connect-four/**",
-        "tests/unit/games/connect-four/**"
-      ],
+      "dependsOn": ["F01"],
+      "owns": ["shared/games/connect-four/**", "tests/unit/games/connect-four/**"],
       "packet": "planning/tasks/game-engines.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/ASSET-INVENTORY.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/ASSET-INVENTORY.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -248,25 +224,15 @@
       "id": "G02",
       "title": "RPS engine",
       "role": "game-engineer",
-      "dependsOn": [
-        "F01"
-      ],
-      "owns": [
-        "shared/games/rps/**",
-        "tests/unit/games/rps/**"
-      ],
+      "dependsOn": ["F01"],
+      "owns": ["shared/games/rps/**", "tests/unit/games/rps/**"],
       "packet": "planning/tasks/game-engines.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/API-CONTRACT.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/API-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
       "lease": null,
-      "acceptance": [
-        "RP01\u2013RP04; private locks, tie and format/readiness terminal fixtures"
-      ],
+      "acceptance": ["RP01\u2013RP04; private locks, tie and format/readiness terminal fixtures"],
       "evidence": [
         "Changes and earlier evidence require review; final source not accepted",
         "planning/review/REVIEW.md",
@@ -290,10 +256,7 @@
       "id": "B01",
       "title": "Saved match authority and transport",
       "role": "backend-engineer",
-      "dependsOn": [
-        "F02",
-        "G01"
-      ],
+      "dependsOn": ["F02", "G01"],
       "owns": [
         "worker/matches/**",
         "worker/api/matches.ts",
@@ -339,21 +302,10 @@
       "id": "C01",
       "title": "Client sync and recovery",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B01",
-        "F03"
-      ],
-      "owns": [
-        "src/sync/**",
-        "src/components/connection-status.tsx",
-        "tests/unit/sync/**"
-      ],
+      "dependsOn": ["B01", "F03"],
+      "owns": ["src/sync/**", "src/components/connection-status.tsx", "tests/unit/sync/**"],
       "packet": "planning/tasks/network.md",
-      "reads": [
-        "planning/TDD.md",
-        "planning/API-CONTRACT.md",
-        "planning/UI-CONTRACT.md"
-      ],
+      "reads": ["planning/TDD.md", "planning/API-CONTRACT.md", "planning/UI-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -389,10 +341,7 @@
       "id": "U01",
       "title": "First playable Connect Four slice",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "C01",
-        "G01"
-      ],
+      "dependsOn": ["C01", "G01"],
       "owns": [
         "src/games/connect-four/**",
         "src/screens/match.tsx",
@@ -400,11 +349,7 @@
         "tests/e2e/connect-four/**"
       ],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "planning/PRD.md",
-        "DESIGN.md",
-        "planning/UI-CONTRACT.md"
-      ],
+      "reads": ["planning/PRD.md", "DESIGN.md", "planning/UI-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -436,17 +381,10 @@
       "id": "R01",
       "title": "First slice authority/auth review",
       "role": "system-designer",
-      "dependsOn": [
-        "U01"
-      ],
-      "owns": [
-        "planning/execution/reports/R01.md"
-      ],
+      "dependsOn": ["U01"],
+      "owns": ["planning/execution/reports/R01.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TRD.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["planning/TRD.md", "planning/TEST-PLAN.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -477,19 +415,10 @@
       "id": "C02",
       "title": "Reusable secret handoff presentation",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "C01",
-        "G02"
-      ],
-      "owns": [
-        "src/components/secret-round/**",
-        "tests/e2e/secret-round/**"
-      ],
+      "dependsOn": ["C01", "G02"],
+      "owns": ["src/components/secret-round/**", "tests/e2e/secret-round/**"],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "planning/UI-CONTRACT.md",
-        "planning/API-CONTRACT.md"
-      ],
+      "reads": ["planning/UI-CONTRACT.md", "planning/API-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -520,20 +449,10 @@
       "id": "U02",
       "title": "RPS complete playable modes",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "C02",
-        "G02",
-        "R01"
-      ],
-      "owns": [
-        "src/games/rps/**",
-        "tests/e2e/rps/**"
-      ],
+      "dependsOn": ["C02", "G02", "R01"],
+      "owns": ["src/games/rps/**", "tests/e2e/rps/**"],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/PRD.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/PRD.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -564,17 +483,10 @@
       "id": "R02",
       "title": "Secret-flow security review",
       "role": "security-reviewer",
-      "dependsOn": [
-        "U02"
-      ],
-      "owns": [
-        "planning/execution/reports/R02.md"
-      ],
+      "dependsOn": ["U02"],
+      "owns": ["planning/execution/reports/R02.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TEST-PLAN.md",
-        "planning/API-CONTRACT.md"
-      ],
+      "reads": ["planning/TEST-PLAN.md", "planning/API-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -606,9 +518,7 @@
       "id": "G03",
       "title": "Ludo and Snakes & Ladders engines",
       "role": "game-engineer",
-      "dependsOn": [
-        "F01"
-      ],
+      "dependsOn": ["F01"],
       "owns": [
         "shared/games/ludo/**",
         "shared/games/snakes-ladders/**",
@@ -616,10 +526,7 @@
         "tests/unit/games/snakes-ladders/**"
       ],
       "packet": "planning/tasks/game-engines.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/TEST-PLAN.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -651,9 +558,7 @@
       "id": "G04",
       "title": "Dots & Boxes and SOS engines",
       "role": "game-engineer",
-      "dependsOn": [
-        "F01"
-      ],
+      "dependsOn": ["F01"],
       "owns": [
         "shared/games/dots-boxes/**",
         "shared/games/sos/**",
@@ -661,10 +566,7 @@
         "tests/unit/games/sos/**"
       ],
       "packet": "planning/tasks/game-engines.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/ASSET-INVENTORY.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/ASSET-INVENTORY.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -695,18 +597,10 @@
       "id": "G05",
       "title": "Hand Cricket engine",
       "role": "game-engineer",
-      "dependsOn": [
-        "F01"
-      ],
-      "owns": [
-        "shared/games/hand-cricket/**",
-        "tests/unit/games/hand-cricket/**"
-      ],
+      "dependsOn": ["F01"],
+      "owns": ["shared/games/hand-cricket/**", "tests/unit/games/hand-cricket/**"],
       "packet": "planning/tasks/game-engines.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/TEST-PLAN.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -738,9 +632,7 @@
       "id": "S01",
       "title": "Verified versioned Sudoku catalog",
       "role": "sudoku-engineer",
-      "dependsOn": [
-        "F01"
-      ],
+      "dependsOn": ["F01"],
       "owns": [
         "scripts/import-sudoku.*",
         "scripts/verify-sudoku.*",
@@ -748,10 +640,7 @@
         "tests/unit/content/**"
       ],
       "packet": "planning/tasks/sudoku.md",
-      "reads": [
-        "planning/ASSET-INVENTORY.md",
-        "planning/GAME-RULES.md"
-      ],
+      "reads": ["planning/ASSET-INVENTORY.md", "planning/GAME-RULES.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -783,10 +672,7 @@
       "id": "S02",
       "title": "Sudoku rules and private server modes",
       "role": "sudoku-engineer",
-      "dependsOn": [
-        "S01",
-        "B01"
-      ],
+      "dependsOn": ["S01", "B01"],
       "owns": [
         "shared/games/sudoku/**",
         "worker/sudoku/**",
@@ -794,11 +680,7 @@
         "tests/integration/sudoku/**"
       ],
       "packet": "planning/tasks/sudoku.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/TDD.md",
-        "planning/DATA-MODEL.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/TDD.md", "planning/DATA-MODEL.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -832,15 +714,7 @@
       "id": "B02",
       "title": "Integrate all engines and complete lifecycle",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "B01",
-        "G02",
-        "G03",
-        "G04",
-        "G05",
-        "S02",
-        "R02"
-      ],
+      "dependsOn": ["B01", "G02", "G03", "G04", "G05", "S02", "R02"],
       "owns": [
         "shared/games/registry.ts",
         "shared/protocol/**",
@@ -850,11 +724,7 @@
         "worker/index.ts"
       ],
       "packet": "planning/tasks/network.md",
-      "reads": [
-        "planning/TDD.md",
-        "planning/API-CONTRACT.md",
-        "planning/PRD.md"
-      ],
+      "reads": ["planning/TDD.md", "planning/API-CONTRACT.md", "planning/PRD.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -887,10 +757,7 @@
       "id": "U03",
       "title": "Ludo and Snakes & Ladders screens",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B02",
-        "C01"
-      ],
+      "dependsOn": ["B02", "C01"],
       "owns": [
         "src/games/ludo/**",
         "src/games/snakes-ladders/**",
@@ -898,11 +765,7 @@
         "tests/e2e/snakes-ladders/**"
       ],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/UI-CONTRACT.md",
-        "planning/GAME-RULES.md"
-      ],
+      "reads": ["DESIGN.md", "planning/UI-CONTRACT.md", "planning/GAME-RULES.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -935,10 +798,7 @@
       "id": "U04",
       "title": "Dots & Boxes and SOS screens",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B02",
-        "C01"
-      ],
+      "dependsOn": ["B02", "C01"],
       "owns": [
         "src/games/dots-boxes/**",
         "src/games/sos/**",
@@ -946,11 +806,7 @@
         "tests/e2e/sos/**"
       ],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/UI-CONTRACT.md",
-        "planning/GAME-RULES.md"
-      ],
+      "reads": ["DESIGN.md", "planning/UI-CONTRACT.md", "planning/GAME-RULES.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -982,21 +838,10 @@
       "id": "U05",
       "title": "Hand Cricket complete screens",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B02",
-        "C02",
-        "U02"
-      ],
-      "owns": [
-        "src/games/hand-cricket/**",
-        "tests/e2e/hand-cricket/**"
-      ],
+      "dependsOn": ["B02", "C02", "U02"],
+      "owns": ["src/games/hand-cricket/**", "tests/e2e/hand-cricket/**"],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/GAME-RULES.md",
-        "planning/UI-CONTRACT.md"
-      ],
+      "reads": ["DESIGN.md", "planning/GAME-RULES.md", "planning/UI-CONTRACT.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -1028,22 +873,10 @@
       "id": "S03",
       "title": "Sudoku all user flows",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B02",
-        "S02",
-        "C01"
-      ],
-      "owns": [
-        "src/games/sudoku/**",
-        "src/screens/sudoku-list.tsx",
-        "tests/e2e/sudoku/**"
-      ],
+      "dependsOn": ["B02", "S02", "C01"],
+      "owns": ["src/games/sudoku/**", "src/screens/sudoku-list.tsx", "tests/e2e/sudoku/**"],
       "packet": "planning/tasks/sudoku.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/PRD.md",
-        "planning/GAME-RULES.md"
-      ],
+      "reads": ["DESIGN.md", "planning/PRD.md", "planning/GAME-RULES.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -1076,9 +909,7 @@
       "id": "B03",
       "title": "Records and account preferences API",
       "role": "backend-engineer",
-      "dependsOn": [
-        "B02"
-      ],
+      "dependsOn": ["B02"],
       "owns": [
         "worker/api/profile.ts",
         "worker/api/records.ts",
@@ -1087,11 +918,7 @@
         "tests/integration/preferences/**"
       ],
       "packet": "planning/tasks/network.md",
-      "reads": [
-        "planning/SYSTEM-CONTRACT.md",
-        "planning/DATA-MODEL.md",
-        "planning/PRD.md"
-      ],
+      "reads": ["planning/SYSTEM-CONTRACT.md", "planning/DATA-MODEL.md", "planning/PRD.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -1122,13 +949,7 @@
       "id": "U06",
       "title": "Complete Home/Games/Us/discovery/navigation",
       "role": "frontend-engineer",
-      "dependsOn": [
-        "B03",
-        "U03",
-        "U04",
-        "U05",
-        "S03"
-      ],
+      "dependsOn": ["B03", "U03", "U04", "U05", "S03"],
       "owns": [
         "src/screens/home.tsx",
         "src/screens/games.tsx",
@@ -1140,11 +961,7 @@
         "src/screens/match.tsx"
       ],
       "packet": "planning/tasks/game-screens.md",
-      "reads": [
-        "PRODUCT.md",
-        "DESIGN.md",
-        "planning/PRD.md"
-      ],
+      "reads": ["PRODUCT.md", "DESIGN.md", "planning/PRD.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -1178,9 +995,7 @@
       "id": "P01",
       "title": "PWA/assets/performance qualification",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "U06"
-      ],
+      "dependsOn": ["U06"],
       "owns": [
         "public/**",
         "src/app/service-worker-registration.ts",
@@ -1191,11 +1006,7 @@
         "THIRD-PARTY-NOTICES.md"
       ],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TRD.md",
-        "planning/UI-CONTRACT.md",
-        "planning/ASSET-INVENTORY.md"
-      ],
+      "reads": ["planning/TRD.md", "planning/UI-CONTRACT.md", "planning/ASSET-INVENTORY.md"],
       "status": "READY_FOR_REVIEW",
       "attempts": 1,
       "assignedHandle": null,
@@ -1227,18 +1038,10 @@
       "id": "Q01",
       "title": "Full Worker adversarial test pass",
       "role": "qa-engineer",
-      "dependsOn": [
-        "P01"
-      ],
-      "owns": [
-        "tests/integration/qa-*/**",
-        "planning/execution/reports/Q01.md"
-      ],
+      "dependsOn": ["P01"],
+      "owns": ["tests/integration/qa-*/**", "planning/execution/reports/Q01.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TEST-PLAN.md",
-        "planning/TRD.md"
-      ],
+      "reads": ["planning/TEST-PLAN.md", "planning/TRD.md"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1266,19 +1069,14 @@
       "id": "Q02",
       "title": "All game/mode browser journeys",
       "role": "qa-engineer",
-      "dependsOn": [
-        "P01"
-      ],
+      "dependsOn": ["P01"],
       "owns": [
         "tests/e2e/qa-*/**",
         "planning/execution/evidence/Q02/**",
         "planning/execution/reports/Q02.md"
       ],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TEST-PLAN.md",
-        "planning/PRD.md"
-      ],
+      "reads": ["planning/TEST-PLAN.md", "planning/PRD.md"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1307,19 +1105,10 @@
       "id": "Q03",
       "title": "Visual, motion and mobile review",
       "role": "motion-reviewer",
-      "dependsOn": [
-        "P01"
-      ],
-      "owns": [
-        "planning/execution/evidence/Q03/**",
-        "planning/execution/reports/Q03.md"
-      ],
+      "dependsOn": ["P01"],
+      "owns": ["planning/execution/evidence/Q03/**", "planning/execution/reports/Q03.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "DESIGN.md",
-        "planning/UI-CONTRACT.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["DESIGN.md", "planning/UI-CONTRACT.md", "planning/TEST-PLAN.md"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1350,17 +1139,10 @@
       "id": "R03",
       "title": "Rules consistency and final security review",
       "role": "consistency-reviewer",
-      "dependsOn": [
-        "P01"
-      ],
-      "owns": [
-        "planning/execution/reports/R03.md"
-      ],
+      "dependsOn": ["P01"],
+      "owns": ["planning/execution/reports/R03.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/GAME-RULES.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["planning/GAME-RULES.md", "planning/TEST-PLAN.md"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1390,21 +1172,10 @@
       "id": "X01",
       "title": "Integrated fixes and rerun",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "Q01",
-        "Q02",
-        "Q03",
-        "R03"
-      ],
-      "owns": [
-        "lead-leased affected files",
-        "planning/execution/reports/X01.md"
-      ],
+      "dependsOn": ["Q01", "Q02", "Q03", "R03"],
+      "owns": ["lead-leased affected files", "planning/execution/reports/X01.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TEST-PLAN.md",
-        "planning/execution/TASKS.json"
-      ],
+      "reads": ["planning/TEST-PLAN.md", "planning/execution/TASKS.json"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1436,18 +1207,10 @@
       "id": "X02",
       "title": "Local V1 release audit",
       "role": "release-reviewer",
-      "dependsOn": [
-        "X01"
-      ],
-      "owns": [
-        "planning/execution/reports/X02.md"
-      ],
+      "dependsOn": ["X01"],
+      "owns": ["planning/execution/reports/X02.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "PRODUCT.md",
-        "planning/TEST-PLAN.md",
-        "planning/TRD.md"
-      ],
+      "reads": ["PRODUCT.md", "planning/TEST-PLAN.md", "planning/TRD.md"],
       "status": "PENDING",
       "attempts": 1,
       "assignedHandle": null,
@@ -1477,18 +1240,10 @@
       "id": "D01",
       "title": "Authenticated Cloudflare deployment verification",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "X02"
-      ],
-      "owns": [
-        "approved deployment config only",
-        "planning/execution/reports/D01.md"
-      ],
+      "dependsOn": ["X02"],
+      "owns": ["approved deployment config only", "planning/execution/reports/D01.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TRD.md",
-        "planning/SYSTEM-CONTRACT.md"
-      ],
+      "reads": ["planning/TRD.md", "planning/SYSTEM-CONTRACT.md"],
       "status": "BLOCKED",
       "attempts": 1,
       "assignedHandle": null,
@@ -1497,9 +1252,7 @@
         "Requires actual deployment authorization/access/bindings/secret provisioning; no purchase/global changes",
         "D03/D04 real live login/create/move/reload/records checks, or exact BLOCKED external evidence"
       ],
-      "evidence": [
-        "planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"
-      ],
+      "evidence": ["planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"],
       "report": "planning/execution/reports/D01.md",
       "blockReason": "External deployment authorization/configuration and live evidence required",
       "previousReviewClaim": {
@@ -1514,17 +1267,10 @@
       "id": "D02",
       "title": "Actual phone PWA certification",
       "role": "qa-engineer",
-      "dependsOn": [
-        "X02"
-      ],
-      "owns": [
-        "planning/execution/reports/D02.md"
-      ],
+      "dependsOn": ["X02"],
+      "owns": ["planning/execution/reports/D02.md"],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/TEST-PLAN.md",
-        "DESIGN.md"
-      ],
+      "reads": ["planning/TEST-PLAN.md", "DESIGN.md"],
       "status": "BLOCKED",
       "attempts": 1,
       "assignedHandle": null,
@@ -1533,9 +1279,7 @@
         "D01/D02 device cases on Pixel/iPhone hardware, not simulated browser; otherwise honest BLOCKED",
         "Safe areas/Back/keyboard/install/suspension/secret concealment checked with evidence"
       ],
-      "evidence": [
-        "planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"
-      ],
+      "evidence": ["planning/review/ANTIGRAVITY-HANDOFF.md: external release gates unverified"],
       "report": "planning/execution/reports/D02.md",
       "blockReason": "Actual Pixel/iPhone hardware certification unavailable",
       "previousReviewClaim": {
@@ -1550,19 +1294,14 @@
       "id": "H01",
       "title": "Morning report and resume handoff",
       "role": "arcade-orchestrator",
-      "dependsOn": [
-        "X02"
-      ],
+      "dependsOn": ["X02"],
       "owns": [
         "planning/execution/MORNING-REPORT.md",
         "planning/execution/STATE.md",
         "planning/execution/TASKS.json"
       ],
       "packet": "planning/tasks/release.md",
-      "reads": [
-        "planning/execution/MORNING-REPORT.md",
-        "planning/TEST-PLAN.md"
-      ],
+      "reads": ["planning/execution/MORNING-REPORT.md", "planning/TEST-PLAN.md"],
       "status": "VERIFIED",
       "attempts": 1,
       "assignedHandle": null,
@@ -1621,9 +1360,7 @@
       "Highest innings and bowling wickets records",
       "Reviewed Stitch mockup/primitive adoption and measured optimization"
     ],
-    "priority2": [
-      "Additional Dots/SOS sizes"
-    ],
+    "priority2": ["Additional Dots/SOS sizes"],
     "referenceInfluence": {
       "tracker": 60,
       "tennis": 30,

@@ -12,20 +12,20 @@ Theme and player accent are independent. Forms, focus, disabled states, errors a
 
 Profile accent families are blue, orange, teal, violet, magenta and green; save family IDs in D1. Snapshot accents into each new match. Changing profile color applies to new matches; changing theme immediately changes the shade of existing identities. Initial A=teal, B=violet. All distinct-family combinations are allowed at launch; identical family selections are rejected with a clear alternative. Color always has initials/seat labels or piece marks alongside it, so similar hues remain distinguishable.
 
-| Family | Dark foreground/piece | Light foreground/piece |
-| --- | --- | --- |
-| Blue | #8EBBFF | #245CC1 |
-| Orange | #FFBD82 | #A5470C |
-| Teal | #68D6C2 | #087568 |
-| Violet | #C5A2FF | #7040B5 |
-| Magenta | #F69ACD | #A12C72 |
-| Green | #A9D47D | #427B1F |
+| Family  | Dark foreground/piece | Light foreground/piece |
+| ------- | --------------------- | ---------------------- |
+| Blue    | #8EBBFF               | #245CC1                |
+| Orange  | #FFBD82               | #A5470C                |
+| Teal    | #68D6C2               | #087568                |
+| Violet  | #C5A2FF               | #7040B5                |
+| Magenta | #F69ACD               | #A12C72                |
+| Green   | #A9D47D               | #427B1F                |
 
 Ownership strokes/pieces use these foregrounds against canvas/surface, with an outline or contrast backing when necessary, including raised surfaces. Soft box/selection fills use low-opacity ownership tint plus full-opacity initials/border. Do not place text on ownership fills without checking the actual pair across all four variants. Warnings/errors keep semantic marks and explanatory text instead of becoming an ambiguous player color.
 
 ## Typography, spacing and controls
 
-Owner correction 2026-10-01: DM Sans for headings, body, controls and tabular scores/timers. Editorial headings use regular/medium weights. Self-host necessary WOFF2 subsets and retain their licenses; use system sans fallbacks while fonts load. No handwriting body type. Upstream source: [DM Sans](https://github.com/googlefonts/dm-fonts). Lucide is the sole icon family; retain its [license](https://lucide.dev/license) and import used icons only.
+Owner correction 2026-10-02 (UI implementation handoff): Plus Jakarta Sans for body and controls; Barlow Condensed 600/700 only for short display titles. Both licensed WOFF2 families are self-hosted in `public/fonts/` with their OFL notices; use a system sans fallback while fonts load. DM Sans remains a fallback, not the selected face. Keep editorial headings at regular/medium weights, scores and timers tabular, and avoid blanket uppercase or condensed controls. No handwriting body type. Lucide is the sole icon family; retain its [license](https://lucide.dev/license) and import used icons only.
 
 Phone page title 32–40 px, section title 22–24, body/control 16, secondary 14, labels 12 only where comfortably legible. Timers use tabular digits. Allow wrapping and text scaling; do not crop reference-style headlines to preserve an image composition. Spacing scale 4/8/12/16/24/32; page gutters 16–20. Corner roles 10/16/24/pill. Prefer clear tonal surfaces and restrained borders/shadows. Controls have 44–48 CSS-pixel targets where feasible; dense board cells have explicit alternatives.
 
@@ -41,16 +41,16 @@ Build at 320–430 CSS-pixel portrait widths, dynamic viewport units and safe-ar
 
 ## Game interaction
 
-| Game | Interaction and accepted feedback |
-| --- | --- |
-| Ludo | Highlight legal tokens. Enlarged token controls below the 15×15 board are an equivalent input path, including stacked tokens. Dice resolves to saved value; travel follows accepted cells; one capture visibly returns that token; ignored six says Roll again and shows no move |
-| Sudoku | One selected cell, row/column/box highlight, large 1–9 pad, Notes, Erase, Undo and Timer. Practice exposes Pause and Check; competition explains continuous timing and omits both. No wrong-entry shake on every keystroke |
-| Dots & Boxes | Broad edge hit regions with deterministic nearest-edge selection; ambiguous taps do nothing and retain selection. Accessible alternative: select one dot then an adjacent dot, tap selected dot to cancel. Accepted SVG edge draws; completed boxes fill with owner initials |
-| RPS | Large Rock/Paper/Scissors selection, explicit Lock, waiting/handoff panel, saved-result reveal, clear round score and Next |
-| Hand Cricket | Large 1–6 choices, explicit Lock, named Batter/Bowler roles, saved reveal, runs/OUT and innings transition, clear next delivery |
-| SOS | Large S/O selector, then empty-cell tap. Letter appears; every newly scored line traces with ownership; score and bonus-turn feedback |
-| Connect Four | Board tap or seven column controls. Disc falls to accepted row and settles; winner's line highlights; full columns clearly unavailable |
-| Snakes & Ladders | Readable fixed board, large Roll control, no cell input. Piece moves along accepted cells then follows the accepted snake/ladder path |
+| Game             | Interaction and accepted feedback                                                                                                                                                                                                                                                |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ludo             | Highlight legal tokens. Enlarged token controls below the 15×15 board are an equivalent input path, including stacked tokens. Dice resolves to saved value; travel follows accepted cells; one capture visibly returns that token; ignored six says Roll again and shows no move |
+| Sudoku           | One selected cell, row/column/box highlight, large 1–9 pad, Notes, Erase, Undo and Timer. Practice exposes Pause and Check; competition explains continuous timing and omits both. No wrong-entry shake on every keystroke                                                       |
+| Dots & Boxes     | Broad edge hit regions with deterministic nearest-edge selection; ambiguous taps do nothing and retain selection. Accessible alternative: select one dot then an adjacent dot, tap selected dot to cancel. Accepted SVG edge draws; completed boxes fill with owner initials     |
+| RPS              | Large Rock/Paper/Scissors selection, explicit Lock, waiting/handoff panel, saved-result reveal, clear round score and Next                                                                                                                                                       |
+| Hand Cricket     | Large 1–6 choices, explicit Lock, named Batter/Bowler roles, saved reveal, runs/OUT and innings transition, clear next delivery                                                                                                                                                  |
+| SOS              | Large S/O selector, then empty-cell tap. Letter appears; every newly scored line traces with ownership; score and bonus-turn feedback                                                                                                                                            |
+| Connect Four     | Board tap or seven column controls. Disc falls to accepted row and settles; winner's line highlights; full columns clearly unavailable                                                                                                                                           |
+| Snakes & Ladders | Readable fixed board, large Roll control, no cell input. Piece moves along accepted cells then follows the accepted snake/ladder path                                                                                                                                            |
 
 Together secret flow: named player Ready → choose → Lock accepted → clear choice → neutral Pass to [name] → second Ready/choose/Lock → neutral Reveal together → saved result → Next. Alternate which player chooses first each new round/delivery. Mask on refresh, focus restoration and navigation. Laptop uses the same full game-area cover; ask the waiting player to look away, without claiming enforceable privacy.
 
