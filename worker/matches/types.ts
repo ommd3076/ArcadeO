@@ -134,6 +134,8 @@ export interface MatchInitializationParams {
 
 export interface ProjectionPayload {
   sudokuRecords?: SudokuRecordParams[];
+  /** Explicit eligibility fact; true only for a deliberately interrupted Sudoku Duel. */
+  interrupted?: boolean;
   matchId: string;
   deliveryVersion: number;
   lifecycle: MatchLifecycle;

@@ -529,7 +529,8 @@ export async function handleMatchesRequest(
       `SELECT matchId, creationId, creatorAccountId, gameId, mode, participants, creationPayload,
               initializationState, lifecycle, deliveryVersion, createdAt, startedAt, finishedAt, lastActionAt
        FROM match_registry
-       ORDER BY lastActionAt DESC
+       ORDER BY CASE WHEN lifecycle IN ('waiting', 'active', 'saved') THEN 0 ELSE 1 END,
+                lastActionAt DESC
        LIMIT 50`,
     ).all<Record<string, unknown>>();
 

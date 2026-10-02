@@ -37,6 +37,12 @@ describe("Sudoku Integration (Task S02 / Worker, Duel & Async Challenge)", () =>
       "utf8",
     );
     await d1.exec(migrationSql);
+    await d1.exec(
+      fs.readFileSync(
+        path.resolve(process.cwd(), "migrations", "0004_sudoku_interrupted.sql"),
+        "utf8",
+      ),
+    );
 
     // Seed Player A and Player B
     await d1

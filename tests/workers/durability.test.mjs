@@ -3,10 +3,11 @@ import { runInDurableObject, runDurableObjectAlarm, evictDurableObject, reset } 
 import { beforeEach, it, expect } from "vitest";
 import schema from "../../migrations/0001_initial_schema.sql?raw";
 import integrity from "../../migrations/0002_review_integrity.sql?raw";
+import interruptedEligibility from "../../migrations/0004_sudoku_interrupted.sql?raw";
 
 beforeEach(async () => {
   await reset();
-  for (const sql of [schema, integrity]) for (const statement of sql.split(";").filter((s) => s.trim())) {
+  for (const sql of [schema, integrity, interruptedEligibility]) for (const statement of sql.replace(/^\s*--.*$/gm, "").split(";").filter((s) => s.trim())) {
     if (statement.includes("ADD COLUMN creationPayload") && (await env.DB.prepare("PRAGMA table_info(match_registry)").all()).results.some((r) => r.name === "creationPayload")) continue;
     await env.DB.prepare(statement).run();
   }

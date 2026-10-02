@@ -117,7 +117,7 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
     expect(db.prepare("SELECT COUNT(*) AS n FROM events").get()?.n).toBe(0);
   });
 
-  it("enforces leave-save lifecycle, 72h expiry, and permits resign while saved", async () => {
+  it("keeps saved matches resumable beyond legacy expiry metadata", async () => {
     const { authority } = await fixture();
     // 1. Leave-save
     const leaveReply = await authority.handleAction(
@@ -137,7 +137,19 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
     const snapSaved = authority.getSnapshot();
     expect(snapSaved?.lifecycle).toBe("saved");
     expect(snapSaved?.pauseId).toBeDefined();
-    expect(snapSaved?.expiresAt).toBeGreaterThan(Date.now() + 71 * 60 * 60 * 1000);
+    expect(snapSaved?.expiresAt).toBeNull();
+
+    // Existing snapshots can still carry the old 72-hour timestamp. It is
+    // legacy metadata and must not end the saved lifecycle or block Resume.
+    const expiredAt = Date.now() - 60_000;
+    authority["state"].storage.sql.exec(
+      "UPDATE match_snapshot SET expiresAt = ? WHERE matchId = ?",
+      expiredAt,
+      "match",
+    );
+    await authority.alarm();
+    expect(authority.getSnapshot()?.lifecycle).toBe("saved");
+    expect(authority.getSnapshot()?.result).toBeNull();
 
     // 2. Normal move while saved is rejected
     const moveReply = await authority.handleAction(
@@ -173,14 +185,14 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
     );
     expect(resumeBad.status).toBe("rejected");
 
-    // 4. Resign while saved is permitted
+    // 4. Resume succeeds even though the legacy timestamp has passed.
     const resignReply = await authority.handleAction(
       {
         protocolVersion: 1,
         matchId: "match",
         actionId: crypto.randomUUID(),
-        action: "match.resign",
-        payload: { resigningSeat: "A" },
+        action: "match.resume",
+        payload: { pauseId: snapSaved!.pauseId! },
         expectedVersion: 2,
         controllerGeneration: 1,
       },
@@ -188,10 +200,35 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
       "unit-A",
     );
     expect(resignReply.status).toBe("accepted");
-    const snapResigned = authority.getSnapshot();
-    expect(snapResigned?.lifecycle).toBe("resigned");
-    expect(snapResigned?.pauseId).toBeNull();
-    expect(snapResigned?.expiresAt).toBeNull();
+    const resumed = authority.getSnapshot();
+    expect(resumed?.lifecycle).toBe("active");
+    expect(resumed?.pauseId).toBeNull();
+    expect(resumed?.expiresAt).toBeNull();
+  });
+
+  it("keeps a previously expired terminal record terminal", async () => {
+    const { authority, db, action } = await fixture();
+    const finishedAt = Date.now() - 86_400_000;
+    const terminal = {
+      winner: null,
+      reason: "expired",
+      finishedAt,
+      scores: { A: 0, B: 0 },
+      details: { scored: false },
+    };
+    db.prepare("UPDATE match_snapshot SET lifecycle = 'expired', result = ? WHERE matchId = ?").run(
+      JSON.stringify(terminal),
+      "match",
+    );
+
+    const view = authority.buildFilteredView(authority.getSnapshot()!, "A", "unit-A");
+    expect(view.lifecycle).toBe("expired");
+    expect(view.result?.reason).toBe("expired");
+    const reply = await authority.handleAction(action(0), "A", "unit-A");
+    expect(reply.status).toBe("rejected");
+    expect((reply as any).code).toBe("MATCH_FINISHED");
+    expect(authority.getSnapshot()?.lifecycle).toBe("expired");
+    expect(authority.getSnapshot()?.result?.finishedAt).toBe(finishedAt);
   });
 
   it("rejects non-UUID pendingActionId in handleSecretRecovery", async () => {
@@ -216,7 +253,7 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
     await authority.initializeMatch({
       matchId: "sudoku-match",
       gameId: "sudoku",
-      mode: "together",
+      mode: "duel",
       creatorAccountId: "A",
       participants: {
         A: { accountId: "A", displayName: "A", ready: true },
@@ -230,22 +267,33 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
       },
     });
 
-    const snap = authority.getSnapshot()!;
-    expect(snap.lifecycle).toBe("active");
+    const act = async (
+      action: string,
+      actor: "A" | "B",
+      expectedVersion: number,
+      payload: Record<string, unknown> = {},
+    ) =>
+      authority.handleAction(
+        {
+          protocolVersion: 1,
+          matchId: "sudoku-match",
+          actionId: crypto.randomUUID(),
+          action: action as any,
+          payload,
+          expectedVersion,
+          controllerGeneration: 1,
+        },
+        actor,
+        `unit-${actor}`,
+      );
 
-    const leave = await authority.handleAction(
-      {
-        protocolVersion: 1,
-        matchId: "sudoku-match",
-        actionId: crypto.randomUUID(),
-        action: "match.leave-save",
-        payload: {},
-        expectedVersion: 1,
-        controllerGeneration: 1,
-      },
-      "A",
-      "unit-A",
-    );
+    expect(authority.getSnapshot()?.lifecycle).toBe("waiting");
+    expect((await act("match.accept", "B", 1)).status).toBe("accepted");
+    expect((await act("match.ready", "A", 2)).status).toBe("accepted");
+    expect((await act("match.ready", "B", 3)).status).toBe("accepted");
+    expect(authority.getSnapshot()?.lifecycle).toBe("active");
+
+    const leave = await act("match.leave-save", "A", 4);
     expect(leave.status).toBe("accepted");
     const savedSnap = authority.getSnapshot()!;
     expect(savedSnap.lifecycle).toBe("saved");
@@ -254,20 +302,11 @@ describe("serialized authority regressions (SQLite adapter, not Workers runtime)
     expect(sState.players.A.paused).toBe(true);
     expect(sState.players.B.paused).toBe(true);
 
-    const resume = await authority.handleAction(
-      {
-        protocolVersion: 1,
-        matchId: "sudoku-match",
-        actionId: crypto.randomUUID(),
-        action: "match.resume",
-        payload: { pauseId: savedSnap.pauseId! },
-        expectedVersion: 2,
-        controllerGeneration: 1,
-      },
-      "A",
-      "unit-A",
-    );
-    expect(resume.status).toBe("accepted");
+    const resumeA = await act("match.resume", "A", 5, { pauseId: savedSnap.pauseId! });
+    expect(resumeA.status).toBe("accepted");
+    expect(authority.getSnapshot()?.lifecycle).toBe("saved");
+    const resumeB = await act("match.resume", "B", 6, { pauseId: savedSnap.pauseId! });
+    expect(resumeB.status).toBe("accepted");
     const resumedSnap = authority.getSnapshot()!;
     expect(resumedSnap.lifecycle).toBe("active");
     const rState = resumedSnap.gameState as any;

@@ -7,7 +7,7 @@ import { generateSessionToken, deriveCsrfToken } from "../../../worker/auth/sess
 import { sha256Hex } from "../../../worker/auth/crypto";
 import { handleRecordsRequest, getCalcuttaWeekStart } from "../../../worker/api/records";
 import type { Env } from "../../../worker/index";
-import { projectSudokuRecord } from "../../../worker/sudoku/records";
+import { getBestUnassistedTime, projectSudokuRecord } from "../../../worker/sudoku/records";
 
 describe("Records & Projections API (Task B03)", () => {
   let sqlite: DatabaseSync;
@@ -23,6 +23,12 @@ describe("Records & Projections API (Task B03)", () => {
       "utf8",
     );
     await db.exec(schemaSql);
+    await db.exec(
+      fs.readFileSync(
+        path.resolve(process.cwd(), "migrations", "0004_sudoku_interrupted.sql"),
+        "utf8",
+      ),
+    );
 
     // Seed Player A and Player B
     await db
@@ -298,5 +304,89 @@ describe("Records & Projections API (Task B03)", () => {
       )
       .first();
     expect(row).toEqual({ elapsedMs: 90_000, completedAt: 100_000, assisted: 1, replay: 1 });
+  });
+
+  it("keeps interrupted Duel history and completion markers while excluding competitive records", async () => {
+    const now = Date.now();
+    await db
+      .prepare(
+        `INSERT INTO match_registry (matchId, creationId, creatorAccountId, gameId, mode, participants, doName, initializationState, lifecycle, deliveryVersion, schemaVersion, rulesVersion, createdAt, lastActionAt)
+         VALUES ('interrupted-duel', 'c-interrupted', 'A', 'sudoku', 'duel', ?, 'interrupted-duel', 'initialized', 'completed', 3, 1, 1, ?, ?)`,
+      )
+      .bind(JSON.stringify({ A: "A", B: "B" }), now - 60_000, now)
+      .run();
+    await db
+      .prepare(
+        `INSERT INTO results (matchId, projectedVersion, gameId, mode, participants, winner, reason, scores, finishedAt, details, interrupted)
+         VALUES ('interrupted-duel', 3, 'sudoku', 'duel', ?, 'A', 'rules_win', '{"A":1,"B":0}', ?, '{"interrupted":true}', 1)`,
+      )
+      .bind(JSON.stringify({ A: "A", B: "B" }), now)
+      .run();
+    await projectSudokuRecord(db, {
+      attemptId: "interrupted-duel",
+      accountId: "A",
+      puzzleId: "easy-001",
+      mode: "duel",
+      elapsedMs: 12_000,
+      assisted: false,
+      replay: false,
+      interrupted: true,
+      completedAt: now,
+      resultMatchId: "interrupted-duel",
+    });
+    await projectSudokuRecord(db, {
+      attemptId: "normal-duel",
+      accountId: "B",
+      puzzleId: "easy-001",
+      mode: "duel",
+      elapsedMs: 42_000,
+      assisted: false,
+      replay: false,
+      interrupted: false,
+      completedAt: now,
+    });
+
+    const { rawToken } = await createSession("A");
+    const env = { DB: db, CSRF_SECRET } as Env;
+    const req = (path: string) =>
+      new Request(`http://localhost/api/v1/records/${path}`, {
+        headers: { Cookie: `arcade-session=${rawToken}` },
+      });
+    const summary = (await (await handleRecordsRequest(req("summary"), env))!.json()) as any;
+    expect(summary.summary.totalPlayed).toBe(0);
+    expect(summary.summary.winsA).toBe(0);
+    expect(summary.ownCompletedPuzzleIds).toContain("easy-001");
+    expect(summary.sudokuBestTimes["easy-001"]).toBeUndefined();
+    expect(await getBestUnassistedTime(db, "A", "easy-001")).toBeNull();
+
+    const recent = (await (await handleRecordsRequest(req("recent"), env))!.json()) as any;
+    expect(recent.recentMatches[0]).toMatchObject({
+      matchId: "interrupted-duel",
+      interrupted: true,
+      details: { interrupted: true },
+    });
+    expect(recent.sharedRecap).toEqual([]);
+  });
+
+  it("monotonically preserves interruption across older Sudoku record projection retries", async () => {
+    const attempt = {
+      attemptId: "duel-attempt",
+      accountId: "A" as const,
+      puzzleId: "easy-001",
+      mode: "duel" as const,
+      elapsedMs: 90_000,
+      completedAt: 100_000,
+      assisted: false,
+      replay: false,
+      interrupted: true,
+    };
+    await projectSudokuRecord(db, attempt);
+    await projectSudokuRecord(db, { ...attempt, interrupted: false, elapsedMs: 1, completedAt: 1 });
+    const row = await db
+      .prepare(
+        "SELECT elapsedMs, completedAt, interrupted FROM sudoku_records WHERE attemptId = 'duel-attempt'",
+      )
+      .first();
+    expect(row).toEqual({ elapsedMs: 90_000, completedAt: 100_000, interrupted: 1 });
   });
 });

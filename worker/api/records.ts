@@ -64,7 +64,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
   ) {
     // 1. Fetch valid completed results
     const results = (await env.DB.prepare(
-      `SELECT matchId, gameId, mode, participants, winner, reason, scores, finishedAt, details 
+      `SELECT matchId, gameId, mode, participants, winner, reason, scores, finishedAt, details, interrupted
        FROM results 
        WHERE reason IN ('rules_win', 'rules_draw', 'resignation')
        ORDER BY finishedAt ASC, matchId ASC`,
@@ -79,6 +79,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
         scores: string;
         finishedAt: number;
         details?: string | null;
+        interrupted: number;
       }>;
     };
 
@@ -117,6 +118,9 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
 
     for (const r of rows) {
       const details = parseDetails(r.details);
+      // Deliberately saved/resumed Sudoku Duels remain history, but never enter
+      // shared competitive totals, streaks or play-day/week counts.
+      if (r.gameId === "sudoku" && r.mode === "duel" && r.interrupted === 1) continue;
       if (r.mode === "practice" || details.scored === false || details.senderAttempt === true)
         continue;
 
@@ -215,7 +219,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
 
     // 2. Fetch Sudoku records (best times)
     const sudokuRows = (await env.DB.prepare(
-      `SELECT attemptId, accountId, puzzleId, mode, elapsedMs, assisted, replay, completedAt 
+      `SELECT attemptId, accountId, puzzleId, mode, elapsedMs, assisted, replay, interrupted, completedAt
        FROM sudoku_records 
        ORDER BY elapsedMs ASC`,
     ).all()) as {
@@ -227,6 +231,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
         elapsedMs: number;
         assisted: number;
         replay: number;
+        interrupted: number;
         completedAt: number;
       }>;
     };
@@ -245,7 +250,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
     };
 
     for (const sr of sRecords) {
-      if (sr.mode !== "practice" || sr.replay) continue;
+      if (sr.mode !== "practice" || sr.replay || sr.interrupted === 1) continue;
       if (!sudokuBestTimes[sr.puzzleId]) {
         sudokuBestTimes[sr.puzzleId] = {};
       }
@@ -297,7 +302,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
   ) {
     const recent = (await env.DB.prepare(
       `SELECT r.matchId, r.gameId, r.mode, r.participants, r.winner, r.reason,
-              r.scores, r.finishedAt, r.details, m.createdAt AS startedAt
+              r.scores, r.finishedAt, r.details, r.interrupted, m.createdAt AS startedAt
        FROM results r
        LEFT JOIN match_registry m ON m.matchId = r.matchId
        ORDER BY r.finishedAt DESC, r.matchId DESC
@@ -313,6 +318,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
         scores: string;
         finishedAt: number;
         details?: string | null;
+        interrupted: number;
         startedAt?: number | null;
       }>;
     };
@@ -337,6 +343,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
         winner: r.winner,
         winnerAccountId: winnerAccount(r.participants, r.winner),
         details: parseDetails(r.details),
+        interrupted: r.interrupted === 1,
         reason: r.reason,
         scores: parsedScores,
         finishedAt: r.finishedAt,
@@ -350,6 +357,7 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
           r.startedAt !== null &&
           r.mode !== "practice" &&
           r.details.scored !== false &&
+          !(r.gameId === "sudoku" && r.mode === "duel" && r.interrupted) &&
           r.details.senderAttempt !== true &&
           (r.reason === "rules_win" || r.reason === "rules_draw" || r.reason === "resignation") &&
           hasBothAccounts(r.participants),

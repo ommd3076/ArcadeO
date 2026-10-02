@@ -15,6 +15,7 @@ export interface SudokuRecordRow {
   elapsedMs: number;
   assisted: number; // 0 or 1
   replay: number; // 0 or 1
+  interrupted: number; // 0 or 1; Duel eligibility only
   completedAt: number; // UTC ms
   resultMatchId: string | null;
 }
@@ -27,6 +28,7 @@ export interface SudokuRecordParams {
   elapsedMs: number;
   assisted: boolean;
   replay: boolean;
+  interrupted?: boolean;
   completedAt: number;
   resultMatchId?: string;
 }
@@ -41,6 +43,7 @@ export async function projectSudokuRecord(
 ): Promise<void> {
   const assistedInt = params.assisted ? 1 : 0;
   const replayInt = params.replay ? 1 : 0;
+  const interruptedInt = params.interrupted ? 1 : 0;
   const resultMatchId = params.resultMatchId || null;
 
   await d1
@@ -53,12 +56,14 @@ export async function projectSudokuRecord(
         elapsedMs,
         assisted,
         replay,
+        interrupted,
         completedAt,
         resultMatchId
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(attemptId, accountId) DO UPDATE SET
         assisted = MAX(sudoku_records.assisted, excluded.assisted),
         replay = MAX(sudoku_records.replay, excluded.replay),
+        interrupted = MAX(sudoku_records.interrupted, excluded.interrupted),
         resultMatchId = COALESCE(sudoku_records.resultMatchId, excluded.resultMatchId)`,
     )
     .bind(
@@ -69,6 +74,7 @@ export async function projectSudokuRecord(
       params.elapsedMs,
       assistedInt,
       replayInt,
+      interruptedInt,
       params.completedAt,
       resultMatchId,
     )
@@ -107,7 +113,7 @@ export async function getBestUnassistedTime(
   const row = await d1
     .prepare(
       `SELECT MIN(elapsedMs) as bestMs FROM sudoku_records 
-       WHERE accountId = ? AND puzzleId = ? AND assisted = 0 AND replay = 0`,
+       WHERE accountId = ? AND puzzleId = ? AND assisted = 0 AND replay = 0 AND interrupted = 0`,
     )
     .bind(accountId, puzzleId)
     .first<{ bestMs: number | null }>();

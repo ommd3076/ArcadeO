@@ -28,6 +28,16 @@ import { activateDuel, acceptChallenge } from "../../shared/games/sudoku/engine"
 import { projectSudokuRecord, getCompletedPuzzleIds } from "../sudoku/records";
 import type { SudokuRecordParams } from "../sudoku/records";
 import type { SudokuState } from "../../shared/games/sudoku/types";
+
+function activeSudokuSeats(game: SudokuState): Seat[] {
+  if (game.mode === "practice") return ["A"];
+  if (game.mode === "duel") return ["A", "B"];
+  if (game.challengePublished && game.receiverAccepted) {
+    const sender = game.senderSeat ?? "A";
+    return [sender === "A" ? "B" : "A"];
+  }
+  return game.challengePublished ? [] : [game.senderSeat ?? "A"];
+}
 import type { CricketState } from "../../shared/games/hand-cricket/types";
 
 export interface MatchDoEnv {
@@ -121,6 +131,7 @@ export class MatchDurableObject implements DurableObject {
           elapsedMs: player.elapsedMs,
           assisted: player.assisted,
           replay: Boolean(game.replay),
+          interrupted: game.mode === "duel" && Boolean(game.interrupted),
           completedAt: player.completedAt,
           resultMatchId:
             game.mode === "practice" || (!game.challengePublished && game.mode === "challenge")
@@ -139,142 +150,10 @@ export class MatchDurableObject implements DurableObject {
     return (value[0] % 6) + 1;
   }
 
-  private seatLastContact: Record<Seat, number> = { A: 0, B: 0 };
-
-  private recordSeatContact(seat?: Seat, time = Date.now()): void {
-    if (seat === "A" || seat === "B") {
-      this.seatLastContact[seat] = time;
-    }
-  }
-
-  private getDisconnectEligibility(
-    snapshot: SnapshotData,
-    now = Date.now(),
-  ): { seat: Seat; eligibleAt: number } | undefined {
-    if (
-      snapshot.mode !== "remote" ||
-      snapshot.lifecycle !== "active" ||
-      (snapshot.gameId === "sudoku" && (snapshot.gameState as SudokuState).mode !== "duel")
-    ) {
-      return undefined;
-    }
-
-    const lastA = this.seatLastContact.A;
-    const lastB = this.seatLastContact.B;
-    if (!lastA || !lastB) return undefined;
-
-    const staleA = now - lastA > 45_000;
-    const staleB = now - lastB > 45_000;
-
-    if (staleA && !staleB) {
-      return { seat: "A", eligibleAt: lastA + 30 * 60 * 1000 };
-    }
-    if (staleB && !staleA) {
-      return { seat: "B", eligibleAt: lastB + 30 * 60 * 1000 };
-    }
-    return undefined;
-  }
-
-  private async checkAndEnforceDisconnect(snapshot: SnapshotData): Promise<SnapshotData> {
-    const eligibility = this.getDisconnectEligibility(snapshot);
-    if (eligibility && Date.now() >= eligibility.eligibleAt) {
-      const serverTime = Date.now();
-      const absentSeat = eligibility.seat;
-      const winningSeat: Seat = absentSeat === "A" ? "B" : "A";
-      const newDeliveryVersion = snapshot.deliveryVersion + 1;
-      const terminalResult: TerminalResult = {
-        winner: winningSeat,
-        reason: "resignation",
-        finishedAt: serverTime,
-        scores: { A: winningSeat === "A" ? 1 : 0, B: winningSeat === "B" ? 1 : 0 },
-        details: { scored: true, disconnectForfeit: true, forfeitingSeat: absentSeat },
-      };
-      const eventId = crypto.randomUUID();
-      const effects = [{ type: "player-resigned", resigningSeat: absentSeat, winner: winningSeat }];
-
-      const outboxPayload: ProjectionPayload = {
-        matchId: snapshot.matchId,
-        gameId: snapshot.gameId,
-        deliveryVersion: newDeliveryVersion,
-        lifecycle: "resigned",
-        finishedAt: serverTime,
-        lastActionAt: serverTime,
-        result: terminalResult,
-        participants: snapshot.participants,
-        mode: snapshot.mode,
-      };
-
-      this.state.storage.transactionSync(() => {
-        this.state.storage.sql.exec(
-          `INSERT INTO events (eventId, actionId, actorAccount, actorSeat, acceptedAt, effects)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          eventId,
-          `act_disconnect_${serverTime}`,
-          snapshot.participants[absentSeat]?.accountId ?? absentSeat,
-          absentSeat,
-          serverTime,
-          JSON.stringify(effects),
-        );
-
-        this.state.storage.sql.exec(
-          `UPDATE match_snapshot
-           SET deliveryVersion = ?, lifecycle = 'resigned', turnSeat = NULL,
-               result = ?, pauseId = NULL, savedAt = NULL, expiresAt = NULL, resumeReadiness = NULL
-           WHERE matchId = ?`,
-          newDeliveryVersion,
-          JSON.stringify(terminalResult),
-          snapshot.matchId,
-        );
-
-        this.state.storage.sql.exec(
-          `INSERT INTO projection_outbox (projectionKey, requiredVersion, payload, retries, nextAttemptAt)
-           VALUES (?, ?, ?, 0, ?)`,
-          `proj_${snapshot.matchId}_${newDeliveryVersion}`,
-          newDeliveryVersion,
-          JSON.stringify(outboxPayload),
-          serverTime,
-        );
-      });
-
-      if (typeof this.state.storage.sync === "function") {
-        await this.state.storage.sync();
-      }
-
-      const updatedSnapshot: SnapshotData = {
-        ...snapshot,
-        deliveryVersion: newDeliveryVersion,
-        lifecycle: "resigned",
-        turnSeat: null,
-        result: terminalResult,
-        pauseId: null,
-        savedAt: null,
-        expiresAt: null,
-        resumeReadiness: null,
-      };
-
-      await this.broadcastEvent(updatedSnapshot, eventId, newDeliveryVersion, effects);
-      this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
-      return updatedSnapshot;
-    }
-    return snapshot;
-  }
-
-  private async scheduleEarliestAlarm(currentSnapshot?: SnapshotData | null): Promise<void> {
+  private async scheduleEarliestAlarm(): Promise<void> {
     if (typeof this.state.storage.setAlarm !== "function") return;
     const now = Date.now();
-    const snapshot = currentSnapshot !== undefined ? currentSnapshot : this.getSnapshot();
     const times: number[] = [];
-
-    if (snapshot?.lifecycle === "saved" && snapshot.expiresAt) {
-      times.push(Math.max(now + 1, snapshot.expiresAt));
-    }
-
-    if (snapshot) {
-      const disconnect = this.getDisconnectEligibility(snapshot, now);
-      if (disconnect) {
-        times.push(Math.max(now + 1, disconnect.eligibleAt));
-      }
-    }
 
     const pending = this.state.storage.sql
       .exec<{ nextAttemptAt: number }>(
@@ -555,9 +434,11 @@ export class MatchDurableObject implements DurableObject {
       rulesVersion: snapshot.rulesVersion,
       pauseId: snapshot.pauseId ?? undefined,
       savedAt: snapshot.savedAt ?? undefined,
-      expiresAt: snapshot.expiresAt ?? undefined,
+      // Legacy saved-snapshot expiry metadata is ignored. Saved matches remain
+      // resumable until an explicit terminal action.
       resumeReadiness: (snapshot.resumeReadiness as Record<Seat, boolean>) ?? undefined,
-      disconnectEligibility: this.getDisconnectEligibility(snapshot),
+      invitationAccepted: Boolean(snapshot.controller.invitationAccepted),
+      readiness: { ...snapshot.readiness },
       participants: {
         A: snapshot.participants.A,
         B: snapshot.participants.B,
@@ -792,7 +673,7 @@ export class MatchDurableObject implements DurableObject {
     requestingSocket?: WebSocket,
   ): Promise<ActionResponse> {
     this.ensureSchema();
-    let snapshot = this.getSnapshot();
+    const snapshot = this.getSnapshot();
 
     if (!snapshot) {
       return {
@@ -803,9 +684,6 @@ export class MatchDurableObject implements DurableObject {
         retryable: false,
       };
     }
-
-    snapshot = await this.checkAndEnforceExpiry(snapshot);
-    snapshot = await this.checkAndEnforceDisconnect(snapshot);
 
     const reject = (
       code: (typeof ErrorCode)[keyof typeof ErrorCode],
@@ -896,8 +774,6 @@ export class MatchDurableObject implements DurableObject {
         };
       }
     }
-    this.recordSeatContact(actorSeat);
-
     // Step 2: Check existing receipt for actorAccount + actionId
     const currentDigest = await computeCanonicalPayloadDigest(envelope.action, envelope.payload);
     const existingReceipts = this.state.storage.sql
@@ -1298,17 +1174,22 @@ export class MatchDurableObject implements DurableObject {
       newLifecycle = "saved";
       newPauseId = generateUuid();
       newSavedAt = serverTime;
-      newExpiresAt = serverTime + 72 * 60 * 60 * 1000;
+      newExpiresAt = null;
       newResumeReadiness = { A: false, B: false };
       if (snapshot.gameId === "sudoku") {
         const sState = JSON.parse(JSON.stringify(newGameState)) as SudokuState;
-        sState.interrupted = true;
-        for (const seat of ["A", "B"] as Seat[]) {
-          const p = sState.players?.[seat];
-          if (p && !p.completedAt && !p.paused) {
-            p.paused = true;
-            p.pausedAt = serverTime;
-            p.progressRevision = (p.progressRevision || 0) + 1;
+        if (sState.mode === "duel") sState.interrupted = true;
+        // Practice and a history-only Duel pause their own clocks on deliberate
+        // save. Async attempts use a continuous competitive clock: lifecycle
+        // gating pauses input, but time continues so Save cannot improve a time.
+        if (sState.mode !== "challenge") {
+          for (const seat of activeSudokuSeats(sState)) {
+            const p = sState.players?.[seat];
+            if (p && !p.completedAt && !p.paused) {
+              p.paused = true;
+              p.pausedAt = serverTime;
+              p.progressRevision = (p.progressRevision || 0) + 1;
+            }
           }
         }
         newGameState = sState;
@@ -1318,7 +1199,7 @@ export class MatchDurableObject implements DurableObject {
           type: "match-saved",
           pauseId: newPauseId,
           savedAt: newSavedAt,
-          expiresAt: newExpiresAt,
+          expiresAt: null,
           savedBy: actorSeat,
         },
       ];
@@ -1330,19 +1211,21 @@ export class MatchDurableObject implements DurableObject {
       if (!snapshot.pauseId || pauseId !== snapshot.pauseId) {
         return reject(ErrorCode.INVALID_ACTION, "Invalid pause ID");
       }
-      if (snapshot.expiresAt && serverTime >= snapshot.expiresAt) {
-        return reject(ErrorCode.MATCH_FINISHED, "Match has expired");
-      }
-
       const unpauseSudokuPlayers = () => {
         if (snapshot.gameId === "sudoku") {
           const sState = JSON.parse(JSON.stringify(newGameState)) as SudokuState;
-          for (const seat of ["A", "B"] as Seat[]) {
+          for (const seat of activeSudokuSeats(sState)) {
             const p = sState.players?.[seat];
             if (p && !p.completedAt && p.paused && p.pausedAt !== null) {
-              const pausedDuration = Math.max(0, serverTime - p.pausedAt);
-              p.totalPausedMs = (p.totalPausedMs || 0) + pausedDuration;
-              p.elapsedMs = Math.max(0, serverTime - p.startedAt - p.totalPausedMs);
+              if (sState.mode === "challenge") {
+                // Older saved Challenge snapshots paused the receiver. Clear
+                // that legacy presentation flag without subtracting saved time.
+                p.elapsedMs = Math.max(0, serverTime - p.startedAt - (p.totalPausedMs || 0));
+              } else {
+                const pausedDuration = Math.max(0, serverTime - p.pausedAt);
+                p.totalPausedMs = (p.totalPausedMs || 0) + pausedDuration;
+                p.elapsedMs = Math.max(0, serverTime - p.startedAt - p.totalPausedMs);
+              }
               p.paused = false;
               p.pausedAt = null;
               p.progressRevision = (p.progressRevision || 0) + 1;
@@ -1362,8 +1245,17 @@ export class MatchDurableObject implements DurableObject {
         effects = [{ type: "match-resumed", resumedBy: actorSeat, active: true }];
       } else {
         const currentReadiness = snapshot.resumeReadiness ?? { A: false, B: false };
+        const resumeSeats: Seat[] =
+          snapshot.gameId === "sudoku"
+            ? activeSudokuSeats(snapshot.gameState as SudokuState)
+            : ["A", "B"];
+        if (!resumeSeats.includes(actorSeat))
+          return reject(
+            ErrorCode.INVALID_ACTION,
+            "This participant does not resume the saved attempt",
+          );
         const nextReadiness = { ...currentReadiness, [actorSeat]: true };
-        if (nextReadiness.A && nextReadiness.B) {
+        if (resumeSeats.every((seat) => nextReadiness[seat])) {
           newLifecycle = "active";
           newPauseId = null;
           newSavedAt = null;
@@ -1375,7 +1267,7 @@ export class MatchDurableObject implements DurableObject {
           newLifecycle = "saved";
           newPauseId = snapshot.pauseId ?? null;
           newSavedAt = snapshot.savedAt ?? null;
-          newExpiresAt = snapshot.expiresAt ?? null;
+          newExpiresAt = null;
           newResumeReadiness = nextReadiness;
           effects = [{ type: "resume-ready", seat: actorSeat, active: false }];
         }
@@ -1500,6 +1392,10 @@ export class MatchDurableObject implements DurableObject {
       gameId: snapshot.gameId,
       mode: snapshot.mode,
       participants: snapshot.participants,
+      interrupted:
+        snapshot.gameId === "sudoku" &&
+        snapshot.mode === "duel" &&
+        Boolean((newGameState as SudokuState).interrupted),
       sudokuRecords:
         snapshot.gameId === "sudoku"
           ? this.sudokuRecords(snapshot, newGameState as SudokuState)
@@ -1620,7 +1516,7 @@ export class MatchDurableObject implements DurableObject {
       effects,
       requestingSocket,
     );
-    await this.scheduleEarliestAlarm(updatedSnapshot);
+    await this.scheduleEarliestAlarm();
     this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
 
     return reply;
@@ -1736,6 +1632,10 @@ export class MatchDurableObject implements DurableObject {
         gameId: snapshot.gameId,
         mode: snapshot.mode,
         participants: snapshot.participants,
+        interrupted:
+          snapshot.gameId === "sudoku" &&
+          snapshot.mode === "duel" &&
+          Boolean((snapshot.gameState as SudokuState).interrupted),
       };
       this.state.storage.sql.exec(
         "INSERT INTO projection_outbox (projectionKey, requiredVersion, payload, retries, nextAttemptAt) VALUES (?, ?, ?, 0, ?)",
@@ -1960,6 +1860,10 @@ export class MatchDurableObject implements DurableObject {
     for (const row of rows) {
       try {
         const payload: ProjectionPayload = JSON.parse(row.payload);
+        const interruptedDuel =
+          payload.gameId === "sudoku" &&
+          payload.mode === "duel" &&
+          (payload.interrupted === true || payload.result?.details?.interrupted === true);
 
         // Update match_registry in D1
         await this.env.DB.prepare(
@@ -1978,7 +1882,10 @@ export class MatchDurableObject implements DurableObject {
           .run();
 
         for (const record of payload.sudokuRecords ?? [])
-          await projectSudokuRecord(this.env.DB, record);
+          await projectSudokuRecord(this.env.DB, {
+            ...record,
+            interrupted: Boolean(record.interrupted || interruptedDuel),
+          });
         // If match finished, insert results row and release slot
         if (
           payload.result &&
@@ -1992,10 +1899,11 @@ export class MatchDurableObject implements DurableObject {
 
           await this.env.DB.prepare(
             `INSERT INTO results
-             (matchId, projectedVersion, gameId, mode, participants, winner, reason, scores, finishedAt, details)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             (matchId, projectedVersion, gameId, mode, participants, winner, reason, scores, finishedAt, details, interrupted)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              ON CONFLICT(matchId) DO UPDATE SET projectedVersion = excluded.projectedVersion, winner = excluded.winner,
-             reason = excluded.reason, scores = excluded.scores, finishedAt = excluded.finishedAt, details = excluded.details
+             reason = excluded.reason, scores = excluded.scores, finishedAt = excluded.finishedAt, details = excluded.details,
+             interrupted = MAX(results.interrupted, excluded.interrupted)
              WHERE results.projectedVersion < excluded.projectedVersion`,
           )
             .bind(
@@ -2009,6 +1917,7 @@ export class MatchDurableObject implements DurableObject {
               scoresJson,
               payload.result.finishedAt,
               detailsJson,
+              interruptedDuel ? 1 : 0,
             )
             .run();
 
@@ -2038,94 +1947,7 @@ export class MatchDurableObject implements DurableObject {
     await this.scheduleEarliestAlarm();
   }
 
-  private async checkAndEnforceExpiry(snapshot: SnapshotData): Promise<SnapshotData> {
-    if (snapshot.lifecycle === "saved" && snapshot.expiresAt && snapshot.expiresAt <= Date.now()) {
-      const serverTime = Date.now();
-      const newDeliveryVersion = snapshot.deliveryVersion + 1;
-      const terminalResult: TerminalResult = {
-        winner: null,
-        reason: "expired",
-        finishedAt: serverTime,
-        scores: { A: 0, B: 0 },
-        details: { scored: false },
-      };
-      const eventId = crypto.randomUUID();
-      const effects = [{ type: "match-expired", expiredAt: serverTime }];
-
-      const outboxPayload: ProjectionPayload = {
-        matchId: snapshot.matchId,
-        gameId: snapshot.gameId,
-        deliveryVersion: newDeliveryVersion,
-        lifecycle: "expired",
-        finishedAt: serverTime,
-        lastActionAt: serverTime,
-        result: terminalResult,
-        participants: snapshot.participants,
-        mode: snapshot.mode,
-      };
-
-      this.state.storage.transactionSync(() => {
-        this.state.storage.sql.exec(
-          `INSERT INTO events (eventId, actionId, actorAccount, actorSeat, acceptedAt, effects)
-           VALUES (?, ?, ?, ?, ?, ?)`,
-          eventId,
-          `act_expired_${serverTime}`,
-          snapshot.participants.A.accountId,
-          "A",
-          serverTime,
-          JSON.stringify(effects),
-        );
-
-        this.state.storage.sql.exec(
-          `UPDATE match_snapshot
-           SET deliveryVersion = ?, lifecycle = 'expired', turnSeat = NULL,
-               result = ?, pauseId = NULL, savedAt = NULL, expiresAt = NULL, resumeReadiness = NULL
-           WHERE matchId = ?`,
-          newDeliveryVersion,
-          JSON.stringify(terminalResult),
-          snapshot.matchId,
-        );
-
-        this.state.storage.sql.exec(
-          `INSERT INTO projection_outbox (projectionKey, requiredVersion, payload, retries, nextAttemptAt)
-           VALUES (?, ?, ?, 0, ?)`,
-          `proj_${snapshot.matchId}_${newDeliveryVersion}`,
-          newDeliveryVersion,
-          JSON.stringify(outboxPayload),
-          serverTime,
-        );
-      });
-
-      if (typeof this.state.storage.sync === "function") {
-        await this.state.storage.sync();
-      }
-
-      const updatedSnapshot: SnapshotData = {
-        ...snapshot,
-        deliveryVersion: newDeliveryVersion,
-        lifecycle: "expired",
-        turnSeat: null,
-        result: terminalResult,
-        pauseId: null,
-        savedAt: null,
-        expiresAt: null,
-        resumeReadiness: null,
-      };
-
-      await this.broadcastEvent(updatedSnapshot, eventId, newDeliveryVersion, effects);
-      await this.scheduleEarliestAlarm(updatedSnapshot);
-      this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
-      return updatedSnapshot;
-    }
-    return snapshot;
-  }
-
   async alarm(): Promise<void> {
-    let snapshot = this.getSnapshot();
-    if (snapshot) {
-      snapshot = await this.checkAndEnforceExpiry(snapshot);
-      snapshot = await this.checkAndEnforceDisconnect(snapshot);
-    }
     await this.flushProjectionOutbox();
     await this.scheduleEarliestAlarm();
   }
@@ -2211,20 +2033,7 @@ export class MatchDurableObject implements DurableObject {
     actorAccountId: AccountId,
     sessionId?: string,
   ): Promise<Response> {
-    let snapshot = this.getSnapshot();
-    if (snapshot) {
-      snapshot = await this.checkAndEnforceExpiry(snapshot);
-      snapshot = await this.checkAndEnforceDisconnect(snapshot);
-      if (snapshot.mode === "remote") {
-        const seat =
-          snapshot.participants.A.accountId === actorAccountId
-            ? "A"
-            : snapshot.participants.B?.accountId === actorAccountId
-              ? "B"
-              : undefined;
-        this.recordSeatContact(seat);
-      }
-    }
+    const snapshot = this.getSnapshot();
     if (
       !snapshot ||
       !this.isMember(snapshot, actorAccountId) ||
@@ -2270,16 +2079,6 @@ export class MatchDurableObject implements DurableObject {
         ws.close(1008, "Session expired");
         return;
       }
-      const snapshot = this.getSnapshot();
-      if (snapshot && snapshot.mode === "remote") {
-        const seat =
-          snapshot.participants.A.accountId === identity.accountId
-            ? "A"
-            : snapshot.participants.B?.accountId === identity.accountId
-              ? "B"
-              : undefined;
-        this.recordSeatContact(seat);
-      }
       const data = typeof message === "string" ? JSON.parse(message) : null;
       if (data?.type === "action" || data?.action) {
         const reply = await this.handleAction(
@@ -2322,19 +2121,6 @@ export class MatchDurableObject implements DurableObject {
     const path = url.pathname;
     const actorAccountId = request.headers.get("X-Actor-Account") as AccountId;
     const sessionId = request.headers.get("X-Session-Id") || undefined;
-
-    if (actorAccountId) {
-      const snap = this.getSnapshot();
-      if (snap && snap.mode === "remote") {
-        const seat =
-          snap.participants.A.accountId === actorAccountId
-            ? "A"
-            : snap.participants.B?.accountId === actorAccountId
-              ? "B"
-              : undefined;
-        this.recordSeatContact(seat);
-      }
-    }
 
     if (request.method === "POST" && path.endsWith("/abort-initialization")) {
       const aborted = await this.serialize(async () => {
@@ -2412,7 +2198,7 @@ export class MatchDurableObject implements DurableObject {
         path.endsWith("/snapshot") ||
         path.endsWith("/view"))
     ) {
-      let snapshot = this.getSnapshot();
+      const snapshot = this.getSnapshot();
       if (!snapshot) {
         return new Response(
           JSON.stringify({ error: "Match not found", code: ErrorCode.NOT_FOUND }),
@@ -2422,8 +2208,6 @@ export class MatchDurableObject implements DurableObject {
           },
         );
       }
-      snapshot = await this.checkAndEnforceExpiry(snapshot);
-      snapshot = await this.checkAndEnforceDisconnect(snapshot);
       if (!this.isMember(snapshot, actorAccountId))
         return Response.json(
           { code: ErrorCode.FORBIDDEN, error: "Match unavailable" },
