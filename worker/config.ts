@@ -7,5 +7,7 @@ export function getCsrfSecret(env: { CSRF_SECRET?: string }): string {
 
 export function isAllowedOrigin(request: Request, env: { ALLOWED_ORIGIN?: string }): boolean {
   const origin = request.headers.get("Origin");
-  return !!origin && origin === (env.ALLOWED_ORIGIN || new URL(request.url).origin);
+  if (!origin) return false;
+  if (env.ALLOWED_ORIGIN === "*") return true;
+  return origin === (env.ALLOWED_ORIGIN || new URL(request.url).origin);
 }

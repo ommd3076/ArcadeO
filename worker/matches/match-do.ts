@@ -2234,7 +2234,13 @@ export class MatchDurableObject implements DurableObject {
         { code: ErrorCode.FORBIDDEN, error: "Match unavailable" },
         { status: 403 },
       );
-    if (!this.env.ALLOWED_ORIGIN || request.headers.get("Origin") !== this.env.ALLOWED_ORIGIN)
+    const origin = request.headers.get("Origin");
+    if (
+      !origin ||
+      (this.env.ALLOWED_ORIGIN &&
+        this.env.ALLOWED_ORIGIN !== "*" &&
+        origin !== (this.env.ALLOWED_ORIGIN || new URL(request.url).origin))
+    )
       return new Response("Origin mismatch", { status: 403 });
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
