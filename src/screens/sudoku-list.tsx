@@ -30,13 +30,18 @@ interface OpenChallenge {
 
 function savedSelection(): { bucket: SudokuBucket; number: number; page: number } {
   try {
-    return (
-      JSON.parse(sessionStorage.getItem("pa_sudoku_selection") || "null") || {
-        bucket: "easy",
-        number: 1,
-        page: 0,
-      }
-    );
+    const saved = JSON.parse(sessionStorage.getItem("pa_sudoku_selection") || "null") as Partial<{
+      bucket: SudokuBucket;
+      number: number;
+    }> | null;
+    const bucket = ["easy", "medium", "hard", "expert"].includes(saved?.bucket ?? "")
+      ? (saved?.bucket as SudokuBucket)
+      : "easy";
+    const storedNumber = saved?.number;
+    const number = Number.isInteger(storedNumber)
+      ? Math.min(250, Math.max(1, storedNumber as number))
+      : 1;
+    return { bucket, number, page: Math.floor((number - 1) / 50) };
   } catch {
     return { bucket: "easy", number: 1, page: 0 };
   }
@@ -52,6 +57,16 @@ export function SudokuListScreen() {
   const [page, setPage] = useState<number>(() => savedSelection().page); // 0..4 (50 puzzles per page)
   const [error, setError] = useState<string | null>(null);
   const [isStarting, setIsStarting] = useState(false);
+  const [isAbandoning, setIsAbandoning] = useState(false);
+  const [completionState, setCompletionState] = useState<"loading" | "ready" | "error">("loading");
+  const [matchState, setMatchState] = useState<"loading" | "ready" | "error">("loading");
+  const [challengeState, setChallengeState] = useState<"idle" | "loading" | "ready" | "error">(
+    "idle",
+  );
+  const [partnerName, setPartnerName] = useState<string | null>(null);
+  const [matchRetry, setMatchRetry] = useState(0);
+  const [challengeRetry, setChallengeRetry] = useState(0);
+  const [completionRetry, setCompletionRetry] = useState(0);
 
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   useEffect(() => {
@@ -63,6 +78,7 @@ export function SudokuListScreen() {
     } catch {}
   }, [selectedBucket, selectedNumber, page]);
   useEffect(() => {
+    setCompletionState("loading");
     apiFetch("/api/v1/records/summary")
       .then((r) => {
         if (!r.ok) throw new Error("Unable to load completion records");
@@ -71,12 +87,21 @@ export function SudokuListScreen() {
       .then((data) =>
         setCompletedIds((data as { ownCompletedPuzzleIds?: string[] }).ownCompletedPuzzleIds ?? []),
       )
-      .catch(() => setError("Completion records unavailable. Refresh to retry."));
-  }, []);
+      .then(() => setCompletionState("ready"))
+      .catch(() => setCompletionState("error"));
+    apiFetch("/api/v1/profile")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: unknown) => {
+        const profile = data as { opponent?: { displayName?: string } } | null;
+        setPartnerName(profile?.opponent?.displayName ?? null);
+      })
+      .catch(() => setPartnerName(null));
+  }, [completionRetry]);
   // Incoming challenges
   const [openChallenges, setOpenChallenges] = useState<OpenChallenge[]>([]);
 
   useEffect(() => {
+    setMatchState("loading");
     apiFetch("/api/v1/matches")
       .then((r) =>
         r.ok
@@ -88,10 +113,14 @@ export function SudokuListScreen() {
                 lifecycle: string;
               }>;
             }>)
-          : null,
+          : Promise.reject(new Error("Unable to check saved Sudoku attempts")),
       )
       .then((data) => {
-        if (!data?.matches) return;
+        if (!data?.matches) {
+          setExistingMatchId(null);
+          setMatchState("ready");
+          return;
+        }
         const matching = data.matches.find(
           (m) =>
             m.gameId === "sudoku" &&
@@ -99,30 +128,40 @@ export function SudokuListScreen() {
             (m.lifecycle === "active" || m.lifecycle === "waiting"),
         );
         setExistingMatchId(matching?.matchId ?? null);
+        setMatchState("ready");
       })
-      .catch(() => {});
-  }, [selectedMode]);
+      .catch(() => setMatchState("error"));
+  }, [selectedMode, matchRetry]);
 
   useEffect(() => {
     // Fetch open challenges if in challenge mode
     if (selectedMode === "challenge") {
+      setChallengeState("loading");
       apiFetch("/api/v1/challenges")
-        .then((res) => (res.ok ? res.json() : null))
+        .then((res) => {
+          if (!res.ok) throw new Error("Unable to load incoming challenges");
+          return res.json();
+        })
         .then((data: unknown) => {
           const resObj = data as { challenges?: OpenChallenge[] } | null;
-          if (resObj?.challenges) {
-            setOpenChallenges(resObj.challenges);
-          }
+          setOpenChallenges(resObj?.challenges ?? []);
+          setChallengeState("ready");
         })
-        .catch(() => {});
+        .catch(() => setChallengeState("error"));
+    } else {
+      setChallengeState("idle");
     }
-  }, [selectedMode]);
+  }, [selectedMode, challengeRetry]);
 
   // Derived puzzleId, e.g. "easy-001"
   const puzzleId = `${selectedBucket}-${selectedNumber.toString().padStart(3, "0")}`;
 
   const handleStartMatch = async () => {
     setError(null);
+    if (existingMatchId) {
+      navigate(`/matches/${existingMatchId}`);
+      return;
+    }
     setIsStarting(true);
     try {
       const signature = puzzleId + selectedMode;
@@ -183,23 +222,71 @@ export function SudokuListScreen() {
         color: "var(--color-text)",
       }}
     >
-      <BackHeader title="Sudoku Vault" fallbackTo="/games" />
+      <BackHeader title="Sudoku" fallbackTo="/games" />
 
-      <main
+      <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           gap: "var(--space-md)",
           padding: "var(--space-md) var(--space-lg) calc(var(--space-xl) + var(--sab))",
-          maxWidth: "520px",
+          maxWidth: "820px",
           margin: "0 auto",
           width: "100%",
           boxSizing: "border-box",
         }}
       >
         {error && <p role="alert">{error}</p>}
-        {existingMatchId && (
+        {completionState === "loading" && (
+          <p role="status" style={{ color: "var(--color-muted-text)" }}>
+            Loading your completed-puzzle markers…
+          </p>
+        )}
+        {completionState === "error" && (
+          <div
+            role="status"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 10,
+              color: "var(--color-muted-text)",
+            }}
+          >
+            <span>
+              Completion markers are unavailable right now. You can still choose and start a puzzle.
+            </span>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setCompletionRetry((value) => value + 1)}
+            >
+              Retry markers
+            </Button>
+          </div>
+        )}
+        {matchState === "loading" && (
+          <p role="status" style={{ color: "var(--color-muted-text)" }}>
+            Checking for a saved attempt…
+          </p>
+        )}
+        {matchState === "error" && (
+          <div
+            role="alert"
+            style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}
+          >
+            <span>Saved-attempt status is unavailable. Retry before starting or resuming.</span>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setMatchRetry((value) => value + 1)}
+            >
+              Retry check
+            </Button>
+          </div>
+        )}
+        {matchState === "ready" && existingMatchId && (
           <div
             style={{
               padding: "var(--space-md)",
@@ -226,7 +313,10 @@ export function SudokuListScreen() {
                 <Button
                   variant="secondary"
                   size="sm"
+                  disabled={isAbandoning}
                   onClick={async () => {
+                    setIsAbandoning(true);
+                    setError(null);
                     try {
                       const vRes = await apiFetch(`/api/v1/matches/${existingMatchId}`);
                       if (!vRes.ok) throw new Error("Unable to check match status.");
@@ -243,110 +333,166 @@ export function SudokuListScreen() {
                           payload: {},
                         }),
                       });
-                      if (actRes.ok) {
-                        const reply = (await actRes.json()) as { status: string };
-                        if (reply.status === "accepted") {
-                          setExistingMatchId(null);
-                          creationRequests.current.clear();
-                        }
-                      }
+                      const reply = (await actRes.json().catch(() => ({}))) as {
+                        status?: string;
+                        message?: string;
+                      };
+                      if (!actRes.ok || reply.status !== "accepted")
+                        throw new Error(reply.message || "Abandon request was not accepted.");
+                      setExistingMatchId(null);
+                      creationRequests.current.clear();
                     } catch (e) {
                       setError((e as Error).message || "Failed to abandon attempt");
+                    } finally {
+                      setIsAbandoning(false);
                     }
                   }}
                 >
-                  Abandon & start fresh
+                  {isAbandoning ? "Abandoning…" : "Abandon & start fresh"}
                 </Button>
               )}
             </div>
           </div>
         )}
         {/* 1. Mode Selector */}
-        <Surface variant="card" padding="sm" radius="lg">
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: "6px",
-            }}
-          >
-            <Button
-              variant={selectedMode === "practice" ? "primary" : "ghost"}
-              size="sm"
-              onClick={() => setSelectedMode("practice")}
-              data-testid="mode-practice"
-              leftIcon={<Zap size={14} />}
+        <Surface variant="card" padding="md" radius="xl">
+          <h2 style={{ fontSize: 21, fontWeight: 650, margin: "0 0 5px" }}>Choose your Sudoku</h2>
+          <p style={{ fontSize: 14, color: "var(--color-muted-text)", margin: "0 0 16px" }}>
+            Pick a mode, difficulty and numbered puzzle. Your practice results stay personal.
+          </p>
+          <fieldset style={{ border: 0, margin: 0, padding: 0 }}>
+            <legend style={{ fontSize: 15, fontWeight: 650, marginBottom: 10 }}>Play mode</legend>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 100px), 1fr))",
+                gap: "8px",
+              }}
             >
-              Practice
-            </Button>
-            <Button
-              variant={selectedMode === "duel" ? "primary" : "ghost"}
-              size="sm"
-              onClick={() => setSelectedMode("duel")}
-              data-testid="mode-duel"
-              leftIcon={<Swords size={14} />}
-            >
-              Duel
-            </Button>
-            <Button
-              variant={selectedMode === "challenge" ? "primary" : "ghost"}
-              size="sm"
-              onClick={() => setSelectedMode("challenge")}
-              data-testid="mode-challenge"
-              leftIcon={<Award size={14} />}
-            >
-              Challenge
-            </Button>
-          </div>
+              <Button
+                variant={selectedMode === "practice" ? "primary" : "ghost"}
+                size="sm"
+                onClick={() => setSelectedMode("practice")}
+                data-testid="mode-practice"
+                aria-pressed={selectedMode === "practice"}
+                style={{ minHeight: 44 }}
+                leftIcon={<Zap size={14} />}
+              >
+                Practice
+              </Button>
+              <Button
+                variant={selectedMode === "duel" ? "primary" : "ghost"}
+                size="sm"
+                onClick={() => setSelectedMode("duel")}
+                data-testid="mode-duel"
+                aria-pressed={selectedMode === "duel"}
+                style={{ minHeight: 44 }}
+                leftIcon={<Swords size={14} />}
+              >
+                Duel
+              </Button>
+              <Button
+                variant={selectedMode === "challenge" ? "primary" : "ghost"}
+                size="sm"
+                onClick={() => setSelectedMode("challenge")}
+                data-testid="mode-challenge"
+                aria-pressed={selectedMode === "challenge"}
+                style={{ minHeight: 44 }}
+                leftIcon={<Award size={14} />}
+              >
+                Challenge
+              </Button>
+            </div>
+          </fieldset>
         </Surface>
 
         {/* 2. Open Challenges Notification (if any) */}
-        {selectedMode === "challenge" && openChallenges.length > 0 && (
-          <Surface
-            variant="card"
-            padding="md"
-            radius="lg"
-            style={{ border: "2px solid var(--color-primary, #38bdf8)" }}
-          >
-            <div style={{ fontSize: "14px", fontWeight: 700, marginBottom: "8px" }}>
-              Incoming Challenges:
-            </div>
-            {openChallenges.map((c) => (
-              <div
-                key={c.challengeId}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "8px 0",
-                  borderBottom: "1px solid var(--color-border)",
-                }}
-              >
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: "13px" }}>{c.puzzleId}</div>
-                  <div style={{ fontSize: "11px", color: "var(--color-muted-text)" }}>
-                    From Player {c.senderAccountId} • Time: {Math.floor(c.senderElapsedMs / 1000)}s
-                  </div>
-                </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => handleAcceptChallenge(c.challengeId)}
-                >
-                  Open invitation
-                </Button>
-              </div>
-            ))}
-          </Surface>
+        {selectedMode === "challenge" && challengeState === "loading" && (
+          <p role="status" style={{ color: "var(--color-muted-text)" }}>
+            Checking for incoming challenges…
+          </p>
         )}
+        {selectedMode === "challenge" && challengeState === "error" && (
+          <div
+            role="alert"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 12,
+              padding: 14,
+              borderRadius: "var(--radius-lg)",
+              background: "var(--color-danger-surface)",
+              color: "var(--color-danger-text)",
+            }}
+          >
+            <span>Incoming challenges could not be loaded.</span>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => setChallengeRetry((value) => value + 1)}
+            >
+              Retry
+            </Button>
+          </div>
+        )}
+        {selectedMode === "challenge" &&
+          challengeState === "ready" &&
+          openChallenges.length === 0 && (
+            <p style={{ color: "var(--color-muted-text)", margin: 0 }}>
+              No incoming Sudoku challenges right now.
+            </p>
+          )}
+        {selectedMode === "challenge" &&
+          challengeState === "ready" &&
+          openChallenges.length > 0 && (
+            <Surface
+              variant="card"
+              padding="md"
+              radius="lg"
+              style={{ border: "1px solid var(--color-focus)" }}
+            >
+              <div style={{ fontSize: "18px", fontWeight: 650, marginBottom: "8px" }}>
+                Incoming challenges
+              </div>
+              {openChallenges.map((c) => (
+                <div
+                  key={c.challengeId}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "8px 0",
+                    borderBottom: "1px solid var(--color-border)",
+                  }}
+                >
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: "13px" }}>{c.puzzleId}</div>
+                    <div style={{ fontSize: "14px", color: "var(--color-muted-text)" }}>
+                      From {partnerName ?? "your opponent"}
+                    </div>
+                  </div>
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => handleAcceptChallenge(c.challengeId)}
+                  >
+                    Open invitation
+                  </Button>
+                </div>
+              ))}
+            </Surface>
+          )}
 
         {/* 3. Difficulty Selector */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, 1fr)",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 70px), 1fr))",
             gap: "8px",
           }}
+          role="group"
+          aria-label="Sudoku difficulty"
         >
           {(["easy", "medium", "hard", "expert"] as SudokuBucket[]).map((bucket) => (
             <Button
@@ -358,7 +504,8 @@ export function SudokuListScreen() {
                 setSelectedNumber(page * 50 + 1);
               }}
               data-testid={`bucket-${bucket}`}
-              style={{ textTransform: "capitalize", fontWeight: 700 }}
+              aria-pressed={selectedBucket === bucket}
+              style={{ minHeight: 44, textTransform: "capitalize", fontWeight: 700 }}
             >
               {bucket}
             </Button>
@@ -375,12 +522,16 @@ export function SudokuListScreen() {
               marginBottom: "12px",
             }}
           >
-            <span style={{ fontSize: "14px", fontWeight: 700 }}>
+            <span style={{ fontSize: "15px", fontWeight: 650 }}>
               Select Puzzle ({page * 50 + 1}–{(page + 1) * 50} of 250):
             </span>
 
             {/* Pagination Tabs */}
-            <div style={{ display: "flex", gap: "4px" }}>
+            <div
+              style={{ display: "flex", gap: "4px", flexWrap: "wrap" }}
+              role="group"
+              aria-label="Puzzle page"
+            >
               {[0, 1, 2, 3, 4].map((p) => (
                 <button
                   key={p}
@@ -389,14 +540,20 @@ export function SudokuListScreen() {
                     setSelectedNumber(p * 50 + 1);
                   }}
                   data-testid={`page-${p + 1}`}
+                  aria-label={`Puzzles ${p * 50 + 1} to ${(p + 1) * 50}`}
+                  aria-current={page === p ? "page" : undefined}
                   style={{
-                    padding: "4px 8px",
-                    borderRadius: "4px",
-                    border: "none",
-                    backgroundColor: page === p ? "var(--color-primary, #38bdf8)" : "transparent",
-                    color: page === p ? "#000" : "var(--color-muted-text)",
-                    fontSize: "11px",
-                    fontWeight: 700,
+                    minWidth: "44px",
+                    minHeight: "44px",
+                    padding: "8px",
+                    borderRadius: "var(--radius-full)",
+                    border:
+                      page === p ? "2px solid var(--color-focus)" : "1px solid var(--color-border)",
+                    backgroundColor:
+                      page === p ? "var(--color-emphasis-mint-bg)" : "var(--color-raised)",
+                    color: page === p ? "var(--color-emphasis-mint-ink)" : "var(--color-text)",
+                    fontSize: "14px",
+                    fontWeight: 650,
                     cursor: "pointer",
                   }}
                 >
@@ -409,12 +566,14 @@ export function SudokuListScreen() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(5, 1fr)",
+              gridTemplateColumns: "repeat(auto-fill, minmax(48px, 1fr))",
               gap: "6px",
               maxHeight: "260px",
               overflowY: "auto",
               padding: "2px",
             }}
+            role="group"
+            aria-label={`Puzzle numbers ${page * 50 + 1} through ${(page + 1) * 50}`}
           >
             {Array.from({ length: 50 }).map((_, i) => {
               const num = page * 50 + i + 1;
@@ -425,21 +584,24 @@ export function SudokuListScreen() {
                   key={num}
                   onClick={() => setSelectedNumber(num)}
                   data-testid={`puzzle-num-${num}`}
+                  aria-pressed={isSelected}
+                  aria-label={`Puzzle ${num}${completedIds.includes(`${selectedBucket}-${String(num).padStart(3, "0")}`) ? ", completed before" : ""}`}
                   style={{
                     minHeight: "44px",
                     padding: "8px 0",
                     borderRadius: "8px",
                     border: isSelected
-                      ? "2px solid var(--color-primary, #38bdf8)"
-                      : "1px solid var(--color-border, #334155)",
+                      ? "2px solid var(--color-focus)"
+                      : "1px solid var(--color-border)",
                     backgroundColor: isSelected
-                      ? "rgba(56, 189, 248, 0.2)"
-                      : "var(--color-raised, #1e293b)",
-                    color: isSelected ? "var(--color-primary, #38bdf8)" : "var(--color-text)",
+                      ? "var(--color-emphasis-mint-bg)"
+                      : "var(--color-raised)",
+                    color: isSelected ? "var(--color-emphasis-mint-ink)" : "var(--color-text)",
                     fontSize: "13px",
                     fontWeight: isSelected ? 800 : 600,
                     cursor: "pointer",
-                    transition: "all 150ms ease",
+                    transition:
+                      "background-color 120ms ease, border-color 120ms ease, color 120ms ease",
                   }}
                 >
                   #{num}
@@ -461,6 +623,8 @@ export function SudokuListScreen() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            gap: "var(--space-md)",
+            flexWrap: "wrap",
           }}
         >
           <div>
@@ -469,7 +633,7 @@ export function SudokuListScreen() {
             </div>
             <div style={{ fontSize: "12px", color: "var(--color-muted-text)" }}>
               {selectedMode === "practice"
-                ? "Untimed or timed solo play with pause & assist"
+                ? "Solo practice with pause, notes and entry check"
                 : selectedMode === "duel"
                   ? "Synchronized head-to-head race"
                   : "Asynchronous timed challenge"}
@@ -479,15 +643,15 @@ export function SudokuListScreen() {
           <Button
             variant="primary"
             size="lg"
-            disabled={isStarting}
+            disabled={isStarting || isAbandoning || matchState !== "ready"}
             onClick={handleStartMatch}
             data-testid="start-sudoku-button"
             leftIcon={<Play size={18} />}
           >
-            {isStarting ? "Starting..." : "Start Puzzle"}
+            {isStarting ? "Starting…" : existingMatchId ? "Resume saved attempt" : "Start puzzle"}
           </Button>
         </Surface>
-      </main>
+      </div>
     </div>
   );
 }
