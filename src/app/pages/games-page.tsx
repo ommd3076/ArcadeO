@@ -64,8 +64,7 @@ export function GamesPage() {
         display: "flex",
         flexDirection: "column",
         gap: "var(--space-xl)",
-        padding:
-          "calc(var(--space-xl) + var(--sat)) var(--space-lg) calc(var(--space-4xl) + var(--sab))",
+        padding: "calc(var(--space-xl) + var(--sat)) var(--space-lg) calc(96px + var(--sab))",
         maxWidth: "960px",
         margin: "0 auto",
         width: "100%",
@@ -90,7 +89,7 @@ export function GamesPage() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 155px), 1fr))",
           gap: "var(--space-lg)",
         }}
       >
@@ -107,6 +106,7 @@ export function GamesPage() {
                   flexDirection: "column",
                   gap: "var(--space-md)",
                   height: "100%",
+                  minHeight: "172px",
                   cursor: "pointer",
                 }}
               >
@@ -129,7 +129,7 @@ export function GamesPage() {
                   </div>
                   <span
                     style={{
-                      fontSize: "11px",
+                      fontSize: "12px",
                       fontWeight: 600,
                       padding: "2px 8px",
                       borderRadius: "var(--radius-full)",

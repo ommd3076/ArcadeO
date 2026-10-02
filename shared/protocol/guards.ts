@@ -8,7 +8,7 @@ export function validateActionPayload(
   action: ActionType,
   payload: unknown,
 ): { valid: true; error?: undefined } | { valid: false; error: ErrorDetails } {
-  if (typeof payload !== "object" || payload === null) {
+  if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
     return {
       valid: false,
       error: createError(ErrorCode.INVALID_ACTION, "Payload must be an object"),
@@ -16,6 +16,38 @@ export function validateActionPayload(
   }
 
   const p = payload as Record<string, unknown>;
+  const allowedKeys: Partial<Record<ActionType, string[]>> = {
+    "connect-four.drop": ["column"],
+    "secret.lock": ["choice", "value"],
+    "ludo.move": ["tokenId"],
+    "ludo.set-colour": ["colourId", "seat"],
+    "dots-boxes.edge": ["r1", "c1", "r2", "c2"],
+    "sos.place": ["row", "col", "letter"],
+    "cricket.choose-role": ["role"],
+    "sudoku.edit": ["row", "col", "operation", "value"],
+    "match.resign": ["resigningSeat"],
+    "challenge.publish": ["senderAttemptId"],
+    "match.accept": [],
+    "match.decline": [],
+    "match.cancel": [],
+    "match.ready": [],
+    "match.request-abandon": [],
+    "match.agree-abandon": [],
+    "dice.roll": [],
+    "secret.reveal": [],
+    "secret.next": [],
+    "sudoku.undo": [],
+    "sudoku.check": [],
+    "sudoku.pause": [],
+    "sudoku.resume": [],
+  };
+  const keys = allowedKeys[action];
+  if (!keys || Object.keys(p).some((key) => !keys.includes(key))) {
+    return {
+      valid: false,
+      error: createError(ErrorCode.INVALID_ACTION, "Unknown action or payload field"),
+    };
+  }
 
   switch (action) {
     case "connect-four.drop": {
@@ -30,6 +62,12 @@ export function validateActionPayload(
     }
 
     case "secret.lock": {
+      if ((p.choice !== undefined) === (p.value !== undefined)) {
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "Exactly one choice is required"),
+        };
+      }
       // RPS choice or Hand cricket value
       if (p.choice !== undefined) {
         const choice = p.choice as RPSChoice;
@@ -72,10 +110,30 @@ export function validateActionPayload(
       return { valid: true };
     }
 
+    case "ludo.set-colour": {
+      if (
+        !["blue", "green", "red", "yellow", "purple", "orange", "cyan", "pink"].includes(
+          p.colourId as string,
+        )
+      ) {
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "Choose a listed Ludo colour"),
+        };
+      }
+      if (p.seat !== undefined && p.seat !== "A" && p.seat !== "B") {
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "Choose player A or B"),
+        };
+      }
+      return { valid: true };
+    }
+
     case "dots-boxes.edge": {
       const { r1, c1, r2, c2 } = p;
       for (const [k, v] of Object.entries({ r1, c1, r2, c2 })) {
-        if (typeof v !== "number" || !Number.isInteger(v) || v < 0) {
+        if (typeof v !== "number" || !Number.isInteger(v) || v < 0 || v > 8) {
           return {
             valid: false,
             error: createError(ErrorCode.INVALID_ACTION, `${k} must be a non-negative integer`),
@@ -87,13 +145,13 @@ export function validateActionPayload(
 
     case "sos.place": {
       const { row, col, letter } = p;
-      if (typeof row !== "number" || !Number.isInteger(row) || row < 0) {
+      if (typeof row !== "number" || !Number.isInteger(row) || row < 0 || row > 8) {
         return {
           valid: false,
           error: createError(ErrorCode.INVALID_ACTION, "Row must be a non-negative integer"),
         };
       }
-      if (typeof col !== "number" || !Number.isInteger(col) || col < 0) {
+      if (typeof col !== "number" || !Number.isInteger(col) || col < 0 || col > 8) {
         return {
           valid: false,
           error: createError(ErrorCode.INVALID_ACTION, "Col must be a non-negative integer"),
@@ -133,6 +191,22 @@ export function validateActionPayload(
       return { valid: true };
     }
 
+    case "cricket.choose-role": {
+      if (p.role !== "bat" && p.role !== "bowl")
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "Invalid cricket role"),
+        };
+      return { valid: true };
+    }
+    case "challenge.publish": {
+      if (typeof p.senderAttemptId !== "string" || !p.senderAttemptId)
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "Sender attempt is required"),
+        };
+      return { valid: true };
+    }
     case "match.resign": {
       if (p.resigningSeat !== undefined && p.resigningSeat !== "A" && p.resigningSeat !== "B") {
         return {

@@ -1,5 +1,7 @@
+import type { SudokuRecordParams } from "../sudoku/records";
 import type {
   AccountId,
+  AccentFamily,
   GameId,
   MatchLifecycle,
   PlayMode,
@@ -11,6 +13,7 @@ export interface ParticipantInfo {
   accountId: AccountId;
   displayName: string;
   ready: boolean;
+  accentFamily?: AccentFamily;
 }
 
 export interface MatchParticipants {
@@ -21,6 +24,10 @@ export interface MatchParticipants {
 export interface ControllerInfo {
   controllingAccountId: AccountId;
   controllerGeneration: number;
+  controllingSessionId?: string;
+  invitationAccepted?: boolean;
+  abandonRequestedBy?: Seat;
+  playerControllers?: Partial<Record<AccountId, { sessionId?: string; generation: number }>>;
 }
 
 export interface MatchSnapshotRow {
@@ -104,12 +111,14 @@ export interface MatchInitializationParams {
   gameId: GameId;
   mode: PlayMode;
   creatorAccountId: AccountId;
+  creatorSessionId?: string;
   participants: MatchParticipants;
   gameOptions?: Record<string, unknown>;
   startingSeat?: Seat;
 }
 
 export interface ProjectionPayload {
+  sudokuRecords?: SudokuRecordParams[];
   matchId: string;
   deliveryVersion: number;
   lifecycle: MatchLifecycle;

@@ -18,7 +18,7 @@ export const rpsEngineAdapter: GameEngineAdapter<RPSState, SecretLockPayload, RP
     gameId: "rock-paper-scissors",
     createInitialState,
     validateAndReduce,
-    legalActions,
+    legalActions: (state, seat) => legalActions(state, seat),
     toPublicView,
     isTerminal,
   };

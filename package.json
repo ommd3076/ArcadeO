@@ -4,16 +4,21 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "node scripts/dev.mjs",
+    "build": "tsc -b && vite build && node scripts/build-public.mjs && node scripts/bundle-worker.mjs",
+    "preview": "node scripts/preview.mjs",
+    "setup:local": "node scripts/setup-local.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"src/**/*.{ts,tsx}\" \"shared/**/*.{ts,tsx}\" \"worker/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"shared/**/*.{ts,tsx}\" \"worker/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"shared/**/*.{ts,tsx}\" \"worker/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "test": "vitest run tests/unit",
-    "test:integration": "vitest run tests/integration",
+    "test:contracts": "vitest run tests/integration",
+    "test:components": "vitest run tests/e2e",
+    "test:integration": "npm run test:workers && node scripts/test-runtime.mjs",
     "test:e2e": "playwright test",
-    "content:verify": "node scripts/verify-sudoku-catalog.mjs"
+    "content:verify": "node scripts/verify-sudoku-catalog.mjs",
+    "test:workers": "vitest run --config vitest.workers.config.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.16.0",
@@ -22,7 +27,11 @@
     "react-router-dom": "^7.3.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250224.0",
+    "@cloudflare/vitest-plugin": "^1.3.4",
+    "@cloudflare/workers-types": "^5.20261001.1",
+    "@fontsource/dm-mono": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
     "@playwright/test": "^1.50.1",
     "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
@@ -33,7 +42,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.71.0",
     "vite": "^6.2.0",
-    "vitest": "^3.0.7",
-    "wrangler": "^3.111.0"
+    "vitest": "^4.1.11",
+    "wrangler": "^4.145.0"
   }
 }

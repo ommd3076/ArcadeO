@@ -23,6 +23,10 @@ import {
   SnapshotData,
 } from "./types";
 import { computeCanonicalPayloadDigest } from "./digest";
+import { activateDuel, acceptChallenge } from "../../shared/games/sudoku/engine";
+import { projectSudokuRecord, getCompletedPuzzleIds } from "../sudoku/records";
+import type { SudokuRecordParams } from "../sudoku/records";
+import type { SudokuState } from "../../shared/games/sudoku/types";
 
 export interface MatchDoEnv {
   DB?: D1Database;
@@ -45,6 +49,93 @@ export class MatchDurableObject implements DurableObject {
   private env: MatchDoEnv;
   private initialized = false;
   private connectedSockets = new Set<SocketClient>();
+  private authorityTail: Promise<unknown> = Promise.resolve();
+
+  private serialize<T>(operation: () => Promise<T>): Promise<T> {
+    const next = this.authorityTail.then(operation, operation);
+    this.authorityTail = next.catch(() => {});
+    return next;
+  }
+
+  private isSolo(snapshot: SnapshotData): boolean {
+    return (
+      snapshot.gameId === "sudoku" &&
+      (snapshot.mode === "practice" ||
+        (snapshot.mode === "challenge" && !(snapshot.gameState as SudokuState).challengePublished))
+    );
+  }
+
+  private isMember(snapshot: SnapshotData, account: AccountId): boolean {
+    if (this.isSolo(snapshot)) return snapshot.participants.A.accountId === account;
+    return (
+      snapshot.participants.A.accountId === account ||
+      snapshot.participants.B?.accountId === account
+    );
+  }
+
+  private safeEffects(snapshot: SnapshotData, effects?: unknown[]): unknown[] {
+    if (snapshot.gameId === "sudoku") return [];
+    if (
+      snapshot.mode === "together" &&
+      ["rock-paper-scissors", "hand-cricket"].includes(snapshot.gameId) &&
+      !(snapshot.gameState as { revealed?: boolean }).revealed
+    )
+      return [];
+    return effects ?? [];
+  }
+
+  private async authorizeSession(account: AccountId, sessionId?: string): Promise<boolean> {
+    if (!this.env.DB) return false;
+    if (!sessionId) return false;
+    const primary =
+      typeof this.env.DB.withSession === "function"
+        ? this.env.DB.withSession("first-primary")
+        : this.env.DB;
+    const row = await primary
+      .prepare("SELECT accountId, expiresAt, revokedAt FROM sessions WHERE sessionId = ?")
+      .bind(sessionId)
+      .first<{ accountId: string; expiresAt: number; revokedAt: number | null }>();
+    return (
+      !!row && row.accountId === account && row.revokedAt == null && row.expiresAt > Date.now()
+    );
+  }
+
+  private sudokuRecords(snapshot: SnapshotData, game: SudokuState): SudokuRecordParams[] {
+    return (["A", "B"] as const).flatMap((seat) => {
+      const player = game.players[seat];
+      const participant = snapshot.participants[seat];
+      if (
+        !participant ||
+        player.completedAt === null ||
+        (game.challengePublished && seat === (game.senderSeat ?? "A"))
+      )
+        return [];
+      return [
+        {
+          attemptId: snapshot.matchId,
+          accountId: participant.accountId,
+          puzzleId: game.puzzleId,
+          mode: game.mode,
+          elapsedMs: player.elapsedMs,
+          assisted: player.assisted,
+          replay: Boolean(game.replay),
+          completedAt: player.completedAt,
+          resultMatchId:
+            game.mode === "practice" || (!game.challengePublished && game.mode === "challenge")
+              ? undefined
+              : snapshot.matchId,
+        },
+      ];
+    });
+  }
+
+  private randomDie(): number {
+    const value = new Uint32Array(1);
+    do {
+      crypto.getRandomValues(value);
+    } while (value[0] >= 4294967292);
+    return (value[0] % 6) + 1;
+  }
 
   constructor(state: DurableObjectState, env: MatchDoEnv) {
     this.state = state;
@@ -58,6 +149,7 @@ export class MatchDurableObject implements DurableObject {
     if (this.initialized) return;
 
     this.state.storage.sql.exec(`
+      CREATE TABLE IF NOT EXISTS initialization_identity (digest TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS match_snapshot (
         matchId TEXT PRIMARY KEY,
         gameId TEXT NOT NULL,
@@ -142,7 +234,12 @@ export class MatchDurableObject implements DurableObject {
       roundId: r.roundId !== null ? Number(r.roundId) : null,
       gameState: JSON.parse(r.gameState),
       readiness: JSON.parse(r.readiness),
-      participants: JSON.parse(r.participants),
+      participants:
+        r.gameId === "sudoku" &&
+        (r.mode === "practice" ||
+          (r.mode === "challenge" && !JSON.parse(r.gameState).challengePublished))
+          ? { A: JSON.parse(r.participants).A }
+          : JSON.parse(r.participants),
       controller: JSON.parse(r.controller),
       result: r.result ? JSON.parse(r.result) : null,
     };
@@ -151,20 +248,44 @@ export class MatchDurableObject implements DurableObject {
   /**
    * Generates a viewer-filtered match view conforming to protocol specifications.
    */
-  public buildFilteredView(snapshot: SnapshotData, viewerAccountId: AccountId): FilteredMatchView {
+  public buildFilteredView(
+    snapshot: SnapshotData,
+    viewerAccountId: AccountId,
+    viewerSessionId?: string,
+  ): FilteredMatchView {
     let viewerSeat: Seat | undefined;
     let isController = false;
 
     if (snapshot.mode === "together") {
-      isController = snapshot.controller.controllingAccountId === viewerAccountId;
-      viewerSeat = snapshot.turnSeat ?? "A";
+      isController =
+        snapshot.controller.controllingAccountId === viewerAccountId &&
+        (!snapshot.controller.controllingSessionId ||
+          snapshot.controller.controllingSessionId === viewerSessionId);
+      const secret = snapshot.gameState as {
+        phase?: string;
+        tossWinner?: Seat;
+        lockedSeats?: Seat[];
+        roundId?: number;
+        deliveryId?: number;
+      };
+      if (
+        ["rock-paper-scissors", "hand-cricket"].includes(snapshot.gameId) &&
+        secret.phase !== "toss"
+      ) {
+        const first: Seat = (secret.roundId ?? secret.deliveryId ?? 1) % 2 === 1 ? "A" : "B";
+        viewerSeat = secret.lockedSeats?.includes(first) ? (first === "A" ? "B" : "A") : first;
+      } else viewerSeat = snapshot.turnSeat ?? "A";
     } else {
       if (snapshot.participants.A.accountId === viewerAccountId) {
         viewerSeat = "A";
       } else if (snapshot.participants.B?.accountId === viewerAccountId) {
         viewerSeat = "B";
       }
-      isController = viewerSeat === snapshot.turnSeat;
+      if (snapshot.gameId === "sudoku") {
+        const controller = snapshot.controller.playerControllers?.[viewerAccountId];
+        isController =
+          !!viewerSeat && (!controller?.sessionId || controller.sessionId === viewerSessionId);
+      } else isController = viewerSeat === snapshot.turnSeat;
     }
 
     const engine = getGameEngine(snapshot.gameId);
@@ -173,6 +294,7 @@ export class MatchDurableObject implements DurableObject {
       viewerSeat,
       isController,
       mode: snapshot.mode,
+      serverTime: Date.now(),
     };
 
     let filteredGameState: unknown = snapshot.gameState;
@@ -183,16 +305,30 @@ export class MatchDurableObject implements DurableObject {
     let legalActions: ActionType[] = [];
     if (snapshot.lifecycle === "active") {
       if (engine && viewerSeat && typeof engine.legalActions === "function") {
-        legalActions = engine.legalActions(snapshot.gameState, viewerSeat);
+        legalActions = engine.legalActions(snapshot.gameState, viewerSeat, Date.now());
       }
-      legalActions.push("match.resign");
+      if (this.isSolo(snapshot)) legalActions.push("match.request-abandon");
+      else legalActions.push("match.resign");
+      if (snapshot.mode === "together") legalActions.push("match.agree-abandon");
       if (snapshot.mode === "remote") {
         legalActions.push("match.request-abandon");
+        if (
+          snapshot.controller.abandonRequestedBy &&
+          snapshot.controller.abandonRequestedBy !== viewerSeat
+        )
+          legalActions.push("match.agree-abandon");
       }
     } else if (snapshot.lifecycle === "waiting") {
-      legalActions = ["match.ready", "match.accept", "match.decline", "match.cancel"];
+      legalActions = snapshot.controller.invitationAccepted
+        ? ["match.ready"]
+        : viewerSeat === "B"
+          ? ["match.accept", "match.decline"]
+          : ["match.cancel"];
+      if (viewerSeat === "A") legalActions.push("match.cancel");
     }
 
+    if ((snapshot.mode === "together" || snapshot.gameId === "sudoku") && !isController)
+      legalActions = [];
     return {
       matchId: snapshot.matchId,
       gameId: snapshot.gameId,
@@ -205,11 +341,13 @@ export class MatchDurableObject implements DurableObject {
       },
       controller: {
         controllingAccountId: snapshot.controller.controllingAccountId,
-        controllerGeneration: snapshot.controller.controllerGeneration,
+        controllerGeneration:
+          snapshot.controller.playerControllers?.[viewerAccountId]?.generation ??
+          snapshot.controller.controllerGeneration,
         isController,
       },
       gameState: filteredGameState,
-      turnSeat: snapshot.turnSeat ?? undefined,
+      turnSeat: snapshot.mode === "together" ? viewerSeat : (snapshot.turnSeat ?? undefined),
       turnId: snapshot.turnId ?? undefined,
       roundId: snapshot.roundId ?? undefined,
       legalActions,
@@ -221,11 +359,42 @@ export class MatchDurableObject implements DurableObject {
   /**
    * Initializes a new match within the Durable Object.
    */
-  public async initializeMatch(params: MatchInitializationParams): Promise<FilteredMatchView> {
+  public initializeMatch(params: MatchInitializationParams): Promise<FilteredMatchView> {
+    return this.serialize(() => this.initializeSerialized(params));
+  }
+
+  private async initializeSerialized(
+    params: MatchInitializationParams,
+  ): Promise<FilteredMatchView> {
     this.ensureSchema();
+    const initializationDigest = await computeCanonicalPayloadDigest("match.initialize", {
+      matchId: params.matchId,
+      gameId: params.gameId,
+      mode: params.mode,
+      creatorAccountId: params.creatorAccountId,
+      participants: params.participants,
+      gameOptions: params.gameOptions ?? {},
+      startingSeat: params.startingSeat ?? "A",
+    });
+    const reservation = this.state.storage.sql
+      .exec<{ digest: string }>("SELECT digest FROM initialization_identity LIMIT 1")
+      .toArray()[0];
+    if (reservation?.digest === "cancelled") throw new Error("Reservation expired");
     const existing = this.getSnapshot();
     if (existing) {
-      return this.buildFilteredView(existing, params.creatorAccountId);
+      const identity = this.state.storage.sql
+        .exec<{ digest: string }>("SELECT digest FROM initialization_identity LIMIT 1")
+        .toArray()[0];
+      if (identity && identity.digest !== initializationDigest)
+        throw new Error("Initialization conflict");
+      if (
+        existing.matchId !== params.matchId ||
+        existing.gameId !== params.gameId ||
+        existing.mode !== params.mode ||
+        !this.isMember(existing, params.creatorAccountId)
+      )
+        throw new Error("Initialization conflict");
+      return this.buildFilteredView(existing, params.creatorAccountId, params.creatorSessionId);
     }
 
     const engine = getGameEngine(params.gameId);
@@ -235,12 +404,20 @@ export class MatchDurableObject implements DurableObject {
 
     const initialGameState = engine.createInitialState({
       serverTime: Date.now(),
-      startingSeat: params.startingSeat ?? "A",
-      config: params.gameOptions,
+      startingSeat:
+        params.startingSeat ??
+        (params.gameId === "hand-cricket" && this.randomDie() % 2 === 0 ? "B" : "A"),
+      config: { ...params.gameOptions, mode: params.mode },
     });
 
     const isTogether = params.mode === "together";
-    const lifecycle: MatchLifecycle = isTogether ? "active" : "waiting";
+    const isPractice = params.mode === "practice";
+    const lifecycle: MatchLifecycle =
+      isTogether ||
+      isPractice ||
+      (params.mode === "challenge" && !params.gameOptions?.challengePublished)
+        ? "active"
+        : "waiting";
 
     const snapshot: SnapshotData = {
       matchId: params.matchId,
@@ -250,18 +427,34 @@ export class MatchDurableObject implements DurableObject {
       deliveryVersion: 1,
       schemaVersion: 1,
       rulesVersion: 1,
-      turnSeat: "A",
+      turnSeat:
+        (initialGameState as { activeSeat?: Seat; tossWinner?: Seat }).activeSeat ??
+        (initialGameState as { tossWinner?: Seat }).tossWinner ??
+        "A",
       turnId: 1,
       roundId: 1,
       gameState: initialGameState,
       readiness: {
-        A: true,
-        B: isTogether,
+        A: isTogether || isPractice,
+        B: isTogether || isPractice,
       },
-      participants: params.participants,
+      participants:
+        params.gameId === "sudoku" &&
+        (params.mode === "practice" ||
+          (params.mode === "challenge" && !params.gameOptions?.challengePublished))
+          ? { A: params.participants.A }
+          : params.participants,
       controller: {
         controllingAccountId: params.creatorAccountId,
         controllerGeneration: 1,
+        controllingSessionId: params.creatorSessionId,
+        ...(params.gameId === "sudoku"
+          ? {
+              playerControllers: {
+                [params.creatorAccountId]: { sessionId: params.creatorSessionId, generation: 1 },
+              },
+            }
+          : {}),
       },
       result: null,
     };
@@ -275,10 +468,14 @@ export class MatchDurableObject implements DurableObject {
       finishedAt: null,
       gameId: params.gameId,
       mode: params.mode,
-      participants: params.participants,
+      participants: snapshot.participants,
     };
 
     this.state.storage.transactionSync(() => {
+      this.state.storage.sql.exec(
+        "INSERT INTO initialization_identity (digest) VALUES (?)",
+        initializationDigest,
+      );
       this.state.storage.sql.exec(
         `INSERT INTO match_snapshot (
           matchId, gameId, mode, lifecycle, deliveryVersion, schemaVersion, rulesVersion,
@@ -315,9 +512,9 @@ export class MatchDurableObject implements DurableObject {
       await this.state.storage.sync();
     }
 
-    this.flushProjectionOutbox().catch(() => {});
+    this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
 
-    return this.buildFilteredView(snapshot, params.creatorAccountId);
+    return this.buildFilteredView(snapshot, params.creatorAccountId, params.creatorSessionId);
   }
 
   /**
@@ -326,7 +523,45 @@ export class MatchDurableObject implements DurableObject {
   public async handleAction(
     envelope: ActionEnvelope,
     actorAccountId: AccountId,
-    _sessionId?: string,
+    sessionId?: string,
+    requestingSocket?: WebSocket,
+  ): Promise<ActionResponse> {
+    return this.serialize(async () => {
+      if (!(await this.authorizeSession(actorAccountId, sessionId)))
+        return {
+          status: "rejected",
+          actionId: envelope?.actionId,
+          code: ErrorCode.AUTH_REQUIRED,
+          message: "Current session required",
+          retryable: false,
+        };
+      let replayAtAcceptance = false;
+      const snapshot = this.getSnapshot();
+      if (
+        this.env.DB &&
+        snapshot?.gameId === "sudoku" &&
+        snapshot.mode === "challenge" &&
+        envelope.action === "match.accept"
+      )
+        replayAtAcceptance = (await getCompletedPuzzleIds(this.env.DB, actorAccountId)).has(
+          (snapshot.gameState as SudokuState).puzzleId,
+        );
+      return this.handleActionSerialized(
+        envelope,
+        actorAccountId,
+        sessionId,
+        replayAtAcceptance,
+        requestingSocket,
+      );
+    });
+  }
+
+  private async handleActionSerialized(
+    envelope: ActionEnvelope,
+    actorAccountId: AccountId,
+    sessionId?: string,
+    replayAtAcceptance = false,
+    requestingSocket?: WebSocket,
   ): Promise<ActionResponse> {
     this.ensureSchema();
     const snapshot = this.getSnapshot();
@@ -341,11 +576,68 @@ export class MatchDurableObject implements DurableObject {
       };
     }
 
+    const reject = (
+      code: (typeof ErrorCode)[keyof typeof ErrorCode],
+      message: string,
+    ): ActionResponse => ({
+      status: "rejected",
+      actionId: envelope?.actionId,
+      code,
+      message,
+      retryable: false,
+      ...(this.isMember(snapshot, actorAccountId)
+        ? { latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId) }
+        : {}),
+    });
+    if (!this.isMember(snapshot, actorAccountId))
+      return reject(ErrorCode.FORBIDDEN, "Match unavailable");
+    if (envelope?.protocolVersion !== 1)
+      return reject(ErrorCode.PROTOCOL_MISMATCH, "Update required");
+    const envelopeKeys = [
+      "protocolVersion",
+      "matchId",
+      "actionId",
+      "action",
+      "payload",
+      "expectedVersion",
+      "turnId",
+      "roundId",
+      "progressRevision",
+      "controllerGeneration",
+    ];
+    if (
+      !envelope ||
+      Object.keys(envelope).some((key) => !envelopeKeys.includes(key)) ||
+      envelope.matchId !== snapshot.matchId ||
+      typeof envelope.action !== "string" ||
+      typeof envelope.actionId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(envelope.actionId)
+    )
+      return reject(ErrorCode.INVALID_ACTION, "Invalid action envelope");
     // Step 1: Authenticate actor membership & check controller generation
     let actorSeat: Seat;
     if (snapshot.mode === "together") {
       const payloadResign = (envelope.payload as { resigningSeat?: Seat })?.resigningSeat;
-      actorSeat = payloadResign || snapshot.turnSeat || "A";
+      const game = snapshot.gameState as {
+        lockedSeats?: Seat[];
+        roundId?: number;
+        deliveryId?: number;
+      };
+      const firstSeat: Seat = (game.roundId ?? game.deliveryId ?? 1) % 2 === 1 ? "A" : "B";
+      actorSeat =
+        envelope.action === "match.resign"
+          ? payloadResign!
+          : envelope.action === "ludo.set-colour"
+            ? ((envelope.payload as { seat?: Seat })?.seat ?? snapshot.turnSeat ?? "A")
+            : envelope.action === "secret.lock"
+              ? game.lockedSeats?.includes(firstSeat)
+                ? firstSeat === "A"
+                  ? "B"
+                  : "A"
+                : firstSeat
+              : snapshot.turnSeat || "A";
+      if (envelope.action === "match.resign" && payloadResign !== "A" && payloadResign !== "B")
+        return reject(ErrorCode.INVALID_ACTION, "Choose the resigning seat");
     } else {
       if (snapshot.participants.A.accountId === actorAccountId) {
         actorSeat = "A";
@@ -358,20 +650,7 @@ export class MatchDurableObject implements DurableObject {
           code: ErrorCode.FORBIDDEN,
           message: "Actor is not an authorized participant in this match",
           retryable: false,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
-        };
-      }
-    }
-
-    if (envelope.controllerGeneration !== undefined) {
-      if (envelope.controllerGeneration < snapshot.controller.controllerGeneration) {
-        return {
-          status: "rejected",
-          actionId: envelope.actionId,
-          code: ErrorCode.CONTROL_TRANSFERRED,
-          message: "Control has been transferred to another device or session",
-          retryable: false,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
     }
@@ -395,7 +674,7 @@ export class MatchDurableObject implements DurableObject {
           code: ErrorCode.ACTION_SUPERSEDED,
           message: "This action was previously superseded during recovery and cannot be replayed",
           retryable: false,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
 
@@ -421,8 +700,8 @@ export class MatchDurableObject implements DurableObject {
             acceptedVersion: receipt.acceptedVersion!,
             eventId: receipt.eventId!,
             serverTime: receipt.createdAt,
-            view: this.buildFilteredView(snapshot, actorAccountId),
-            effects: cachedEffects,
+            view: this.buildFilteredView(snapshot, actorAccountId, sessionId),
+            effects: this.safeEffects(snapshot, cachedEffects),
           };
         } else {
           return {
@@ -431,12 +710,39 @@ export class MatchDurableObject implements DurableObject {
             code: ErrorCode.ID_REUSED,
             message: "Action ID was previously used with a different payload",
             retryable: false,
-            latestView: this.buildFilteredView(snapshot, actorAccountId),
+            latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
           };
         }
       }
     }
 
+    if (snapshot.mode === "together") {
+      if (
+        snapshot.controller.controllingAccountId !== actorAccountId ||
+        envelope.controllerGeneration !== snapshot.controller.controllerGeneration ||
+        (snapshot.controller.controllingSessionId &&
+          snapshot.controller.controllingSessionId !== sessionId)
+      ) {
+        return {
+          status: "rejected",
+          actionId: envelope.actionId,
+          code: ErrorCode.CONTROL_TRANSFERRED,
+          message: "Control has been transferred to another device or session",
+          retryable: false,
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
+        };
+      }
+    }
+
+    if (snapshot.schemaVersion !== 1 || snapshot.rulesVersion !== 1)
+      return reject(ErrorCode.UNSUPPORTED_RULES, "Saved rules require a compatible update");
+    // A resolved winning secret round is immutable before its presentation reveal.
+    if (
+      (snapshot.gameState as { terminalResult?: unknown }).terminalResult &&
+      snapshot.mode === "together" &&
+      envelope.action !== "secret.reveal"
+    )
+      return reject(ErrorCode.MATCH_FINISHED, "Only reveal remains");
     // Step 3: Guard checks (lifecycle, concurrency, turn seat)
     if (["completed", "resigned", "abandoned", "cancelled"].includes(snapshot.lifecycle)) {
       return {
@@ -445,7 +751,7 @@ export class MatchDurableObject implements DurableObject {
         code: ErrorCode.MATCH_FINISHED,
         message: "Match has already finished",
         retryable: false,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
@@ -457,11 +763,13 @@ export class MatchDurableObject implements DurableObject {
         code: payloadCheck.error.code,
         message: payloadCheck.error.message,
         retryable: payloadCheck.error.retryable,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
     if (
+      !envelope.action.startsWith("secret.") &&
+      !envelope.action.startsWith("sudoku.") &&
       envelope.expectedVersion !== undefined &&
       envelope.expectedVersion !== snapshot.deliveryVersion
     ) {
@@ -471,7 +779,7 @@ export class MatchDurableObject implements DurableObject {
         code: ErrorCode.STALE_STATE,
         message: `Expected delivery version ${envelope.expectedVersion}, but current is ${snapshot.deliveryVersion}`,
         retryable: true,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
@@ -486,7 +794,7 @@ export class MatchDurableObject implements DurableObject {
         code: ErrorCode.STALE_STATE,
         message: `Expected turn ${envelope.turnId}, but current is ${snapshot.turnId}`,
         retryable: true,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
@@ -501,9 +809,58 @@ export class MatchDurableObject implements DurableObject {
         code: ErrorCode.WRONG_ROUND,
         message: `Expected round ${envelope.roundId}, but current is ${snapshot.roundId}`,
         retryable: false,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
+
+    if (
+      (envelope.action.startsWith("match.") ||
+        [
+          "connect-four.drop",
+          "ludo.move",
+          "ludo.set-colour",
+          "dots-boxes.edge",
+          "sos.place",
+          "dice.roll",
+          "cricket.choose-role",
+        ].includes(envelope.action)) &&
+      envelope.expectedVersion !== snapshot.deliveryVersion
+    )
+      return reject(ErrorCode.STALE_STATE, "Current version required");
+    if (
+      ["connect-four.drop", "ludo.move", "dots-boxes.edge", "sos.place", "dice.roll"].includes(
+        envelope.action,
+      ) &&
+      envelope.turnId !== snapshot.turnId
+    )
+      return reject(ErrorCode.STALE_STATE, "Current turn required");
+    if (envelope.action.startsWith("sudoku.")) {
+      const controller = snapshot.controller.playerControllers?.[actorAccountId];
+      if (
+        controller &&
+        (envelope.controllerGeneration !== controller.generation ||
+          (controller.sessionId && controller.sessionId !== sessionId))
+      )
+        return reject(ErrorCode.CONTROL_TRANSFERRED, "Current Sudoku controller required");
+      if (!controller && envelope.controllerGeneration !== snapshot.controller.controllerGeneration)
+        return reject(ErrorCode.CONTROL_TRANSFERRED, "Current Sudoku generation required");
+      const player = (snapshot.gameState as SudokuState).players[actorSeat];
+      if (envelope.progressRevision !== player.progressRevision)
+        return reject(ErrorCode.STALE_STATE, "Current progress revision required");
+    }
+    if (envelope.action.startsWith("secret.") && envelope.roundId !== snapshot.roundId)
+      return reject(ErrorCode.WRONG_ROUND, "Current round required");
+    if (
+      ["match.accept", "match.decline", "match.cancel", "match.ready"].includes(envelope.action) &&
+      snapshot.lifecycle !== "waiting"
+    )
+      return reject(ErrorCode.INVALID_ACTION, "Invitation is no longer waiting");
+    if (["match.accept", "match.decline"].includes(envelope.action) && actorSeat !== "B")
+      return reject(ErrorCode.FORBIDDEN, "Invitee required");
+    if (envelope.action === "match.cancel" && actorSeat !== "A")
+      return reject(ErrorCode.FORBIDDEN, "Creator required");
+    if (!envelope.action.startsWith("match.") && snapshot.lifecycle !== "active")
+      return reject(ErrorCode.INVALID_ACTION, "Match has not started");
 
     // Turn seat check for turn-based moves
     const turnActions: ActionType[] = [
@@ -521,7 +878,7 @@ export class MatchDurableObject implements DurableObject {
           code: ErrorCode.NOT_YOUR_TURN,
           message: `It is not seat ${actorSeat}'s turn`,
           retryable: true,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
     }
@@ -531,13 +888,33 @@ export class MatchDurableObject implements DurableObject {
     let newLifecycle = snapshot.lifecycle;
     let newTurnSeat = snapshot.turnSeat;
     let newTurnId = snapshot.turnId;
-    const newRoundId = snapshot.roundId;
+    let newRoundId = snapshot.roundId;
     const newReadiness = { ...snapshot.readiness };
+    const newController = { ...snapshot.controller };
+    if (snapshot.gameId === "sudoku" && !newController.playerControllers?.[actorAccountId])
+      newController.playerControllers = {
+        ...newController.playerControllers,
+        [actorAccountId]: { sessionId, generation: 1 },
+      };
     let effects: unknown[] = [];
     let terminalResult: TerminalResult | null = null;
     const serverTime = Date.now();
 
-    if (envelope.action === "match.ready" || envelope.action === "match.accept") {
+    if (envelope.action === "match.accept") {
+      newController.invitationAccepted = true;
+      if (snapshot.gameId === "sudoku" && snapshot.mode === "challenge") {
+        newGameState = acceptChallenge(
+          snapshot.gameState as SudokuState,
+          actorSeat,
+          serverTime,
+          Boolean((snapshot.gameState as SudokuState).replay) || replayAtAcceptance,
+        );
+        newLifecycle = "active";
+      }
+      effects = [{ type: "invitation-accepted", seat: actorSeat }];
+    } else if (envelope.action === "match.ready") {
+      if (snapshot.mode !== "together" && !snapshot.controller.invitationAccepted)
+        return reject(ErrorCode.INVALID_ACTION, "Accept invitation first");
       newReadiness[actorSeat] = true;
       if (snapshot.mode === "together") {
         newReadiness.A = true;
@@ -545,6 +922,8 @@ export class MatchDurableObject implements DurableObject {
       }
       if (newReadiness.A && newReadiness.B) {
         newLifecycle = "active";
+        if (snapshot.gameId === "sudoku" && snapshot.mode === "duel")
+          newGameState = activateDuel(snapshot.gameState as SudokuState, serverTime);
       }
       effects = [{ type: "player-ready", seat: actorSeat, active: newLifecycle === "active" }];
     } else if (envelope.action === "match.decline") {
@@ -567,7 +946,41 @@ export class MatchDurableObject implements DurableObject {
       };
       newTurnSeat = null;
       effects = [{ type: "match-cancelled", seat: actorSeat }];
+    } else if (envelope.action === "match.request-abandon") {
+      if (this.isSolo(snapshot)) {
+        newLifecycle = "abandoned";
+        newTurnSeat = null;
+        terminalResult = {
+          winner: null,
+          reason: "abandonment",
+          finishedAt: serverTime,
+          scores: { A: 0, B: 0 },
+          details: { scored: false },
+        };
+        effects = [{ type: "match-abandoned" }];
+      } else {
+        newController.abandonRequestedBy = actorSeat;
+        effects = [{ type: "abandon-requested", seat: actorSeat }];
+      }
+    } else if (envelope.action === "match.agree-abandon") {
+      if (
+        snapshot.mode !== "together" &&
+        (!snapshot.controller.abandonRequestedBy ||
+          snapshot.controller.abandonRequestedBy === actorSeat)
+      )
+        return reject(ErrorCode.INVALID_ACTION, "Other seat must request abandonment");
+      newLifecycle = "abandoned";
+      newTurnSeat = null;
+      terminalResult = {
+        winner: null,
+        reason: "abandonment",
+        finishedAt: serverTime,
+        scores: { A: 0, B: 0 },
+      };
+      effects = [{ type: "match-abandoned" }];
     } else if (envelope.action === "match.resign") {
+      if (this.isSolo(snapshot))
+        return reject(ErrorCode.INVALID_ACTION, "Use unscored abandonment for a solo attempt");
       const resigningSeat =
         (snapshot.mode === "together" &&
           (envelope.payload as { resigningSeat?: Seat })?.resigningSeat) ||
@@ -595,14 +1008,14 @@ export class MatchDurableObject implements DurableObject {
           code: ErrorCode.UNSUPPORTED_RULES,
           message: `Unsupported game engine for ${snapshot.gameId}`,
           retryable: false,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
 
       const reduction = engine.validateAndReduce(
         snapshot.gameState,
         { action: envelope.action, payload: envelope.payload },
-        { serverTime, actorSeat },
+        { serverTime, actorSeat, randomValues: [this.randomDie()] },
       );
 
       if (!reduction.success) {
@@ -612,7 +1025,7 @@ export class MatchDurableObject implements DurableObject {
           code: reduction.error.code,
           message: reduction.error.message,
           retryable: reduction.error.retryable,
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
+          latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
 
@@ -624,8 +1037,17 @@ export class MatchDurableObject implements DurableObject {
         newLifecycle = "completed";
         newTurnSeat = null;
       } else {
-        newTurnSeat = actorSeat === "A" ? "B" : "A";
-        newTurnId = (snapshot.turnId ?? 0) + 1;
+        const state = newGameState as {
+          activeSeat?: Seat;
+          roundId?: number;
+          deliveryId?: number;
+          innings?: number;
+        };
+        newTurnSeat = state.activeSeat ?? snapshot.turnSeat;
+        newTurnId =
+          envelope.action === "ludo.set-colour" ? snapshot.turnId : (snapshot.turnId ?? 0) + 1;
+        newRoundId =
+          state.roundId ?? (state.deliveryId === undefined ? snapshot.roundId : state.deliveryId);
       }
     }
 
@@ -642,10 +1064,24 @@ export class MatchDurableObject implements DurableObject {
       gameId: snapshot.gameId,
       mode: snapshot.mode,
       participants: snapshot.participants,
+      sudokuRecords:
+        snapshot.gameId === "sudoku"
+          ? this.sudokuRecords(snapshot, newGameState as SudokuState)
+          : undefined,
     };
 
     // Step 5: Atomic commit: synchronous SQLite transaction
     this.state.storage.transactionSync(() => {
+      if (envelope.action === "secret.lock") {
+        const payload = envelope.payload as { choice?: string; value?: number };
+        this.state.storage.sql.exec(
+          "INSERT INTO private_round_choices (roundId, seat, choiceValue, lockedAt) VALUES (?, ?, ?, ?)",
+          snapshot.roundId!,
+          actorSeat,
+          JSON.stringify(payload.choice ?? payload.value),
+          serverTime,
+        );
+      }
       this.state.storage.sql.exec(
         `INSERT INTO events (eventId, actionId, actorAccount, actorSeat, acceptedAt, effects)
          VALUES (?, ?, ?, ?, ?, ?)`,
@@ -671,7 +1107,7 @@ export class MatchDurableObject implements DurableObject {
       this.state.storage.sql.exec(
         `UPDATE match_snapshot
          SET deliveryVersion = ?, lifecycle = ?, turnSeat = ?, turnId = ?, roundId = ?,
-             gameState = ?, readiness = ?, result = ?
+             gameState = ?, readiness = ?, result = ?, controller = ?
          WHERE matchId = ?`,
         newDeliveryVersion,
         newLifecycle,
@@ -681,6 +1117,7 @@ export class MatchDurableObject implements DurableObject {
         JSON.stringify(newGameState),
         JSON.stringify(newReadiness),
         terminalResult ? JSON.stringify(terminalResult) : null,
+        JSON.stringify(newController),
         snapshot.matchId,
       );
 
@@ -708,11 +1145,12 @@ export class MatchDurableObject implements DurableObject {
       roundId: newRoundId,
       gameState: newGameState,
       readiness: newReadiness,
+      controller: newController,
       result: terminalResult,
     };
 
     // Step 7: Filtered Reply, Broadcast, and Outbox flush
-    const filteredView = this.buildFilteredView(updatedSnapshot, actorAccountId);
+    const filteredView = this.buildFilteredView(updatedSnapshot, actorAccountId, sessionId);
     const reply: AcceptedReply = {
       status: "accepted",
       actionId: envelope.actionId,
@@ -720,11 +1158,17 @@ export class MatchDurableObject implements DurableObject {
       eventId,
       serverTime,
       view: filteredView,
-      effects,
+      effects: this.safeEffects(updatedSnapshot, effects),
     };
 
-    this.broadcastEvent(updatedSnapshot, eventId, newDeliveryVersion, effects);
-    this.flushProjectionOutbox().catch(() => {});
+    await this.broadcastEvent(
+      updatedSnapshot,
+      eventId,
+      newDeliveryVersion,
+      effects,
+      requestingSocket,
+    );
+    this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
 
     return reply;
   }
@@ -735,6 +1179,7 @@ export class MatchDurableObject implements DurableObject {
   public async handleControllerTakeover(
     actorAccountId: AccountId,
     expectedGeneration?: number,
+    sessionId?: string,
   ): Promise<
     | {
         success: true;
@@ -744,44 +1189,79 @@ export class MatchDurableObject implements DurableObject {
       }
     | { success: false; code: string; message: string; latestView?: FilteredMatchView }
   > {
+    return this.serialize(() =>
+      this.takeoverSerialized(actorAccountId, expectedGeneration, sessionId),
+    );
+  }
+
+  private async takeoverSerialized(
+    actorAccountId: AccountId,
+    expectedGeneration?: number,
+    sessionId?: string,
+  ) {
     this.ensureSchema();
     const snapshot = this.getSnapshot();
     if (!snapshot) {
-      return { success: false, code: ErrorCode.NOT_FOUND, message: "Match not found" };
+      return { success: false as const, code: ErrorCode.NOT_FOUND, message: "Match not found" };
     }
 
     // Verify actor is a participant
-    if (snapshot.mode === "remote") {
+    if (true) {
       if (
         snapshot.participants.A.accountId !== actorAccountId &&
         snapshot.participants.B?.accountId !== actorAccountId
       ) {
         return {
-          success: false,
+          success: false as const,
           code: ErrorCode.FORBIDDEN,
           message: "Actor is not a participant in this match",
-          latestView: this.buildFilteredView(snapshot, actorAccountId),
         };
       }
     }
 
     if (
-      expectedGeneration !== undefined &&
-      expectedGeneration !== snapshot.controller.controllerGeneration
+      expectedGeneration !==
+      (snapshot.gameId === "sudoku"
+        ? (snapshot.controller.playerControllers?.[actorAccountId]?.generation ??
+          snapshot.controller.controllerGeneration)
+        : snapshot.controller.controllerGeneration)
     ) {
       return {
-        success: false,
+        success: false as const,
         code: ErrorCode.STALE_STATE,
         message: `Expected controller generation ${expectedGeneration}, but current is ${snapshot.controller.controllerGeneration}`,
-        latestView: this.buildFilteredView(snapshot, actorAccountId),
+        latestView: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
-    const newGeneration = snapshot.controller.controllerGeneration + 1;
+    if (!(await this.authorizeSession(actorAccountId, sessionId)))
+      return {
+        success: false as const,
+        code: ErrorCode.AUTH_REQUIRED,
+        message: "Current session required",
+      };
+    if (["completed", "resigned", "cancelled", "abandoned"].includes(snapshot.lifecycle))
+      return { success: false as const, code: ErrorCode.MATCH_FINISHED, message: "Match finished" };
+    const newGeneration =
+      (snapshot.gameId === "sudoku"
+        ? (snapshot.controller.playerControllers?.[actorAccountId]?.generation ??
+          snapshot.controller.controllerGeneration)
+        : snapshot.controller.controllerGeneration) + 1;
     const newDeliveryVersion = snapshot.deliveryVersion + 1;
     const newController = {
+      ...snapshot.controller,
+      ...(snapshot.gameId === "sudoku"
+        ? {
+            playerControllers: {
+              ...snapshot.controller.playerControllers,
+              [actorAccountId]: { sessionId, generation: newGeneration },
+            },
+          }
+        : {}),
       controllingAccountId: actorAccountId,
-      controllerGeneration: newGeneration,
+      controllerGeneration:
+        snapshot.gameId === "sudoku" ? snapshot.controller.controllerGeneration : newGeneration,
+      controllingSessionId: sessionId,
     };
 
     this.state.storage.transactionSync(() => {
@@ -792,6 +1272,24 @@ export class MatchDurableObject implements DurableObject {
         JSON.stringify(newController),
         newDeliveryVersion,
         snapshot.matchId,
+      );
+      const projection: ProjectionPayload = {
+        matchId: snapshot.matchId,
+        deliveryVersion: newDeliveryVersion,
+        lifecycle: snapshot.lifecycle,
+        result: snapshot.result,
+        finishedAt: snapshot.result?.finishedAt ?? null,
+        lastActionAt: Date.now(),
+        gameId: snapshot.gameId,
+        mode: snapshot.mode,
+        participants: snapshot.participants,
+      };
+      this.state.storage.sql.exec(
+        "INSERT INTO projection_outbox (projectionKey, requiredVersion, payload, retries, nextAttemptAt) VALUES (?, ?, ?, 0, ?)",
+        `proj_${snapshot.matchId}_${newDeliveryVersion}`,
+        newDeliveryVersion,
+        JSON.stringify(projection),
+        Date.now(),
       );
     });
 
@@ -805,12 +1303,13 @@ export class MatchDurableObject implements DurableObject {
       deliveryVersion: newDeliveryVersion,
     };
 
-    this.broadcastControlChanged(updatedSnapshot);
+    await this.broadcastControlChanged(updatedSnapshot);
+    this.state.waitUntil?.(this.flushProjectionOutbox().catch(() => {}));
     return {
-      success: true,
+      success: true as const,
       controllerGeneration: newGeneration,
       deliveryVersion: newDeliveryVersion,
-      view: this.buildFilteredView(updatedSnapshot, actorAccountId),
+      view: this.buildFilteredView(updatedSnapshot, actorAccountId, sessionId),
     };
   }
 
@@ -820,7 +1319,27 @@ export class MatchDurableObject implements DurableObject {
   public async handleSecretRecovery(
     pendingActionId: string,
     actorAccountId: AccountId,
-    _roundId?: number,
+    roundId?: number,
+    sessionId?: string,
+    controllerGeneration?: number,
+  ): Promise<{ status: "accepted" | "superseded"; locked: boolean; view: FilteredMatchView }> {
+    return this.serialize(() =>
+      this.recoverSerialized(
+        pendingActionId,
+        actorAccountId,
+        roundId,
+        sessionId,
+        controllerGeneration,
+      ),
+    );
+  }
+
+  private async recoverSerialized(
+    pendingActionId: string,
+    actorAccountId: AccountId,
+    roundId?: number,
+    sessionId?: string,
+    controllerGeneration?: number,
   ): Promise<{ status: "accepted" | "superseded"; locked: boolean; view: FilteredMatchView }> {
     this.ensureSchema();
     const snapshot = this.getSnapshot();
@@ -828,6 +1347,11 @@ export class MatchDurableObject implements DurableObject {
       throw new Error("Match not found");
     }
 
+    if (
+      !this.isMember(snapshot, actorAccountId) ||
+      !(await this.authorizeSession(actorAccountId, sessionId))
+    )
+      throw new Error("Match unavailable");
     const existingReceipts = this.state.storage.sql
       .exec<ActionReceiptRow>(
         "SELECT * FROM action_receipts WHERE actorAccount = ? AND actionId = ? LIMIT 1",
@@ -842,16 +1366,30 @@ export class MatchDurableObject implements DurableObject {
         return {
           status: "accepted",
           locked: true,
-          view: this.buildFilteredView(snapshot, actorAccountId),
+          view: this.buildFilteredView(snapshot, actorAccountId, sessionId),
         };
       }
       return {
         status: "superseded",
         locked: false,
-        view: this.buildFilteredView(snapshot, actorAccountId),
+        view: this.buildFilteredView(snapshot, actorAccountId, sessionId),
       };
     }
 
+    if (
+      roundId !== snapshot.roundId ||
+      typeof pendingActionId !== "string" ||
+      !["rock-paper-scissors", "hand-cricket"].includes(snapshot.gameId)
+    )
+      throw new Error("Invalid recovery request");
+    if (
+      snapshot.mode === "together" &&
+      (controllerGeneration !== snapshot.controller.controllerGeneration ||
+        snapshot.controller.controllingAccountId !== actorAccountId ||
+        (snapshot.controller.controllingSessionId &&
+          snapshot.controller.controllingSessionId !== sessionId))
+    )
+      throw new Error("Control transferred");
     // Persist a superseded tombstone for this pending action ID
     this.state.storage.transactionSync(() => {
       this.state.storage.sql.exec(
@@ -870,7 +1408,7 @@ export class MatchDurableObject implements DurableObject {
     return {
       status: "superseded",
       locked: false,
-      view: this.buildFilteredView(snapshot, actorAccountId),
+      view: this.buildFilteredView(snapshot, actorAccountId, sessionId),
     };
   }
 
@@ -880,6 +1418,7 @@ export class MatchDurableObject implements DurableObject {
   public handleGetReceipt(
     actionId: string,
     actorAccountId: AccountId,
+    sessionId?: string,
   ): {
     status: "accepted" | "superseded" | "unknown";
     acceptedVersion?: number;
@@ -901,7 +1440,8 @@ export class MatchDurableObject implements DurableObject {
       )
       .toArray();
 
-    const view = this.buildFilteredView(snapshot, actorAccountId);
+    if (!this.isMember(snapshot, actorAccountId)) return { status: "unknown" };
+    const view = this.buildFilteredView(snapshot, actorAccountId, sessionId);
 
     if (receipts.length === 0) {
       return { status: "unknown", view };
@@ -951,6 +1491,8 @@ export class MatchDurableObject implements DurableObject {
           )
           .run();
 
+        for (const record of payload.sudokuRecords ?? [])
+          await projectSudokuRecord(this.env.DB, record);
         // If match finished, insert results row and release slot
         if (
           payload.result &&
@@ -963,9 +1505,12 @@ export class MatchDurableObject implements DurableObject {
           const participantsJson = JSON.stringify(payload.participants || {});
 
           await this.env.DB.prepare(
-            `INSERT OR REPLACE INTO results
+            `INSERT INTO results
              (matchId, projectedVersion, gameId, mode, participants, winner, reason, scores, finishedAt, details)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(matchId) DO UPDATE SET projectedVersion = excluded.projectedVersion, winner = excluded.winner,
+             reason = excluded.reason, scores = excluded.scores, finishedAt = excluded.finishedAt, details = excluded.details
+             WHERE results.projectedVersion < excluded.projectedVersion`,
           )
             .bind(
               payload.matchId,
@@ -988,42 +1533,63 @@ export class MatchDurableObject implements DurableObject {
 
         // Successfully projected -> remove from outbox
         this.state.storage.sql.exec(
-          "DELETE FROM projection_outbox WHERE projectionKey = ?",
+          "DELETE FROM projection_outbox WHERE projectionKey = ? AND requiredVersion = ?",
           row.projectionKey,
+          row.requiredVersion,
         );
       } catch {
         const nextRetries = row.retries + 1;
         const delay = Math.min(60000, 1000 * Math.pow(2, nextRetries));
         this.state.storage.sql.exec(
-          "UPDATE projection_outbox SET retries = ?, nextAttemptAt = ? WHERE projectionKey = ?",
+          "UPDATE projection_outbox SET retries = ?, nextAttemptAt = ? WHERE projectionKey = ? AND requiredVersion = ?",
           nextRetries,
           Date.now() + delay,
           row.projectionKey,
+          row.requiredVersion,
         );
       }
     }
+    const pending = this.state.storage.sql
+      .exec<{ nextAttemptAt: number }>(
+        "SELECT MIN(nextAttemptAt) AS nextAttemptAt FROM projection_outbox",
+      )
+      .toArray()[0];
+    if (pending?.nextAttemptAt && typeof this.state.storage.setAlarm === "function")
+      await this.state.storage.setAlarm(Math.max(Date.now() + 1, pending.nextAttemptAt));
+  }
+
+  async alarm(): Promise<void> {
+    await this.flushProjectionOutbox();
   }
 
   /**
    * WebSocket Broadcast on accepted event
    */
-  private broadcastEvent(
+  private async broadcastEvent(
     snapshot: SnapshotData,
     eventId: string,
     acceptedVersion: number,
     effects: unknown[],
-  ): void {
+    requestingSocket?: WebSocket,
+  ): Promise<void> {
     const clients = this.getActiveSockets();
     for (const client of clients) {
       try {
-        const view = this.buildFilteredView(snapshot, client.accountId);
+        // The initiating socket receives the accepted reply with the same saved,
+        // filtered view and effects after handleAction returns.
+        if (client.ws === requestingSocket) continue;
+        if (!(await this.authorizeSession(client.accountId, client.sessionId))) {
+          client.ws.close(1008, "Session expired");
+          continue;
+        }
+        const view = this.buildFilteredView(snapshot, client.accountId, client.sessionId);
         client.ws.send(
           JSON.stringify({
             type: "event",
             eventId,
             acceptedVersion,
             view,
-            effects,
+            effects: this.safeEffects(snapshot, effects),
             serverTime: Date.now(),
           }),
         );
@@ -1036,15 +1602,19 @@ export class MatchDurableObject implements DurableObject {
   /**
    * WebSocket Broadcast on control takeover
    */
-  private broadcastControlChanged(snapshot: SnapshotData): void {
+  private async broadcastControlChanged(snapshot: SnapshotData): Promise<void> {
     const clients = this.getActiveSockets();
     for (const client of clients) {
       try {
-        const view = this.buildFilteredView(snapshot, client.accountId);
+        if (!(await this.authorizeSession(client.accountId, client.sessionId))) {
+          client.ws.close(1008, "Session expired");
+          continue;
+        }
+        const view = this.buildFilteredView(snapshot, client.accountId, client.sessionId);
         client.ws.send(
           JSON.stringify({
             type: "control-changed",
-            controller: snapshot.controller,
+            controller: view.controller,
             deliveryVersion: snapshot.deliveryVersion,
             view,
             serverTime: Date.now(),
@@ -1055,94 +1625,96 @@ export class MatchDurableObject implements DurableObject {
   }
 
   private getActiveSockets(): SocketClient[] {
-    const active: SocketClient[] = [];
-    for (const item of this.connectedSockets) {
-      try {
-        if (item.ws.readyState === 1) {
-          active.push(item);
-        }
-      } catch {}
-    }
-    return active;
+    if (typeof this.state.getWebSockets === "function")
+      return this.state.getWebSockets().flatMap((ws) => {
+        const attachment = ws.deserializeAttachment() as {
+          accountId?: AccountId;
+          sessionId?: string;
+        } | null;
+        return attachment?.accountId
+          ? [{ ws, accountId: attachment.accountId, sessionId: attachment.sessionId }]
+          : [];
+      });
+    return [...this.connectedSockets].filter((client) => client.ws.readyState === 1);
   }
 
-  /**
-   * WebSocket upgrade handler
-   */
-  private handleWebSocketUpgrade(
-    _request: Request,
+  private async handleWebSocketUpgrade(
+    request: Request,
     actorAccountId: AccountId,
     sessionId?: string,
-  ): Response {
-    if (typeof WebSocketPair === "undefined") {
-      return new Response("WebSocketPair not available in this environment", { status: 501 });
-    }
-
-    const pair = new WebSocketPair();
-    const clientWs = pair[0];
-    const serverWs = pair[1];
-
-    if (typeof (this.state as any).acceptWebSocket === "function") {
-      (this.state as any).acceptWebSocket(serverWs, [actorAccountId]);
-      if (typeof (serverWs as any).serializeAttachment === "function") {
-        (serverWs as any).serializeAttachment({
-          accountId: actorAccountId,
-          sessionId,
-          expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
-        });
-      }
-    } else if (typeof (serverWs as any).accept === "function") {
-      (serverWs as any).accept();
-    }
-
-    const socketRecord: SocketClient = { ws: serverWs, accountId: actorAccountId, sessionId };
-    this.connectedSockets.add(socketRecord);
-
-    serverWs.addEventListener("message", async (evt: any) => {
-      try {
-        const data = typeof evt.data === "string" ? JSON.parse(evt.data) : null;
-        if (!data) return;
-
-        if (data.type === "action" || data.action) {
-          const actionEnvelope = data.type === "action" ? data.envelope : data;
-          const reply = await this.handleAction(actionEnvelope, actorAccountId, sessionId);
-          serverWs.send(JSON.stringify(reply));
-        } else if (data.type === "ping") {
-          serverWs.send(JSON.stringify({ type: "pong", serverTime: Date.now() }));
-        }
-      } catch (err: any) {
-        serverWs.send(
-          JSON.stringify({
-            status: "rejected",
-            code: ErrorCode.INVALID_ACTION,
-            message: err?.message || "Invalid socket message",
-            retryable: false,
-          }),
-        );
-      }
-    });
-
-    serverWs.addEventListener("close", () => {
-      this.connectedSockets.delete(socketRecord);
-    });
-
-    // Send initial snapshot message
+  ): Promise<Response> {
     const snapshot = this.getSnapshot();
-    if (snapshot) {
-      const initialView = this.buildFilteredView(snapshot, actorAccountId);
-      serverWs.send(
+    if (
+      !snapshot ||
+      !this.isMember(snapshot, actorAccountId) ||
+      !(await this.authorizeSession(actorAccountId, sessionId))
+    )
+      return Response.json(
+        { code: ErrorCode.FORBIDDEN, error: "Match unavailable" },
+        { status: 403 },
+      );
+    if (!this.env.ALLOWED_ORIGIN || request.headers.get("Origin") !== this.env.ALLOWED_ORIGIN)
+      return new Response("Origin mismatch", { status: 403 });
+    const pair = new WebSocketPair();
+    const [client, server] = Object.values(pair);
+    this.state.acceptWebSocket(server, [actorAccountId]);
+    server.serializeAttachment({
+      accountId: actorAccountId,
+      sessionId,
+      controllerGeneration: snapshot.controller.controllerGeneration,
+    });
+    server.send(
+      JSON.stringify({
+        type: "snapshot",
+        view: this.buildFilteredView(snapshot, actorAccountId, sessionId),
+        serverTime: Date.now(),
+      }),
+    );
+    return new Response(null, { status: 101, webSocket: client });
+  }
+
+  async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    const identity = ws.deserializeAttachment() as {
+      accountId: AccountId;
+      sessionId?: string;
+    } | null;
+    try {
+      if (!identity || !(await this.authorizeSession(identity.accountId, identity.sessionId))) {
+        ws.close(1008, "Session expired");
+        return;
+      }
+      const data = typeof message === "string" ? JSON.parse(message) : null;
+      if (data?.type === "action" || data?.action) {
+        const reply = await this.handleAction(
+          data.type === "action" ? data.envelope : data,
+          identity.accountId,
+          identity.sessionId,
+          ws,
+        );
+        ws.send(JSON.stringify(reply));
+      } else if (data?.type === "ping")
+        ws.send(JSON.stringify({ type: "pong", serverTime: Date.now() }));
+    } catch {
+      ws.send(
         JSON.stringify({
-          type: "snapshot",
-          view: initialView,
-          serverTime: Date.now(),
+          status: "rejected",
+          code: ErrorCode.UNAVAILABLE,
+          message: "Message could not be processed",
+          retryable: true,
         }),
       );
     }
+  }
 
-    return new Response(null, {
-      status: 101,
-      webSocket: clientWs,
-    } as any);
+  webSocketClose(ws: WebSocket): void {
+    try {
+      ws.close();
+    } catch {}
+  }
+  webSocketError(ws: WebSocket): void {
+    try {
+      ws.close(1011, "Connection interrupted");
+    } catch {}
   }
 
   /**
@@ -1151,8 +1723,55 @@ export class MatchDurableObject implements DurableObject {
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
-    const actorAccountId = (request.headers.get("X-Actor-Account") as AccountId) || "A";
+    const actorAccountId = request.headers.get("X-Actor-Account") as AccountId;
     const sessionId = request.headers.get("X-Session-Id") || undefined;
+
+    if (request.method === "POST" && path.endsWith("/abort-initialization")) {
+      const aborted = await this.serialize(async () => {
+        if (this.getSnapshot()) return false;
+        this.state.storage.transactionSync(() => {
+          this.state.storage.sql.exec("DELETE FROM initialization_identity");
+          this.state.storage.sql.exec(
+            "INSERT INTO initialization_identity (digest) VALUES (?)",
+            "cancelled",
+          );
+        });
+        await this.state.storage.sync();
+        return true;
+      });
+      return Response.json({ aborted });
+    }
+
+    if (path.endsWith("/challenge-source")) {
+      const snapshot = this.getSnapshot();
+      if (
+        !snapshot ||
+        !this.isMember(snapshot, actorAccountId) ||
+        !(await this.authorizeSession(actorAccountId, sessionId))
+      )
+        return Response.json(
+          { code: ErrorCode.FORBIDDEN, error: "Match unavailable" },
+          { status: 403 },
+        );
+      const game = snapshot.gameState as SudokuState;
+      const senderSeat = game.senderSeat ?? "A";
+      const player = game.players?.[senderSeat];
+      if (
+        snapshot.gameId !== "sudoku" ||
+        snapshot.mode !== "challenge" ||
+        game.challengePublished ||
+        snapshot.participants[senderSeat]?.accountId !== actorAccountId ||
+        !player?.completedAt ||
+        player.assisted
+      )
+        return new Response("Sender attempt ineligible", { status: 409 });
+      return Response.json({
+        puzzleId: game.puzzleId,
+        senderElapsedMs: player.elapsedMs,
+        replay: Boolean(game.replay),
+        senderSeat,
+      });
+    }
 
     // WebSocket Upgrade
     if (request.headers.get("Upgrade")?.toLowerCase() === "websocket" || path.endsWith("/socket")) {
@@ -1162,12 +1781,19 @@ export class MatchDurableObject implements DurableObject {
     // POST /initialize
     if (request.method === "POST" && (path === "/initialize" || path.endsWith("/initialize"))) {
       const body = (await request.json()) as MatchInitializationParams;
-      const view = await this.initializeMatch(body);
+      const view = await this.initializeMatch({ ...body, creatorSessionId: sessionId });
       return new Response(JSON.stringify({ status: "ok", view }), {
         headers: { "Content-Type": "application/json" },
       });
     }
 
+    if (path.includes("/view") || path.includes("/snapshot") || path.includes("/receipts/")) {
+      if (!(await this.authorizeSession(actorAccountId, sessionId)))
+        return Response.json(
+          { code: ErrorCode.AUTH_REQUIRED, error: "Current session required" },
+          { status: 401 },
+        );
+    }
     // GET /view or /snapshot
     if (
       request.method === "GET" &&
@@ -1186,7 +1812,12 @@ export class MatchDurableObject implements DurableObject {
           },
         );
       }
-      const view = this.buildFilteredView(snapshot, actorAccountId);
+      if (!this.isMember(snapshot, actorAccountId))
+        return Response.json(
+          { code: ErrorCode.FORBIDDEN, error: "Match unavailable" },
+          { status: 403 },
+        );
+      const view = this.buildFilteredView(snapshot, actorAccountId, sessionId);
       return new Response(JSON.stringify(view), {
         headers: { "Content-Type": "application/json" },
       });
@@ -1208,8 +1839,11 @@ export class MatchDurableObject implements DurableObject {
     // GET /receipts/:actionId
     const receiptMatch = path.match(/\/receipts\/([^/]+)$/);
     if (request.method === "GET" && receiptMatch) {
+      const snapshot = this.getSnapshot();
+      if (!snapshot || !this.isMember(snapshot, actorAccountId))
+        return Response.json({ code: ErrorCode.FORBIDDEN }, { status: 403 });
       const actionId = receiptMatch[1];
-      const receiptRes = this.handleGetReceipt(actionId, actorAccountId);
+      const receiptRes = this.handleGetReceipt(actionId, actorAccountId, sessionId);
       return new Response(JSON.stringify(receiptRes), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -1225,6 +1859,7 @@ export class MatchDurableObject implements DurableObject {
       const takeoverRes = await this.handleControllerTakeover(
         actorAccountId,
         body.expectedControllerGeneration,
+        sessionId,
       );
       return new Response(JSON.stringify(takeoverRes), {
         status: takeoverRes.success ? 200 : 400,
@@ -1237,11 +1872,17 @@ export class MatchDurableObject implements DurableObject {
       request.method === "POST" &&
       (path === "/secret-recovery" || path.endsWith("/secret-recovery"))
     ) {
-      const body = (await request.json()) as { pendingActionId: string; roundId?: number };
+      const body = (await request.json()) as {
+        pendingActionId: string;
+        roundId?: number;
+        controllerGeneration?: number;
+      };
       const recoveryRes = await this.handleSecretRecovery(
         body.pendingActionId,
         actorAccountId,
         body.roundId,
+        sessionId,
+        body.controllerGeneration,
       );
       return new Response(JSON.stringify(recoveryRes), {
         status: 200,

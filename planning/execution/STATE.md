@@ -1,25 +1,30 @@
-# Execution checkpoint
+# Current checkpoint — Hand Cricket and UI planning
 
-Status: **IN_PROGRESS**. F00, F01, F02, F03, G01, G02, G03, S01, B01 verified.
+Owner update, 2026-10-02: Hand Cricket pass-and-play, masking/unmasking and a clock showing roughly `1129:29` need renewed investigation. Numbers 1–10 are confirmed for the new cricket rules. Current authorization is **planning only**. No application repair or new runtime check was performed for this planning pass.
 
-- Target host/model: Google Antigravity / Gemini 3.8 Flash (inherited); native subagents active.
-- Queue: TASKS.json (F00-F03, G01-G03, S01, B01 VERIFIED).
-- Active tasks:
-  - C01 (frontend-engineer): Client sync and recovery.
-  - G04 (game-engineer): Dots & Boxes and SOS engines.
-  - S02 (sudoku-engineer): Sudoku rules and private server modes.
-- Active worker handles: frontend-engineer (C01), game-engineer (G04), sudoku-engineer (S02).
-- Leased paths:
-  - C01: src/sync/**, src/components/connection-status.tsx, tests/unit/sync/**
-  - G04: shared/games/dots-boxes/**, shared/games/sos/**, tests/unit/games/dots-boxes/**, tests/unit/games/sos/**
-  - S02: shared/games/sudoku/**, worker/sudoku/**, tests/unit/games/sudoku/**, tests/integration/sudoku/**
-- Runtime: Node v24.18.1, npm 11.16.0, Git 2.55.0.windows.3, Vite 6, Vitest 3, TypeScript 5.7.
-- Local functional / visual / actual-device / deployed: Foundation established; game engine and auth slices next.
-- Secrets: zero credentials committed; safe .gitignore active.
-- Native discovery: Confirmed. 12 role profiles registered in subagent system.
+Read [Hand Cricket repair and mockup adoption plan](../review/HAND-CRICKET-UI-PLAN.md). Hand Cricket is first priority; reviewed mockup adoption follows; extra Dots/SOS sizes are second priority. The 60% tracker / 30% tennis / 10% playful reference mix is separate from typography percentages. Functionality and blanket mockup adoption remain unaccepted until the reported issues and missing states are addressed.
 
-## Update after every integrated task
+## Historical local verification snapshot
 
-Record last verified task/report; running tasks + actual handles/owned paths; failed checks/fixes; blocked dependency versus external access; next dependency-ready task; local start commands/URLs once real; exact context-resume instruction. Only the orchestrator edits this shared checkpoint.
+Current disposition, 2026-10-02: **LOCAL_OWNER_CORRECTIONS_VERIFIED**. The owner-authorized corrections are implemented and tested in the current local build. Earlier preparation/slice reports are historical; the final checkpoint supersedes their pending integration statements.
 
-On resume inspect queue/reports/working tree and actual worker status before redispatching. Expired/orphaned lease does not authorize reverting work; inspect changes, preserve and integrate. Do not reset completed tasks to PENDING without evidence that later edits invalidated them.
+## Current validation
+
+- Build, typecheck, lint and formatting: exit 0.
+- Pure/unit: 265 tests; source/mocked contracts: 55; server-rendered components: 44; all exit 0.
+- Actual Workers durability: 4; real workerd/SQLite DO/D1 HTTP: 26 scenarios; integrated command exit 0.
+- Full real Worker Chromium suite: 56 passed in one run, exit 0. Supplementary zoom/recap: 3 passed, exit 0. Performance follow-up reruns an existing test, exit 0. There are 59 distinct browser tests across these runs.
+- Sudoku: 1,000 uniquely solvable puzzles verified, exit 0.
+- 208 matrix screenshots plus focus/zoom/125% text/reduced-motion; root/Luna visual and sampled frame review. Real panning reaches playable outer columns. Five motion boards have live accepted-event, settled reload and reduced-motion evidence.
+
+A parallel HTTP repeat lost its connection after three checks. The later isolated complete integration run passed all 26 scenarios. Earlier browser failures/fixes and evidence boundaries are documented in the final report.
+
+## Performance
+
+Initial JS 517,672→342,456 bytes; public precache 631,268→435,579 bytes; received messages 18→12. These demonstrate payload/cache/traffic reductions. Faster loading or input is not demonstrated: final cold FCP median 800 ms versus 684 ms baseline; input 19.5 ms versus 15.5 ms; typical frame interval 16.7 ms unchanged. Resource/heap limits are explicit in the performance report.
+
+See [final checkpoint](reports/owner-corrections-checkpoint.md), [performance comparison](reports/owner-performance-final.md), and [GATES.md](../../GATES.md).
+
+## External release boundary
+
+Cloudflare deployment remains separately authorized work. Physical phone certification requires hardware. Browser emulation/Worker dry-run do not establish either. No deployment or commit was performed in this pass.

@@ -1,0 +1,33 @@
+.rps-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.rps-score-strip {
+  width: 100%;
+}
+
+.rps-score-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px var(--space-sm);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rps-score-target {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-muted-text);
+  padding: 2px 8px;
+  background-color: var(--color-raised);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}

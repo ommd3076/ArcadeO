@@ -4,6 +4,8 @@ Implementation design; no endpoints currently running. Same-origin JSON API unde
 
 ## Endpoints
 
+Owner correction additions, 2026-10-01: `GET /library` returns personal `favourites` and shared `playNext`, each `{gameIds,version}`. `PUT /library/favourites` and `/library/play-next` accept `{gameIds,expectedVersion}`, with unique ordered IDs restricted to the eight games and CSRF protection. A stale version returns 409 and current saved data. Profile preferences also accept a trimmed 1–32 character display name under the same preference version. `GET /records/recent` adds the five newest factual scored `sharedRecap` rows. New Dots/SOS creation accepts `gameOptions.gridSize` 5/7/9; Ludo accepts distinct `gameOptions.colours`. All are server validated.
+
 | Method / path | Input / result |
 | --- | --- |
 | POST /auth/login | username, password; generic failure or safe profile/CSRF metadata + secure cookie |

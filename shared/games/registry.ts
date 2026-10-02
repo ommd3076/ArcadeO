@@ -4,6 +4,10 @@ import { connectFourEngineAdapter } from "./connect-four/adapter";
 import { rpsEngineAdapter } from "./rps/adapter";
 import { ludoEngineAdapter } from "./ludo/adapter";
 import { snakesAndLaddersEngineAdapter } from "./snakes-and-ladders/adapter";
+import { dotsBoxesEngineAdapter } from "./dots-boxes/adapter";
+import { sosEngineAdapter } from "./sos/adapter";
+import { sudokuEngineAdapter } from "./sudoku/adapter";
+import { handCricketEngineAdapter } from "./hand-cricket/adapter";
 
 export interface SuppliedStartFacts {
   serverTime: number;
@@ -46,7 +50,7 @@ export interface GameEngineAdapter<
     action: { action: ActionType; payload: TActionPayload },
     acceptedFacts: AcceptedFacts,
   ): ReductionResult<TState, TEffect>;
-  legalActions(state: TState, seat: Seat): ActionType[];
+  legalActions(state: TState, seat: Seat, serverTime?: number): ActionType[];
   toPublicView(state: TState, viewer: ViewerContext): TView;
   isTerminal(state: TState): TerminalResult | null;
 }
@@ -58,6 +62,10 @@ registerGameEngine(connectFourEngineAdapter);
 registerGameEngine(rpsEngineAdapter);
 registerGameEngine(ludoEngineAdapter);
 registerGameEngine(snakesAndLaddersEngineAdapter);
+registerGameEngine(dotsBoxesEngineAdapter);
+registerGameEngine(sosEngineAdapter);
+registerGameEngine(sudokuEngineAdapter);
+registerGameEngine(handCricketEngineAdapter);
 
 export function registerGameEngine(adapter: GameEngineAdapter<any, any, any, any>): void {
   engineRegistry.set(adapter.gameId, adapter);

@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useState, useMemo, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+  type ReactNode,
+  useCallback,
+} from "react";
 import type { PaletteFamily, ThemeMode, AccentFamily } from "@shared/protocol/types";
 import {
   resolveThemeColors,
@@ -105,26 +113,26 @@ export function ThemeProvider({
 
   const resolvedMode: "light" | "dark" = mode === "system" ? systemMode : mode;
 
-  const setFamily = (nextFamily: PaletteFamily) => {
+  const setFamily = useCallback((nextFamily: PaletteFamily) => {
     setFamilyState(nextFamily);
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY_FAMILY, nextFamily);
     }
-  };
+  }, []);
 
-  const setMode = (nextMode: ThemeMode) => {
+  const setMode = useCallback((nextMode: ThemeMode) => {
     setModeState(nextMode);
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY_MODE, nextMode);
     }
-  };
+  }, []);
 
-  const setPlayerAccent = (nextAccent: AccentFamily) => {
+  const setPlayerAccent = useCallback((nextAccent: AccentFamily) => {
     setPlayerAccentState(nextAccent);
     if (typeof window !== "undefined") {
       localStorage.setItem(STORAGE_KEY_ACCENT, nextAccent);
     }
-  };
+  }, []);
 
   const toggleMode = () => {
     const nextMode = resolvedMode === "dark" ? "light" : "dark";

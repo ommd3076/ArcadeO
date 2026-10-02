@@ -125,7 +125,7 @@ describe("Worker Auth Foundation (F02)", () => {
   describe("Auth API Integration", () => {
     let sqlite: DatabaseSync;
     let env: AuthEnv;
-    const CSRF_SECRET = "test-csrf-secret-key-12345";
+    const CSRF_SECRET = "test-csrf-secret-key-12345-explicit-long";
     const ALLOWED_ORIGIN = "http://localhost:5173";
 
     beforeEach(async () => {

@@ -1,6 +1,6 @@
 # Agent hierarchy and execution contract
 
-Target host: Google Antigravity with Gemini 3.1 Pro Low selected by the owner. All custom profiles use `model: inherit`; no invented model ID or hidden model upgrade. Native entrypoints live in `.agents/agents/`; canonical responsibilities live in `agents/profiles/`. Root AGENTS.md is the continuously active workspace guide.
+The preparation targeted Google Antigravity and its inherited owner-selected model. The current 2026-10-01 repair runs in Codex; the owner selected GPT-6.1 Sol for specialist execution. Native Codex tools dispatch canonical profiles as bounded briefs. This does not establish Antigravity discovery. For future hosts, inherit the owner's current model and verify actual discovery rather than relying on old profile wording. Native Antigravity entrypoints live in `.agents/agents/`; canonical responsibilities live in `agents/profiles/`. Root AGENTS.md is the workspace guide.
 
 ## Hierarchy
 

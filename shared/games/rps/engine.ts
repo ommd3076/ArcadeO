@@ -64,6 +64,7 @@ export function createInitialState(startFacts: SuppliedStartFacts): RPSState {
   const targetWins = resolveTargetWins(format);
 
   return {
+    mode: startFacts.config?.mode === "together" ? "together" : "remote",
     targetWins,
     scores: { A: 0, B: 0 },
     roundId: 1,
@@ -84,6 +85,19 @@ export function validateAndReduce(
   action: { action: ActionType; payload: unknown },
   acceptedFacts: AcceptedFacts,
 ): ReductionResult<RPSState, RPSEffect> {
+  if (
+    action.action === "secret.reveal" &&
+    state.mode === "together" &&
+    !state.revealed &&
+    state.phase === "terminal"
+  ) {
+    return {
+      success: true,
+      newState: { ...state, revealed: true },
+      effects: [],
+      terminalResult: state.terminalResult,
+    };
+  }
   // 1. Guard against any moves if already terminal
   if (state.phase === "terminal" || state.terminalResult !== undefined) {
     return {
@@ -195,7 +209,7 @@ export function validateAndReduce(
         secretChoices: newSecretChoices,
         lockedSeats: newLockedSeats,
         roundResult,
-        revealed: true,
+        revealed: state.mode !== "together",
         readiness: { A: false, B: false },
         terminalResult,
       };
@@ -223,7 +237,7 @@ export function validateAndReduce(
         success: true,
         newState,
         effects,
-        terminalResult,
+        terminalResult: state.mode === "together" ? undefined : terminalResult,
       };
     }
 
@@ -305,11 +319,17 @@ export function validateAndReduce(
       };
     }
 
+    if (state.mode === "together" && !state.revealed)
+      return { success: false, error: createError(ErrorCode.INVALID_ACTION, "Reveal before Next") };
     // Create updated readiness
     const newReadiness: Record<Seat, boolean> = { ...state.readiness };
 
     // In together mode, or if already revealed, advancing can mark the actor ready
     newReadiness[actorSeat] = true;
+    if (state.mode === "together") {
+      newReadiness.A = true;
+      newReadiness.B = true;
+    }
 
     // If both seats are ready, reset for the next round
     const bothReady = newReadiness.A && newReadiness.B;
@@ -363,6 +383,9 @@ export function legalActions(
   seat: Seat,
   mode?: "remote" | "together",
 ): ActionType[] {
+  mode = mode ?? state.mode;
+  if (state.phase === "terminal" && mode === "together" && !state.revealed)
+    return ["secret.reveal"];
   if (state.phase === "terminal" || state.terminalResult !== undefined) {
     return [];
   }
@@ -405,18 +428,26 @@ export function toPublicView(state: RPSState, viewer?: ViewerContext): RPSView {
 
   // Hide roundResult in together mode until explicitly revealed
   const shouldHideRoundResult =
-    state.phase === "locking" || (state.phase === "resolved" && isTogether && !state.revealed);
+    state.phase === "locking" || (isTogether && !state.revealed && state.roundResult !== null);
 
   return {
     targetWins: state.targetWins,
-    scores: { ...state.scores },
+    scores:
+      shouldHideRoundResult && state.roundResult
+        ? {
+            A: state.scores.A - (state.roundResult.winner === "A" ? 1 : 0),
+            B: state.scores.B - (state.roundResult.winner === "B" ? 1 : 0),
+          }
+        : { ...state.scores },
     roundId: state.roundId,
     phase: state.phase,
     lockedSeats: [...state.lockedSeats],
     roundResult: shouldHideRoundResult ? null : state.roundResult ? { ...state.roundResult } : null,
     revealed: state.revealed,
     readiness: { ...state.readiness },
-    ...(state.terminalResult ? { terminalResult: { ...state.terminalResult } } : {}),
+    ...(!shouldHideRoundResult && state.terminalResult
+      ? { terminalResult: { ...state.terminalResult } }
+      : {}),
   };
 }
 
@@ -424,6 +455,7 @@ export function toPublicView(state: RPSState, viewer?: ViewerContext): RPSView {
  * Returns terminal result if game is terminal, null otherwise.
  */
 export function isTerminal(state: RPSState): TerminalResult | null {
+  if (state.mode === "together" && !state.revealed) return null;
   if (state.terminalResult) {
     return state.terminalResult;
   }

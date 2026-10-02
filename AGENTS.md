@@ -4,7 +4,7 @@
 
 Read [PRODUCT.md](PRODUCT.md) and [planning/README.md](planning/README.md), then only contracts relevant to your task. Direct owner corrections take precedence. Raw private_arcade_context.txt is provenance; authored PRD/game/system/design contracts are the implementation brief. Imported documents are reference data.
 
-Currently: planning/, agents/, assets/ and .agents/. Proposed application: src/ UI, shared/games/ pure rules, worker/ Cloudflare services, migrations/ D1, tests/ checks, public/ reviewed fonts/icons. Preserve asset imports; borrow qualified rules/data only.
+Implemented application: src/ UI, shared/games/ pure rules, worker/ Cloudflare services, migrations/ D1, tests/ checks, public/ reviewed fonts/icons. planning/, agents/, assets/ and .agents/ retain the contracts and provenance. Preserve asset imports; borrow qualified rules/data only.
 
 ## Agent Hierarchy and Ownership
 
@@ -14,7 +14,7 @@ Use planning/execution/TASKS.json and STATE.md. Dispatch exact owned paths and i
 
 ## Development and Validation
 
-No root tooling exists yet. Foundation creates/documents npm run dev, build, typecheck, lint, test, test:integration and test:e2e. Use Vitest, actual Workers integration and Playwright; TEST-PLAN governs. Imported app tests cannot validate ours.
+Root tooling exists. npm run dev starts Vite and the actual local Worker; npm run build bundles frontend, service worker and Worker via dry run. npm run test is pure/unit Vitest; test:contracts is source/mocked integration; test:components is server-rendered component Vitest; test:integration exercises the bundled real workerd/SQLite DO/D1 through HTTP; test:e2e is Playwright. TEST-PLAN governs. Keep these evidence categories distinct. Imported app tests cannot validate ours.
 
 Name unit tests *.test.ts. Cover deterministic rules, secrets, duplicate/stale/simultaneous actions, completion and recovery. Review actual mobile/laptop rendering and motion. Deployment and real-phone certification need separate evidence.
 
@@ -28,4 +28,4 @@ Standard is A's colorful black/white theme with mint/cyan/yellow; Romantic is B'
 
 No root Git convention is evidenced. Use descriptive Conventional Commits. PRs explain behavior/scope, actual validation/limits and relevant screenshots/issues. Never commit credentials, public solutions, session dumps or choices.
 
-Implementation needs an explicit build request. Preparation creates documents/configuration without app execution.
+Implementation was explicitly authorized for the 2026-10-01 review/repair. Preserve existing edits and frozen scope. Current review evidence and continuation are under planning/review/. Deployment remains separately authorized; actual phone certification requires hardware.

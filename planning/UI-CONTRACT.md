@@ -25,7 +25,7 @@ Ownership strokes/pieces use these foregrounds against canvas/surface, with an o
 
 ## Typography, spacing and controls
 
-Three roles only: Space Grotesk for headings, DM Sans for body/controls, DM Mono for scores/timers. Self-host necessary WOFF2 subsets and retain their licenses; use system sans/monospace fallbacks while fonts load. No handwriting body type. Upstream sources: [Space Grotesk](https://github.com/floriankarsten/space-grotesk), [DM Sans](https://github.com/googlefonts/dm-fonts), [DM Mono](https://github.com/googlefonts/dm-mono). Lucide is the sole icon family; retain its [license](https://lucide.dev/license) and import used icons only.
+Owner correction 2026-10-01: DM Sans for headings, body, controls and tabular scores/timers. Editorial headings use regular/medium weights. Self-host necessary WOFF2 subsets and retain their licenses; use system sans fallbacks while fonts load. No handwriting body type. Upstream source: [DM Sans](https://github.com/googlefonts/dm-fonts). Lucide is the sole icon family; retain its [license](https://lucide.dev/license) and import used icons only.
 
 Phone page title 32–40 px, section title 22–24, body/control 16, secondary 14, labels 12 only where comfortably legible. Timers use tabular digits. Allow wrapping and text scaling; do not crop reference-style headlines to preserve an image composition. Spacing scale 4/8/12/16/24/32; page gutters 16–20. Corner roles 10/16/24/pill. Prefer clear tonal surfaces and restrained borders/shadows. Controls have 44–48 CSS-pixel targets where feasible; dense board cells have explicit alternatives.
 

@@ -1,0 +1,392 @@
+﻿/* Connect Four Board Styles & Drop Animations */
+
+.c4-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(100%, 760px, 90vh);
+  margin: 0 auto;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 1. Column Drop Controls */
+.c4-drop-controls {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.c4-drop-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  min-width: 0;
+  width: 100%;
+  height: 44px;
+  background-color: var(--color-raised, #29292e);
+  border: 1px solid var(--color-interactive-line, #898993);
+  border-radius: var(--radius-md, 12px);
+  color: var(--color-text, #f5f5f7);
+  cursor: pointer;
+  transition:
+    transform var(--duration-press, 150ms) var(--ease-press, cubic-bezier(0.2, 0.8, 0.2, 1)),
+    background-color 150ms ease,
+    border-color 150ms ease;
+  padding: 0;
+}
+
+.c4-drop-btn:not(:disabled):hover {
+  background-color: var(--color-surface, #1c1c20);
+  border-color: var(--color-focus, #a8dfe4);
+  transform: translateY(-2px);
+}
+
+.c4-drop-btn:not(:disabled):active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.c4-drop-btn:focus-visible {
+  outline: 2px solid var(--color-focus, #a8dfe4);
+  outline-offset: 2px;
+}
+
+.c4-drop-btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.c4-drop-btn-arrow {
+  color: var(--color-muted-text, #b9b9c4);
+  transition:
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.c4-drop-btn:not(:disabled):hover .c4-drop-btn-arrow {
+  color: var(--color-focus, #a8dfe4);
+  transform: translateY(2px);
+}
+
+/* 2. Board Grid Surface */
+.c4-board-surface {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  width: 100%;
+  aspect-ratio: 7 / 6;
+  background-color: var(--color-surface, #1c1c20);
+  border: 2px solid var(--color-border, #2c2c34);
+  border-radius: var(--radius-xl, 24px);
+  padding: 10px;
+  gap: 6px;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-card, 0 4px 16px rgba(0, 0, 0, 0.18));
+}
+
+/* Column Touch Area */
+.c4-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-lg, 16px);
+  padding: 2px;
+  transition: background-color 150ms ease;
+  outline: none;
+}
+
+.c4-column:not(.c4-column--disabled):hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.c4-column:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-focus, #a8dfe4);
+}
+
+.c4-column--disabled {
+  cursor: default;
+}
+
+/* Cell Slot */
+.c4-cell-slot {
+  flex: 1;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.c4-cell-empty {
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background-color: var(--color-inset, #141418);
+  border: 1px solid var(--color-border, #2c2c34);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Disc Tokens */
+.c4-disc {
+  width: 92%;
+  height: 92%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 2px 2px rgba(255, 255, 255, 0.25);
+  position: relative;
+  z-index: 1;
+}
+
+.c4-disc-mark {
+  font-family: var(--font-heading, "Space Grotesk", sans-serif);
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Player A Disc: Teal Accent (Dark: #68D6C2, Light: #087568) */
+.c4-disc--a {
+  background: radial-gradient(circle at 35% 35%, #88ecd9, #68d6c2 60%, #44b5a0);
+  border: 2px solid #68d6c2;
+  color: #0a2b25;
+}
+
+[data-theme-mode="light"] .c4-disc--a {
+  background: radial-gradient(circle at 35% 35%, #10a390, #087568 60%, #065349);
+  border: 2px solid #087568;
+  color: #ffffff;
+}
+
+/* Player B Disc: Violet Accent (Dark: #C5A2FF, Light: #7040B5) */
+.c4-disc--b {
+  background: radial-gradient(circle at 35% 35%, #dac2ff, #c5a2ff 60%, #a476f5);
+  border: 2px solid #c5a2ff;
+  color: #221238;
+}
+
+[data-theme-mode="light"] .c4-disc--b {
+  background: radial-gradient(circle at 35% 35%, #8d59db, #7040b5 60%, #522b8c);
+  border: 2px solid #7040b5;
+  color: #ffffff;
+}
+
+/* Winning Discs Distinct Glow & Highlight */
+.c4-disc--winning {
+  z-index: 5;
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 16px 4px var(--color-focus, #a8dfe4),
+    0 0 28px 8px rgba(168, 223, 228, 0.6);
+  animation: c4-pulse-win 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes c4-pulse-win {
+  from {
+    transform: scale(1);
+    box-shadow:
+      0 0 0 2px #ffffff,
+      0 0 12px 3px var(--color-focus, #a8dfe4),
+      0 0 20px 4px rgba(168, 223, 228, 0.4);
+  }
+  to {
+    transform: scale(1.06);
+    box-shadow:
+      0 0 0 4px #ffffff,
+      0 0 20px 6px var(--color-focus, #a8dfe4),
+      0 0 32px 10px rgba(168, 223, 228, 0.7);
+  }
+}
+
+/* Drop Animations: 200–600ms with settle bounce */
+@keyframes c4-drop-0 {
+  0% {
+    transform: translateY(-80px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes c4-drop-1 {
+  0% {
+    transform: translateY(-130px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes c4-drop-2 {
+  0% {
+    transform: translateY(-180px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-12px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes c4-drop-3 {
+  0% {
+    transform: translateY(-230px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-14px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes c4-drop-4 {
+  0% {
+    transform: translateY(-280px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-16px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes c4-drop-5 {
+  0% {
+    transform: translateY(-330px);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  80% {
+    transform: translateY(-18px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.c4-disc--dropping-r0 {
+  animation: c4-drop-0 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.c4-disc--dropping-r1 {
+  animation: c4-drop-1 340ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.c4-disc--dropping-r2 {
+  animation: c4-drop-2 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.c4-disc--dropping-r3 {
+  animation: c4-drop-3 460ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.c4-disc--dropping-r4 {
+  animation: c4-drop-4 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.c4-disc--dropping-r5 {
+  animation: c4-drop-5 580ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Reduced Motion: Short highlight, no drop travel */
+@media (prefers-reduced-motion: reduce) {
+  .c4-disc--dropping-r0,
+  .c4-disc--dropping-r1,
+  .c4-disc--dropping-r2,
+  .c4-disc--dropping-r3,
+  .c4-disc--dropping-r4,
+  .c4-disc--dropping-r5 {
+    animation: c4-fade-in 200ms ease forwards;
+  }
+  .c4-disc--winning {
+    animation: none;
+    box-shadow:
+      0 0 0 3px #ffffff,
+      0 0 12px 4px var(--color-focus, #a8dfe4);
+  }
+  .c4-drop-btn:not(:disabled):hover {
+    transform: none;
+  }
+}
+
+@keyframes c4-fade-in {
+  from {
+    opacity: 0.2;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.c4-drop-number {
+  display: none;
+}
+@media (max-width: 380px) {
+  .c4-drop-controls {
+    padding: 0;
+    gap: 2px;
+  }
+  .c4-drop-btn {
+    min-height: 44px;
+  }
+  .c4-drop-number {
+    display: inline;
+  }
+  .c4-drop-btn-arrow {
+    display: none;
+  }
+}
+
+.c4-disc--a,
+[data-theme-mode="light"] .c4-disc--a {
+  background: var(--player-a-accent, #68d6c2);
+  border-color: var(--player-a-accent, #68d6c2);
+  color: var(--player-a-on, #0a2b25);
+}
+.c4-disc--b,
+[data-theme-mode="light"] .c4-disc--b {
+  background: var(--player-b-accent, #c5a2ff);
+  border-color: var(--player-b-accent, #c5a2ff);
+  color: var(--player-b-on, #221238);
+}

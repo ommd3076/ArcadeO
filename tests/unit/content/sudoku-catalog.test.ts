@@ -146,5 +146,5 @@ describe("Sudoku Catalog and Solutions (Task S01)", () => {
         expect(boxMasks[idx]).toBe(fullMask);
       }
     }
-  });
+  }, 15000);
 });

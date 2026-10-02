@@ -12,8 +12,8 @@ import { ActionType, Seat, TerminalResult, ViewerContext } from "../../protocol/
 import { AcceptedFacts, ReductionResult, SuppliedStartFacts } from "../registry";
 import { ErrorCode, createError } from "../../protocol/errors";
 import {
-  LADDERS,
-  SNAKES,
+  boardMapFor,
+  REFERENCE_BOARD_VERSION,
   SNAKES_AND_LADDERS_MAX_POSITION,
   SNAKES_AND_LADDERS_START_POSITION,
   SnakesAndLaddersEffect,
@@ -26,6 +26,7 @@ import {
  */
 export function createInitialState(startFacts: SuppliedStartFacts): SnakesAndLaddersState {
   return {
+    boardVersion: REFERENCE_BOARD_VERSION,
     positions: {
       A: SNAKES_AND_LADDERS_START_POSITION,
       B: SNAKES_AND_LADDERS_START_POSITION,
@@ -195,10 +196,11 @@ export function validateAndReduce(
   ];
 
   let finalPos = targetPos;
+  const { ladders, snakes } = boardMapFor(state.boardVersion);
 
   // Check for ladder
-  if (targetPos in LADDERS) {
-    const ladderDest = LADDERS[targetPos];
+  if (targetPos in ladders) {
+    const ladderDest = ladders[targetPos];
     effects.push({
       type: "ladder-climbed",
       seat: state.activeSeat,
@@ -206,9 +208,9 @@ export function validateAndReduce(
       to: ladderDest,
     });
     finalPos = ladderDest;
-  } else if (targetPos in SNAKES) {
+  } else if (targetPos in snakes) {
     // Check for snake
-    const snakeDest = SNAKES[targetPos];
+    const snakeDest = snakes[targetPos];
     effects.push({
       type: "snake-bitten",
       seat: state.activeSeat,
@@ -265,6 +267,7 @@ export function toPublicView(
   _viewer?: ViewerContext,
 ): SnakesAndLaddersView {
   return {
+    ...(state.boardVersion ? { boardVersion: state.boardVersion } : {}),
     positions: { ...state.positions },
     activeSeat: state.activeSeat,
     status: state.status,

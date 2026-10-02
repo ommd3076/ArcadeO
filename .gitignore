@@ -34,4 +34,7 @@ Thumbs.db
 
 # Local state overrides
 *.local
+.dev.vars*
+.local/
+.unlazy/
 planning/execution/*.local.md

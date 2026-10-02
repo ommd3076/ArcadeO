@@ -42,7 +42,7 @@ A Standard Light primary action may be black like the tracker reference; mint re
 
 ## Type, spacing and surfaces
 
-Space Grotesk headings; DM Sans body/controls; DM Mono timers/scores. Self-host small needed subsets, keep licenses and use fallbacks. Phone title 32–40 px with compact leading; body 16; secondary 14; labels 12 only where legible. Do not reproduce the tracker headline's exact breaks at the expense of wrapping.
+Owner correction, 2026-10-01: DM Sans for interface headings, body and controls; regular/medium editorial headings and tabular numerals for scores and timers. Self-host only the needed subsets, keep licenses and use fallbacks. Phone title 32–40 px with compact leading; body 16; secondary 14; labels 12 only where legible. Standard Light follows bright white tennis surfaces with fresh mint/lime accents; Standard Dark follows charcoal tracker framing and mint/cyan/yellow emphasis. Do not reproduce the tracker headline's exact breaks at the expense of wrapping.
 
 Use spacing 4/8/12/16/24/32. Phone page gutters 16–20, card padding 20–24, inter-card gap 12–16, section gap 24–32. Surface radii 24; inset panels 16; compact controls 10–16; pills/circles only for their appropriate roles. A nested radius is smaller than its parent. Keep shadows quiet; separate dark surfaces through tone and a restrained border. No glass dashboard, floating ornaments or endless bento boxes.
 

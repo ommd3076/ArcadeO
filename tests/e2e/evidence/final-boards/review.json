@@ -1,0 +1,314 @@
+[
+  {
+    "game": "connect-four",
+    "id": "3da586d8-7d2f-4816-a074-49b140af4ce5",
+    "owned": false,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/connect-four-phone-320.png",
+      "tests/e2e/evidence/final-boards/connect-four-phone-390.png",
+      "tests/e2e/evidence/final-boards/connect-four-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "preexisting match untouched"
+  },
+  {
+    "game": "ludo",
+    "id": "30826473-446f-41e1-b670-2804600afc6e",
+    "owned": true,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/ludo-phone-320.png",
+      "tests/e2e/evidence/final-boards/ludo-phone-390.png",
+      "tests/e2e/evidence/final-boards/ludo-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "transition": "ordinary UI accepted move",
+        "savedVersion": 2
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "unscored abandonment"
+  },
+  {
+    "game": "snakes-and-ladders",
+    "id": "666e4f3a-d0a3-4bd5-8cab-a8edd4949750",
+    "owned": true,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/snakes-and-ladders-phone-320.png",
+      "tests/e2e/evidence/final-boards/snakes-and-ladders-phone-390.png",
+      "tests/e2e/evidence/final-boards/snakes-and-ladders-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "transition": "ordinary UI accepted move",
+        "savedVersion": 2
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "unscored abandonment"
+  },
+  {
+    "game": "dots-boxes",
+    "id": "676772c0-6e7d-442f-9662-abc780165cd2",
+    "owned": true,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/dots-boxes-phone-320.png",
+      "tests/e2e/evidence/final-boards/dots-boxes-phone-390.png",
+      "tests/e2e/evidence/final-boards/dots-boxes-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "unscored abandonment"
+  },
+  {
+    "game": "sos",
+    "id": "d64229d1-7dbb-42ab-814b-62f35b4ddcdf",
+    "owned": true,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/sos-phone-320.png",
+      "tests/e2e/evidence/final-boards/sos-phone-390.png",
+      "tests/e2e/evidence/final-boards/sos-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "unscored abandonment"
+  },
+  {
+    "game": "rock-paper-scissors",
+    "id": "ac76cdc7-40af-4fc2-bf30-57addcb07ac9",
+    "owned": true,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/rock-paper-scissors-phone-320.png",
+      "tests/e2e/evidence/final-boards/rock-paper-scissors-phone-390.png",
+      "tests/e2e/evidence/final-boards/rock-paper-scissors-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "unscored abandonment"
+  },
+  {
+    "game": "hand-cricket",
+    "id": "0e96cc55-0eaa-4ce7-93d7-19aa2df20d23",
+    "owned": false,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/hand-cricket-phone-320.png",
+      "tests/e2e/evidence/final-boards/hand-cricket-phone-390.png",
+      "tests/e2e/evidence/final-boards/hand-cricket-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "preexisting match untouched"
+  },
+  {
+    "game": "sudoku",
+    "id": "44408543-e436-4259-b445-ec7dd83c3cb5",
+    "owned": false,
+    "screenshots": [
+      "tests/e2e/evidence/final-boards/sudoku-phone-320.png",
+      "tests/e2e/evidence/final-boards/sudoku-phone-390.png",
+      "tests/e2e/evidence/final-boards/sudoku-laptop.png"
+    ],
+    "errors": [],
+    "checks": [
+      {
+        "size": "phone-320",
+        "scrollWidth": 320,
+        "viewport": 320
+      },
+      {
+        "size": "phone-390",
+        "scrollWidth": 390,
+        "viewport": 390
+      },
+      {
+        "size": "laptop",
+        "scrollWidth": 1366,
+        "viewport": 1366
+      },
+      {
+        "reducedMotion": true
+      },
+      {
+        "dialogFocusTrapped": true
+      },
+      {
+        "escapeClosedDialog": true
+      }
+    ],
+    "cleanup": "preexisting match untouched"
+  }
+]

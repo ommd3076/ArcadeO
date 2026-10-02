@@ -1,4 +1,4 @@
-﻿import { useEffect, type ReactNode } from "react";
+﻿import { useEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { IconButton } from "./icon-button";
 
@@ -11,10 +11,35 @@ export interface SheetProps {
 }
 
 export function Sheet({ isOpen, onClose, title, description, children }: SheetProps) {
+  const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!isOpen) return;
 
+    const previousFocus = document.activeElement as HTMLElement | null;
+    const focusable = () =>
+      Array.from(
+        panel.current?.querySelectorAll<HTMLElement>(
+          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex="0"]',
+        ) ?? [],
+      );
+    focusable()[0]?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Tab") {
+        const targets = focusable();
+        const first = targets[0];
+        const last = targets[targets.length - 1];
+        if (!first) {
+          e.preventDefault();
+          return;
+        }
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
       if (e.key === "Escape") {
         onClose();
       }
@@ -28,6 +53,7 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalOverflow;
+      previousFocus?.focus();
     };
   }, [isOpen, onClose]);
 
@@ -36,6 +62,7 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
   return (
     <div className="arcade-sheet-backdrop" onClick={onClose} role="presentation">
       <div
+        ref={panel}
         className="arcade-sheet-content"
         role="dialog"
         aria-modal="true"

@@ -1,4 +1,6 @@
-﻿import { useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { useAuth } from "../auth";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
 import { Lock, User } from "lucide-react";
@@ -6,11 +8,48 @@ import { Lock, User } from "lucide-react";
 export function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { refresh } = useAuth();
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Handled by auth provider in F02
+    if (!username.trim() || !password) {
+      setError("Please provide username and password");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/v1/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
+      });
+
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || `Login failed (${res.status})`);
+      }
+
+      await refresh();
+      setPassword("");
+      const returnTo = location.state?.returnTo;
+      navigate(
+        typeof returnTo === "string" && returnTo.startsWith("/") && !returnTo.startsWith("//")
+          ? returnTo
+          : "/",
+        { replace: true },
+      );
+    } catch (err: any) {
+      setError(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,7 +117,7 @@ export function LoginPage() {
               style={{
                 display: "block",
                 fontSize: "12px",
-                fontWeight: 600,
+                fontWeight: 500,
                 color: "var(--color-muted-text)",
                 marginBottom: "6px",
               }}
@@ -102,7 +141,7 @@ export function LoginPage() {
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                placeholder="Username (e.g. player_a)"
                 style={{
                   width: "100%",
                   height: "44px",
@@ -125,7 +164,7 @@ export function LoginPage() {
               style={{
                 display: "block",
                 fontSize: "12px",
-                fontWeight: 600,
+                fontWeight: 500,
                 color: "var(--color-muted-text)",
                 marginBottom: "6px",
               }}
@@ -167,8 +206,8 @@ export function LoginPage() {
           </div>
 
           <div style={{ marginTop: "var(--space-md)" }}>
-            <Button type="submit" variant="primary" size="lg" fullWidth>
-              Sign In
+            <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </div>
         </form>

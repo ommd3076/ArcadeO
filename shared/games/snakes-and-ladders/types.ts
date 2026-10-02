@@ -11,6 +11,8 @@ import { Seat, TerminalResult } from "../../protocol/types";
 export const SNAKES_AND_LADDERS_BOARD_SIZE = 10;
 export const SNAKES_AND_LADDERS_MAX_POSITION = 100;
 export const SNAKES_AND_LADDERS_START_POSITION = 0;
+export const REFERENCE_BOARD_VERSION = 2 as const;
+export type SnakesBoardVersion = 1 | typeof REFERENCE_BOARD_VERSION;
 
 /**
  * Fixed ladders: origin -> destination.
@@ -40,7 +42,38 @@ export const SNAKES: Readonly<Record<number, number>> = {
   97: 76,
 };
 
+// Transcribed from the owner's supplied classic board. The saved version is
+// essential: old matches without a version continue using the original map.
+export const REFERENCE_LADDERS: Readonly<Record<number, number>> = {
+  1: 38,
+  4: 14,
+  9: 31,
+  21: 42,
+  28: 84,
+  51: 67,
+  72: 91,
+  81: 99,
+};
+
+export const REFERENCE_SNAKES: Readonly<Record<number, number>> = {
+  17: 7,
+  53: 34,
+  63: 18,
+  64: 60,
+  87: 45,
+  92: 73,
+  95: 75,
+  98: 79,
+};
+
+export function boardMapFor(version?: SnakesBoardVersion) {
+  return version === REFERENCE_BOARD_VERSION
+    ? { ladders: REFERENCE_LADDERS, snakes: REFERENCE_SNAKES }
+    : { ladders: LADDERS, snakes: SNAKES };
+}
+
 export interface SnakesAndLaddersState {
+  boardVersion?: SnakesBoardVersion;
   positions: Record<Seat, number>; // 0 (off-board) .. 100
   activeSeat: Seat;
   status: "active" | "completed";
@@ -84,6 +117,7 @@ export type SnakesAndLaddersEffect =
     };
 
 export interface SnakesAndLaddersView {
+  boardVersion?: SnakesBoardVersion;
   positions: Record<Seat, number>;
   activeSeat: Seat;
   status: "active" | "completed";
