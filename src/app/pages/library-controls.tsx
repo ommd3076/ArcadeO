@@ -49,8 +49,8 @@ export function LibraryControls() {
     };
   }, [refresh, reload]);
 
-  async function save(kind: "favourites" | "playNext", gameIds: string[]) {
-    if (!library || saving) return;
+  async function save(kind: "favourites" | "playNext", gameIds: string[]): Promise<boolean> {
+    if (!library || saving) return false;
     const endpoint = kind === "favourites" ? "favourites" : "play-next";
     setSaving(true);
     try {
@@ -62,13 +62,15 @@ export function LibraryControls() {
       if (response.status === 409) {
         await refresh();
         setNotice("The game list changed on another device. Review it, then retry.");
-        return;
+        return false;
       }
       if (!response.ok) throw new Error("Unable to save game list");
       await refresh();
       setNotice(kind === "favourites" ? "Favourites saved" : "Play next saved for both players");
+      return true;
     } catch (error) {
       setNotice((error as Error).message);
+      return false;
     } finally {
       setSaving(false);
     }
@@ -236,6 +238,7 @@ export function LibraryControls() {
             <label htmlFor="play-next-game">Add a game</label>
             <select
               id="play-next-game"
+              className="arcade-select"
               value={queueChoice}
               disabled={!library || saving || loading || queue.length >= games.length}
               onChange={(event) => setQueueChoice(event.target.value)}
@@ -256,8 +259,9 @@ export function LibraryControls() {
               style={{ minHeight: 44 }}
               onClick={() => {
                 if (!queueChoice || queue.includes(queueChoice)) return;
-                void save("playNext", [...queue, queueChoice]);
-                setQueueChoice("");
+                void save("playNext", [...queue, queueChoice]).then((saved) => {
+                  if (saved) setQueueChoice("");
+                });
               }}
             >
               Add

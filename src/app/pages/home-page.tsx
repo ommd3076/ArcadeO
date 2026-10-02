@@ -61,7 +61,8 @@ function formatGameName(gameId: string) {
 }
 
 function matchStatus(lifecycle: string) {
-  return lifecycle === "waiting" ? "Waiting" : "In progress";
+  if (lifecycle === "saved") return "Paused · Resume when ready";
+  return lifecycle === "waiting" ? "Waiting for players" : "In progress";
 }
 
 function modeName(mode: ActiveMatchSummary["mode"]) {
@@ -103,7 +104,10 @@ export function HomePage() {
     if (matchesResult.status === "fulfilled") {
       setActiveMatches(
         (matchesResult.value.matches ?? []).filter(
-          (match) => match.lifecycle === "active" || match.lifecycle === "waiting",
+          (match) =>
+            match.lifecycle === "active" ||
+            match.lifecycle === "waiting" ||
+            match.lifecycle === "saved",
         ),
       );
     }
@@ -115,7 +119,10 @@ export function HomePage() {
     void loadDashboard();
   }, [loadDashboard, reloadKey]);
 
-  const dominantMatch = activeMatches[0] ?? null;
+  const dominantMatch =
+    [...activeMatches].sort(
+      (left, right) => Number(right.lifecycle === "saved") - Number(left.lifecycle === "saved"),
+    )[0] ?? null;
   const weeklyCount =
     recordsSummary?.summary?.thisWeek?.total ??
     recordsSummary?.summary?.calcuttaWeek?.matchesThisWeek;
@@ -167,7 +174,9 @@ export function HomePage() {
                 padding="xl"
               >
                 <div className="home-continue__topline">
-                  <p className="home-continue__eyebrow">Continue</p>
+                  <p className="home-continue__eyebrow">
+                    {dominantMatch.lifecycle === "saved" ? "Saved match" : "Continue"}
+                  </p>
                   <span className="home-status">{matchStatus(dominantMatch.lifecycle)}</span>
                 </div>
                 <h2 id="continue-heading">{formatGameName(dominantMatch.gameId)}</h2>
@@ -182,7 +191,9 @@ export function HomePage() {
                   to={`/matches/${dominantMatch.matchId}`}
                   aria-label={`Resume ${formatGameName(dominantMatch.gameId)}`}
                 >
-                  <span>Resume game</span>
+                  <span>
+                    {dominantMatch.lifecycle === "saved" ? "Resume saved match" : "Open match"}
+                  </span>
                   <ArrowRight size={18} aria-hidden="true" />
                 </Link>
               </Surface>
@@ -239,29 +250,31 @@ export function HomePage() {
           {activeMatches.length > 1 && !matchesError && (
             <section className="home-active-matches" aria-labelledby="active-matches-heading">
               <div className="home-section-heading home-section-heading--compact">
-                <h2 id="active-matches-heading">Active matches</h2>
+                <h2 id="active-matches-heading">More matches to resume</h2>
                 <span className="home-count">{activeMatches.length}</span>
               </div>
               <div className="home-active-matches__list">
-                {activeMatches.slice(1).map((match) => (
-                  <Link
-                    className="home-active-match"
-                    key={match.matchId}
-                    to={`/matches/${match.matchId}`}
-                    aria-label={`Resume ${formatGameName(match.gameId)}, ${matchStatus(match.lifecycle)}`}
-                  >
-                    <span className="home-active-match__icon">
-                      <Clock3 size={18} aria-hidden="true" />
-                    </span>
-                    <span className="home-active-match__copy">
-                      <strong>{formatGameName(match.gameId)}</strong>
-                      <span>
-                        {modeName(match.mode)} · {matchStatus(match.lifecycle)}
+                {activeMatches
+                  .filter((match) => match.matchId !== dominantMatch?.matchId)
+                  .map((match) => (
+                    <Link
+                      className="home-active-match"
+                      key={match.matchId}
+                      to={`/matches/${match.matchId}`}
+                      aria-label={`Resume ${formatGameName(match.gameId)}, ${matchStatus(match.lifecycle)}`}
+                    >
+                      <span className="home-active-match__icon">
+                        <Clock3 size={18} aria-hidden="true" />
                       </span>
-                    </span>
-                    <ArrowRight size={17} aria-hidden="true" />
-                  </Link>
-                ))}
+                      <span className="home-active-match__copy">
+                        <strong>{formatGameName(match.gameId)}</strong>
+                        <span>
+                          {modeName(match.mode)} · {matchStatus(match.lifecycle)}
+                        </span>
+                      </span>
+                      <ArrowRight size={17} aria-hidden="true" />
+                    </Link>
+                  ))}
               </div>
             </section>
           )}

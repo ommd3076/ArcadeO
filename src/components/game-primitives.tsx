@@ -2,19 +2,9 @@ import type { CSSProperties, ReactNode } from "react";
 import type { Seat } from "@shared/protocol/types";
 import { Button } from "./button";
 import { Surface } from "./surface";
+import { Check } from "lucide-react";
 import { BackHeader, type BackHeaderProps } from "./back-header";
 export { Sheet } from "./sheet";
-
-function colourLabelInk(colour: string) {
-  const channels = colour.replace("#", "").match(/.{2}/g);
-  if (!channels || channels.length !== 3) return "var(--color-text)";
-  const linear = channels.map((channel) => {
-    const value = parseInt(channel, 16) / 255;
-    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-  const luminance = 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
-  return luminance > 0.179 ? "#000" : "#fff";
-}
 
 export function GameHeader(props: BackHeaderProps) {
   return <BackHeader {...props} />;
@@ -259,6 +249,7 @@ export function ColourPicker<T extends string>({
   label,
   disabled = false,
   disabledIds = [],
+  disabledDescriptions = {},
 }: {
   value: T;
   colours: readonly { id: T; color: string; name: string }[];
@@ -266,34 +257,74 @@ export function ColourPicker<T extends string>({
   label: string;
   disabled?: boolean;
   disabledIds?: readonly T[];
+  disabledDescriptions?: Partial<Record<T, string>>;
 }) {
   return (
     <fieldset style={{ border: 0, padding: 0 }}>
       <legend>{label}</legend>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        {colours.map(({ id, color, name }) => (
-          <button
-            key={id}
-            type="button"
-            aria-label={name}
-            aria-pressed={value === id}
-            disabled={disabled || disabledIds.includes(id)}
-            onClick={() => onChange(id)}
-            style={{
-              minWidth: 72,
-              minHeight: 44,
-              borderRadius: 12,
-              background: color,
-              opacity: disabled || disabledIds.includes(id) ? 0.45 : 1,
-              color: colourLabelInk(color),
-              border:
-                value === id ? "3px solid var(--color-text)" : "1px solid var(--color-border)",
-            }}
-          >
-            {name}
-          </button>
-        ))}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(88px, 1fr))",
+          gap: 8,
+        }}
+      >
+        {colours.map(({ id, color, name }) => {
+          const unavailable = disabled || disabledIds.includes(id);
+          const reason = disabledDescriptions[id];
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-label={`${label}: ${name}${value === id ? ", selected" : ""}${unavailable ? `, unavailable${reason ? `: ${reason}` : ""}` : ""}`}
+              aria-pressed={value === id}
+              disabled={unavailable}
+              title={unavailable ? (reason ?? "Unavailable") : name}
+              onClick={() => onChange(id)}
+              style={{
+                position: "relative",
+                display: "flex",
+                minWidth: 0,
+                minHeight: 48,
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 7,
+                borderRadius: "var(--radius-md)",
+                padding: "8px 10px",
+                background: "var(--color-raised)",
+                color: "var(--color-text)",
+                border:
+                  value === id ? "2px solid var(--color-focus)" : "1px solid var(--color-border)",
+                opacity: unavailable ? 0.55 : 1,
+                cursor: unavailable ? "not-allowed" : "pointer",
+                font: "inherit",
+                fontSize: 14,
+                fontWeight: value === id ? 650 : 500,
+                textAlign: "center",
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  width: 18,
+                  height: 18,
+                  flex: "none",
+                  borderRadius: "50%",
+                  background: color,
+                  border: "1px solid color-mix(in srgb, var(--color-text) 35%, transparent)",
+                }}
+              />
+              <span style={{ overflowWrap: "anywhere" }}>{name}</span>
+              {value === id && <Check size={16} aria-hidden="true" />}
+            </button>
+          );
+        })}
       </div>
+      {disabledIds.length > 0 && (
+        <p style={{ margin: "8px 0 0", color: "var(--color-muted-text)", fontSize: 13 }}>
+          Colors too similar to the other player’s pawns are unavailable.
+        </p>
+      )}
     </fieldset>
   );
 }

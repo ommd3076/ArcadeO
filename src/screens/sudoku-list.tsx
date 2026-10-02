@@ -16,6 +16,7 @@ import { BackHeader } from "../components/back-header";
 import { Surface } from "../components/surface";
 import { Button } from "../components/button";
 import { Zap, Swords, Award, Play } from "lucide-react";
+import { generateUuid } from "../../shared/utils/uuid";
 
 type SudokuBucket = "easy" | "medium" | "hard" | "expert";
 type SudokuMode = "practice" | "duel" | "challenge";
@@ -49,6 +50,7 @@ function savedSelection(): { bucket: SudokuBucket; number: number; page: number 
 export function SudokuListScreen() {
   const navigate = useNavigate();
   const [existingMatchId, setExistingMatchId] = useState<string | null>(null);
+  const [existingLifecycle, setExistingLifecycle] = useState<string | null>(null);
   const creationRequests = useRef(new Map<string, string>());
 
   const [selectedBucket, setSelectedBucket] = useState<SudokuBucket>(() => savedSelection().bucket);
@@ -118,6 +120,7 @@ export function SudokuListScreen() {
       .then((data) => {
         if (!data?.matches) {
           setExistingMatchId(null);
+          setExistingLifecycle(null);
           setMatchState("ready");
           return;
         }
@@ -125,9 +128,10 @@ export function SudokuListScreen() {
           (m) =>
             m.gameId === "sudoku" &&
             m.mode === selectedMode &&
-            (m.lifecycle === "active" || m.lifecycle === "waiting"),
+            (m.lifecycle === "active" || m.lifecycle === "waiting" || m.lifecycle === "saved"),
         );
         setExistingMatchId(matching?.matchId ?? null);
+        setExistingLifecycle(matching?.lifecycle ?? null);
         setMatchState("ready");
       })
       .catch(() => setMatchState("error"));
@@ -167,7 +171,7 @@ export function SudokuListScreen() {
       const signature = puzzleId + selectedMode;
       let creationId = creationRequests.current.get(signature);
       if (!creationId) {
-        creationId = crypto.randomUUID();
+        creationId = generateUuid();
         creationRequests.current.set(signature, creationId);
       }
 
@@ -299,7 +303,9 @@ export function SudokuListScreen() {
             }}
           >
             <span style={{ fontSize: "14px", fontWeight: 600 }}>
-              A saved {selectedMode} attempt is in progress
+              {existingLifecycle === "saved"
+                ? `Paused ${selectedMode} attempt`
+                : `${selectedMode} attempt ready to continue`}
             </span>
             <div style={{ display: "flex", gap: "var(--space-sm)", flexWrap: "wrap" }}>
               <Button
@@ -307,7 +313,7 @@ export function SudokuListScreen() {
                 size="sm"
                 onClick={() => navigate("/matches/" + existingMatchId)}
               >
-                Resume saved attempt
+                {existingLifecycle === "saved" ? "Resume saved attempt" : "Continue attempt"}
               </Button>
               {selectedMode === "practice" && (
                 <Button
@@ -315,6 +321,12 @@ export function SudokuListScreen() {
                   size="sm"
                   disabled={isAbandoning}
                   onClick={async () => {
+                    if (
+                      !window.confirm(
+                        "Abandon this practice attempt without a score? This cannot be undone.",
+                      )
+                    )
+                      return;
                     setIsAbandoning(true);
                     setError(null);
                     try {
@@ -327,7 +339,7 @@ export function SudokuListScreen() {
                         body: JSON.stringify({
                           protocolVersion: 1,
                           matchId: existingMatchId,
-                          actionId: crypto.randomUUID(),
+                          actionId: generateUuid(),
                           action: "match.request-abandon",
                           expectedVersion: v.deliveryVersion,
                           payload: {},

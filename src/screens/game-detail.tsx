@@ -5,7 +5,10 @@ import { BackHeader } from "../components/back-header";
 import { Surface } from "../components/surface";
 import { Button } from "../components/button";
 import { useTheme } from "../theme/theme-context";
-import { Play, Users, Wifi, AlertCircle, RefreshCw } from "lucide-react";
+import { Play, Users, Wifi, AlertCircle, RefreshCw, Check } from "lucide-react";
+import { generateUuid } from "../../shared/utils/uuid";
+import { LUDO_COLOUR_PALETTE, type LudoColourId } from "../../shared/games/ludo/types";
+import type { Seat } from "../../shared/protocol/types";
 
 const GAME_TITLES: Record<string, string> = {
   "connect-four": "Connect Four",
@@ -17,17 +20,7 @@ const GAME_TITLES: Record<string, string> = {
   "hand-cricket": "Hand Cricket",
   sudoku: "Sudoku",
 };
-const LUDO_COLOURS = [
-  "blue",
-  "green",
-  "red",
-  "yellow",
-  "purple",
-  "orange",
-  "cyan",
-  "pink",
-] as const;
-const LUDO_NEAR: Record<string, string> = {
+const LUDO_SIMILAR: Partial<Record<LudoColourId, LudoColourId>> = {
   blue: "cyan",
   cyan: "blue",
   red: "pink",
@@ -40,7 +33,12 @@ export function GameDetailScreen() {
   const { gameId = "connect-four" } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
   const { resolvedMode } = useTheme();
-  const [seatNames, setSeatNames] = useState({ A: "Account A", B: "Account B" });
+  const [seatNames, setSeatNames] = useState<Record<"A" | "B", string>>({
+    A: "Player A",
+    B: "Player B",
+  });
+  const [profileState, setProfileState] = useState<"loading" | "ready" | "error">("loading");
+  const [profileRetry, setProfileRetry] = useState(0);
   const [activeMatches, setActiveMatches] = useState<
     Array<{ matchId: string; mode: string; lifecycle: string }>
   >([]);
@@ -49,7 +47,11 @@ export function GameDetailScreen() {
   const [selectedMode, setSelectedMode] = useState<"remote" | "together">("remote");
   const [format, setFormat] = useState("best-of-3");
   const [gridSize, setGridSize] = useState<5 | 7 | 9>(5);
-  const [ludoColours, setLudoColours] = useState({ A: "blue", B: "green" });
+  const [selectedColourSeat, setSelectedColourSeat] = useState<Seat>("A");
+  const [ludoColours, setLudoColours] = useState<Record<Seat, LudoColourId>>({
+    A: "blue",
+    B: "green",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAbandoning, setIsAbandoning] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -78,7 +80,9 @@ export function GameDetailScreen() {
           return;
         }
         const matching = data.matches.filter(
-          (m) => m.gameId === gameId && (m.lifecycle === "active" || m.lifecycle === "waiting"),
+          (m) =>
+            m.gameId === gameId &&
+            (m.lifecycle === "active" || m.lifecycle === "waiting" || m.lifecycle === "saved"),
         );
         setActiveMatches(matching);
       })
@@ -92,26 +96,35 @@ export function GameDetailScreen() {
 
   useEffect(() => {
     let active = true;
+    setProfileState("loading");
     apiFetch("/api/v1/profile")
-      .then((response) => (response.ok ? response.json() : null))
+      .then((response) => {
+        if (!response.ok) throw new Error(`Unable to load player names (${response.status})`);
+        return response.json();
+      })
       .then((data: unknown) => {
         const profile = data as {
           profile?: { id?: "A" | "B"; displayName?: string };
           opponent?: { id?: "A" | "B"; displayName?: string };
         } | null;
-        if (!active || !profile?.profile || !profile.opponent) return;
-        const names = { A: "Account A", B: "Account B" };
+        if (!active) return;
+        if (!profile?.profile || !profile.opponent)
+          throw new Error("Player names are unavailable.");
+        const names: Record<"A" | "B", string> = { A: "Player A", B: "Player B" };
         if (profile.profile.id && profile.profile.displayName)
           names[profile.profile.id] = profile.profile.displayName;
         if (profile.opponent.id && profile.opponent.displayName)
           names[profile.opponent.id] = profile.opponent.displayName;
         setSeatNames(names);
+        setProfileState("ready");
       })
-      .catch(() => {});
+      .catch(() => {
+        if (active) setProfileState("error");
+      });
     return () => {
       active = false;
     };
-  }, []);
+  }, [profileRetry]);
 
   const activeMatchForMode = activeMatches.find((m) => m.mode === selectedMode);
   const currentExistingMatchId = activeMatchForMode?.matchId;
@@ -129,7 +142,7 @@ export function GameDetailScreen() {
       const signature = gameId + selectedMode + format + gridSize + ludoColours.A + ludoColours.B;
       let creationId = creationRequests.current.get(signature);
       if (!creationId) {
-        creationId = crypto.randomUUID();
+        creationId = generateUuid();
         creationRequests.current.set(signature, creationId);
       }
 
@@ -196,6 +209,7 @@ export function GameDetailScreen() {
 
   const handleAbandonSaved = async () => {
     if (!currentExistingMatchId) return;
+    if (!window.confirm("End this match without a score? This cannot be undone.")) return;
     setIsAbandoning(true);
     setErrorMsg(null);
     try {
@@ -246,19 +260,17 @@ export function GameDetailScreen() {
         }
       }
 
-      let action = "match.agree-abandon";
-      if (currentView.lifecycle === "waiting") {
-        action = "match.cancel";
-      } else if (currentView.legalActions && currentView.legalActions.length > 0) {
-        if (currentView.legalActions.includes("match.agree-abandon")) {
-          action = "match.agree-abandon";
-        } else if (currentView.legalActions.includes("match.cancel")) {
-          action = "match.cancel";
-        } else if (currentView.legalActions.includes("match.request-abandon")) {
-          action = "match.request-abandon";
-        }
-      } else if (currentView.mode !== "together") {
-        action = "match.request-abandon";
+      const action = currentView.legalActions?.includes("match.agree-abandon")
+        ? "match.agree-abandon"
+        : currentView.legalActions?.includes("match.cancel")
+          ? "match.cancel"
+          : currentView.legalActions?.includes("match.request-abandon")
+            ? "match.request-abandon"
+            : null;
+      if (!action) {
+        throw new Error(
+          "This match has no unscored-abandon action here. Resume it to review the available choices.",
+        );
       }
 
       const actionRes = await apiFetch(`/api/v1/matches/${currentExistingMatchId}/actions`, {
@@ -267,7 +279,7 @@ export function GameDetailScreen() {
         body: JSON.stringify({
           protocolVersion: 1,
           matchId: currentExistingMatchId,
-          actionId: crypto.randomUUID(),
+          actionId: generateUuid(),
           action,
           expectedVersion,
           ...(controllerGen !== undefined ? { controllerGeneration: controllerGen } : {}),
@@ -284,19 +296,47 @@ export function GameDetailScreen() {
         status: string;
         code?: string;
         message?: string;
+        view?: { lifecycle?: string };
       };
       if (reply.status === "rejected") {
         throw new Error(reply.message || `Abandon rejected (${reply.code || "UNKNOWN"})`);
       }
 
-      setActiveMatches((prev) => prev.filter((m) => m.matchId !== currentExistingMatchId));
-      creationRequests.current.clear();
+      if (reply.view?.lifecycle === "active" && action === "match.request-abandon") {
+        setErrorMsg(
+          "Unscored abandonment was requested. The other player must agree before this match closes.",
+        );
+      } else {
+        setActiveMatches((prev) => prev.filter((m) => m.matchId !== currentExistingMatchId));
+        creationRequests.current.clear();
+      }
     } catch (err) {
       setErrorMsg((err as Error).message || "Failed to abandon match.");
     } finally {
       setIsAbandoning(false);
     }
   };
+
+  if (!Object.prototype.hasOwnProperty.call(GAME_TITLES, gameId)) {
+    return (
+      <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
+        <BackHeader title="Game not found" fallbackTo="/games" />
+        <main
+          style={{ flex: 1, width: "min(100%, 640px)", margin: "0 auto", padding: "24px 16px" }}
+        >
+          <Surface variant="card" padding="xl" radius="xl">
+            <h2>This game is unavailable</h2>
+            <p style={{ color: "var(--color-muted-text)" }}>
+              Choose one of the eight games in your arcade to continue.
+            </p>
+            <Button variant="primary" onClick={() => navigate("/games", { replace: true })}>
+              Back to Games
+            </Button>
+          </Surface>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
@@ -314,6 +354,19 @@ export function GameDetailScreen() {
           width: "100%",
         }}
       >
+        {profileState === "loading" && (
+          <p role="status" style={{ color: "var(--color-muted-text)" }}>
+            Loading player names…
+          </p>
+        )}
+        {profileState === "error" && (
+          <div role="alert" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span>Player names could not load. Retry before inviting someone.</span>
+            <Button size="sm" variant="secondary" onClick={() => setProfileRetry((v) => v + 1)}>
+              Retry names
+            </Button>
+          </div>
+        )}
         <Surface variant="card" padding="xl" radius="xl">
           <h2 style={{ fontSize: "22px", fontWeight: 700, margin: "0 0 8px 0" }}>
             Choose Play Mode
@@ -432,10 +485,11 @@ export function GameDetailScreen() {
             <label style={{ display: "block", marginTop: 16 }}>
               Match format{" "}
               <select
+                className="arcade-select"
                 aria-label="Match format"
                 value={format}
                 onChange={(e) => setFormat(e.target.value)}
-                style={{ colorScheme: resolvedMode, accentColor: "var(--color-focus)" }}
+                style={{ colorScheme: resolvedMode }}
               >
                 {["best-of-3", "best-of-5", "best-of-7"].map((value) => (
                   <option key={value} value={value}>
@@ -465,32 +519,70 @@ export function GameDetailScreen() {
           )}
           {gameId === "ludo" && (
             <fieldset style={{ border: 0, padding: 0, marginTop: 16 }}>
-              <legend>Pawn and house colours</legend>
-              {(["A", "B"] as const).map((seat) => (
-                <label key={seat} style={{ display: "block", marginTop: 8 }}>
-                  {seatNames[seat]}{" "}
-                  <select
-                    value={ludoColours[seat]}
-                    onChange={(event) =>
-                      setLudoColours((current) => ({ ...current, [seat]: event.target.value }))
-                    }
-                    style={{ colorScheme: resolvedMode, accentColor: "var(--color-focus)" }}
+              <legend>Choose each player’s pawn colour</legend>
+              <div
+                role="group"
+                aria-label="Player whose pawn colour to choose"
+                className="ludo-owner-control"
+              >
+                {(["A", "B"] as const).map((seat) => (
+                  <Button
+                    key={seat}
+                    variant={selectedColourSeat === seat ? "primary" : "secondary"}
+                    aria-pressed={selectedColourSeat === seat}
+                    onClick={() => setSelectedColourSeat(seat)}
+                    style={{ minHeight: 44, flex: "1 1 140px" }}
                   >
-                    {LUDO_COLOURS.map((colour) => (
-                      <option
-                        key={colour}
-                        value={colour}
-                        disabled={
-                          colour === ludoColours[seat === "A" ? "B" : "A"] ||
-                          LUDO_NEAR[colour] === ludoColours[seat === "A" ? "B" : "A"]
+                    {seatNames[seat]}
+                  </Button>
+                ))}
+              </div>
+              <div
+                className="ludo-setup-swatches"
+                role="group"
+                aria-label={`${seatNames[selectedColourSeat]} pawn colour`}
+              >
+                {(Object.entries(LUDO_COLOUR_PALETTE) as [LudoColourId, string][]).map(
+                  ([id, color]) => {
+                    const otherSeat: Seat = selectedColourSeat === "A" ? "B" : "A";
+                    const otherColour = ludoColours[otherSeat];
+                    const unavailable = id === otherColour || LUDO_SIMILAR[id] === otherColour;
+                    const selected = ludoColours[selectedColourSeat] === id;
+                    const label = id[0].toUpperCase() + id.slice(1);
+                    const explanation = unavailable
+                      ? id === otherColour
+                        ? `Already used by ${seatNames[otherSeat]}.`
+                        : `Too similar to ${seatNames[otherSeat]}’s ${otherColour} pawns.`
+                      : "";
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        className="ludo-setup-swatch"
+                        aria-label={`${seatNames[selectedColourSeat]}: ${label}${selected ? ", selected" : ""}${explanation ? `, unavailable. ${explanation}` : ""}`}
+                        aria-pressed={selected}
+                        title={explanation || label}
+                        disabled={unavailable || profileState !== "ready"}
+                        onClick={() =>
+                          setLudoColours((current) => ({ ...current, [selectedColourSeat]: id }))
                         }
                       >
-                        {colour}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ))}
+                        <span
+                          aria-hidden="true"
+                          className="ludo-setup-swatch__sample"
+                          style={{ backgroundColor: color }}
+                        />
+                        <span>{label}</span>
+                        {selected && <Check size={16} aria-hidden="true" />}
+                      </button>
+                    );
+                  },
+                )}
+              </div>
+              <p style={{ margin: "8px 0 0", color: "var(--color-muted-text)", fontSize: 13 }}>
+                Colors used by or easily confused with{" "}
+                {seatNames[selectedColourSeat === "A" ? "B" : "A"]} are unavailable.
+              </p>
             </fieldset>
           )}
           {matchesState === "loading" && (
@@ -547,12 +639,14 @@ export function GameDetailScreen() {
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <Play size={16} color="var(--color-focus)" />
                 <span style={{ fontSize: "14px", fontWeight: 600 }}>
-                  A saved {selectedMode} match is in progress
+                  {activeMatchForMode?.lifecycle === "saved"
+                    ? `Paused ${selectedMode} match`
+                    : `A ${selectedMode} match is ready to resume`}
                 </span>
               </div>
               <p style={{ fontSize: "14px", color: "var(--color-muted-text)", margin: 0 }}>
-                Continue with the Resume button below, or abandon this saved match before starting
-                fresh.
+                Resume the accepted match state below. To abandon it without a score, confirm the
+                separate abandonment action.
               </p>
               <div
                 style={{
@@ -603,7 +697,12 @@ export function GameDetailScreen() {
             fullWidth
             leftIcon={<Play size={20} />}
             onClick={handleStartMatch}
-            disabled={isSubmitting || isAbandoning || matchesState !== "ready"}
+            disabled={
+              isSubmitting ||
+              isAbandoning ||
+              matchesState !== "ready" ||
+              (gameId === "ludo" && profileState !== "ready")
+            }
             aria-label={currentExistingMatchId ? "Resume Match" : "Start Match"}
           >
             {isSubmitting

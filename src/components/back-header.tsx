@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { IconButton } from "./icon-button";
+import { canGoBackInApp } from "../app/navigation-history";
 
 export interface BackHeaderProps {
   title: string;
@@ -25,7 +26,7 @@ export function BackHeader({
   const handleBack = () => {
     if (onBack) {
       onBack();
-    } else if (window.history.length > 1) {
+    } else if (canGoBackInApp()) {
       navigate(-1);
     } else {
       navigate(fallbackTo);

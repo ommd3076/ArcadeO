@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent } from "react";
-import { useAuth } from "../auth";
+import { apiFetch, useAuth } from "../auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
@@ -27,7 +27,7 @@ export function LoginPage() {
     setError(null);
 
     try {
-      const res = await fetch("/api/v1/auth/login", {
+      const res = await apiFetch("/api/v1/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),
@@ -115,6 +115,7 @@ export function LoginPage() {
 
         <form
           onSubmit={handleSubmit}
+          aria-busy={loading}
           style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}
         >
           <div>

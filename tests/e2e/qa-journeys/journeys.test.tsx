@@ -3,10 +3,203 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "../../../src/theme/theme-context";
-import { MatchScreen } from "../../../src/screens/match";
+import {
+  canUseMatchAction,
+  isHistoryOnlySudokuDuel,
+  MatchScreen,
+  matchNeedsExclusiveControl,
+} from "../../../src/screens/match";
 import { createMockFilteredView } from "../../fixtures/matches";
 
 describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () => {
+  it("keeps legal off-turn Remote actions enabled without exclusive device control", () => {
+    const remoteView = createMockFilteredView({
+      mode: "remote",
+      lifecycle: "waiting",
+      controller: { controllingAccountId: "A", controllerGeneration: 1, isController: false },
+      legalActions: ["match.accept", "match.ready"],
+    });
+    const common = {
+      view: remoteView,
+      activeOnly: false,
+      lifecycle: "waiting",
+      connected: true,
+      offline: false,
+      inputPaused: false,
+      pending: false,
+      syncing: false,
+      requiresExclusiveControl: matchNeedsExclusiveControl(remoteView),
+      hasExclusiveControl: false,
+    };
+
+    expect(matchNeedsExclusiveControl(remoteView)).toBe(false);
+    expect(canUseMatchAction({ ...common, action: "match.accept" })).toBe(true);
+    expect(canUseMatchAction({ ...common, action: "match.ready" })).toBe(true);
+
+    const savedView = createMockFilteredView({
+      mode: "remote",
+      lifecycle: "saved",
+      controller: { controllingAccountId: "A", controllerGeneration: 1, isController: false },
+      legalActions: ["match.resume", "match.resign"],
+    });
+    expect(
+      canUseMatchAction({ ...common, view: savedView, lifecycle: "saved", action: "match.resume" }),
+    ).toBe(true);
+    expect(
+      canUseMatchAction({ ...common, view: savedView, lifecycle: "saved", action: "match.resign" }),
+    ).toBe(true);
+
+    const activeView = createMockFilteredView({
+      mode: "remote",
+      lifecycle: "active",
+      controller: { controllingAccountId: "A", controllerGeneration: 1, isController: false },
+      legalActions: ["match.leave-save", "match.resign"],
+    });
+    expect(
+      canUseMatchAction({
+        ...common,
+        view: activeView,
+        lifecycle: "active",
+        activeOnly: true,
+        action: "match.leave-save",
+      }),
+    ).toBe(true);
+    expect(
+      canUseMatchAction({
+        ...common,
+        view: activeView,
+        lifecycle: "active",
+        action: "match.resign",
+      }),
+    ).toBe(true);
+
+    const remoteRps = createMockFilteredView({
+      gameId: "rock-paper-scissors",
+      mode: "remote",
+      lifecycle: "active",
+      controller: { controllingAccountId: "A", controllerGeneration: 1, isController: false },
+      legalActions: ["secret.lock"],
+    });
+    expect(matchNeedsExclusiveControl(remoteRps)).toBe(false);
+    expect(
+      canUseMatchAction({
+        ...common,
+        view: remoteRps,
+        lifecycle: "active",
+        activeOnly: true,
+        action: "secret.lock",
+      }),
+    ).toBe(true);
+    expect(matchNeedsExclusiveControl(createMockFilteredView({ mode: "together" }))).toBe(true);
+    expect(
+      matchNeedsExclusiveControl(createMockFilteredView({ gameId: "sudoku", mode: "remote" })),
+    ).toBe(true);
+  });
+
+  it("marks only deliberately interrupted Sudoku duels as history-only", () => {
+    const interruptedByState = createMockFilteredView({
+      gameId: "sudoku",
+      mode: "remote",
+      gameState: { mode: "duel", interrupted: true },
+    });
+    const interruptedByResult = createMockFilteredView({
+      gameId: "sudoku",
+      mode: "remote",
+      gameState: { mode: "duel" },
+    });
+    const interruptedPractice = createMockFilteredView({
+      gameId: "sudoku",
+      mode: "together",
+      gameState: { mode: "practice", interrupted: true },
+    });
+
+    expect(isHistoryOnlySudokuDuel(interruptedByState)).toBe(true);
+    expect(
+      isHistoryOnlySudokuDuel(interruptedByResult, {
+        winner: "B",
+        reason: "rules_win",
+        scores: { A: 0, B: 1 },
+        finishedAt: 1,
+        details: { interrupted: true },
+      }),
+    ).toBe(true);
+    expect(isHistoryOnlySudokuDuel(interruptedPractice)).toBe(false);
+  });
+
+  it("renders accepted invitation and canonical readiness for both named players", () => {
+    const mockView = createMockFilteredView({
+      mode: "remote",
+      lifecycle: "waiting",
+      invitationAccepted: true,
+      readiness: { A: false, B: true },
+      participants: {
+        A: { accountId: "A", displayName: "Player One", ready: true },
+        B: { accountId: "B", displayName: "Player Two", ready: false },
+      },
+      legalActions: ["match.ready"],
+    });
+    const html = renderToString(
+      React.createElement(
+        MemoryRouter,
+        { initialEntries: ["/matches/ready-check"] },
+        React.createElement(
+          ThemeProvider,
+          null,
+          React.createElement(
+            Routes,
+            null,
+            React.createElement(Route, {
+              path: "/matches/:matchId",
+              element: React.createElement(MatchScreen, {
+                actorAccountId: "A",
+                initialView: mockView,
+              }),
+            }),
+          ),
+        ),
+      ),
+    );
+
+    expect(html).toContain("Player One: Not ready · Player Two: Ready");
+    expect(html).toContain("I am ready");
+    expect(html).not.toContain("Accept invitation");
+  });
+
+  it("offers a legal Resume action for a saved remote match", () => {
+    const mockView = createMockFilteredView({
+      mode: "remote",
+      lifecycle: "saved",
+      pauseId: "pause-1",
+      resumeReadiness: { A: false, B: true },
+      legalActions: ["match.resume", "match.resign"],
+    });
+    const html = renderToString(
+      React.createElement(
+        MemoryRouter,
+        { initialEntries: ["/matches/saved-match"] },
+        React.createElement(
+          ThemeProvider,
+          null,
+          React.createElement(
+            Routes,
+            null,
+            React.createElement(Route, {
+              path: "/matches/:matchId",
+              element: React.createElement(MatchScreen, {
+                actorAccountId: "A",
+                initialView: mockView,
+              }),
+            }),
+          ),
+        ),
+      ),
+    );
+
+    expect(html).toContain("Match paused and saved");
+    expect(html).toContain("Resume saved match");
+    expect(html).toContain("Both players must resume this match");
+  });
+
   it("renders Connect Four together match screen with drop buttons and cells", () => {
     const mockView = createMockFilteredView({
       matchId: "match-c4",

@@ -50,6 +50,9 @@ export interface SessionError {
   code: string;
   message: string;
   retryable?: boolean;
+  category?: "game" | "transport";
+  backendCode?: string;
+  httpStatus?: number;
   timestamp: number;
 }
 

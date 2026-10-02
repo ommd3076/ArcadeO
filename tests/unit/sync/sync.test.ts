@@ -311,7 +311,16 @@ describe("MatchSession & Sync Client (Task C01)", () => {
       const originalActionId = pending?.actionId;
       expect(originalActionId).toBeDefined();
 
-      // Now network returns ok on retry
+      // Reconcile the original receipt first, then replay only because it is
+      // explicitly unknown. The action identity and payload remain unchanged.
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "unknown" }),
+      });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => initialView,
+      });
       const acceptedReply: AcceptedReply = {
         status: "accepted",
         actionId: originalActionId!,
@@ -341,6 +350,42 @@ describe("MatchSession & Sync Client (Task C01)", () => {
       );
 
       expect(session.getState().pendingAction).toBeNull();
+    });
+
+    it("settles a dropped-after-commit action from its receipt without resubmitting", async () => {
+      const initialView = createMockFilteredView({ deliveryVersion: 1 });
+      mockFetch.mockRejectedValueOnce(new Error("Reply dropped after commit"));
+      const session = new MatchSession({
+        matchId: "match-receipt",
+        actorAccountId: "A",
+        initialView,
+        baseUrl: "https://arcade.test",
+        transport: "polling",
+        fetchFn: mockFetch,
+        storage: mockStorage,
+      });
+      session.connect();
+      session.setConnectionState("connected");
+
+      await expect(session.sendAction("connect-four.drop", { column: 1 })).rejects.toThrow(
+        "Reply dropped after commit",
+      );
+      const originalActionId = session.getState().pendingAction!.actionId;
+      const acceptedView = createMockFilteredView({ deliveryVersion: 2, turnSeat: "B" });
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ status: "accepted", view: acceptedView }),
+      });
+
+      const retryResult = await session.retryPendingAction();
+      expect(retryResult).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch).toHaveBeenLastCalledWith(
+        `https://arcade.test/api/v1/matches/match-receipt/receipts/${originalActionId}`,
+        expect.any(Object),
+      );
+      expect(session.getState().pendingAction).toBeNull();
+      expect(session.getState().view?.deliveryVersion).toBe(2);
     });
   });
 

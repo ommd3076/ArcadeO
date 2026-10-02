@@ -1,5 +1,6 @@
 import { useAuth, apiFetch } from "../auth";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
 import { useTheme } from "../../theme/theme-context";
@@ -16,6 +17,7 @@ import {
   History,
   RefreshCw,
   Sparkles,
+  Pause,
 } from "lucide-react";
 
 interface RecordsData {
@@ -68,6 +70,13 @@ interface ProfileData {
 
 type LoadState = "loading" | "ready" | "error";
 
+interface SavedMatch {
+  matchId: string;
+  gameId: string;
+  mode: string;
+  lifecycle: string;
+}
+
 const gameNames: Record<string, string> = {
   "connect-four": "Connect Four",
   "rock-paper-scissors": "Rock Paper Scissors",
@@ -98,6 +107,8 @@ export function UsPage() {
   const [recordsState, setRecordsState] = useState<LoadState>("loading");
   const [profileState, setProfileState] = useState<LoadState>("loading");
   const [recentState, setRecentState] = useState<LoadState>("loading");
+  const [savedMatches, setSavedMatches] = useState<SavedMatch[]>([]);
+  const [savedMatchesState, setSavedMatchesState] = useState<LoadState>("loading");
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [savingPreferences, setSavingPreferences] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
@@ -108,6 +119,7 @@ export function UsPage() {
     setRecordsState("loading");
     setProfileState("loading");
     setRecentState("loading");
+    setSavedMatchesState("loading");
 
     const fetchJson = async <T,>(path: string): Promise<T> => {
       const response = await apiFetch(path);
@@ -121,7 +133,8 @@ export function UsPage() {
       fetchJson<{ sharedRecap?: NonNullable<RecordsData["sharedRecap"]> }>(
         "/api/v1/records/recent",
       ),
-    ]).then(([recordsResult, profileResult, recentResult]) => {
+      fetchJson<{ matches?: SavedMatch[] }>("/api/v1/matches"),
+    ]).then(([recordsResult, profileResult, recentResult, matchesResult]) => {
       if (!isMounted) return;
 
       if (recordsResult.status === "fulfilled") {
@@ -150,6 +163,16 @@ export function UsPage() {
         setRecentState("ready");
       } else {
         setRecentState("error");
+      }
+
+      if (matchesResult.status === "fulfilled") {
+        setSavedMatches(
+          (matchesResult.value.matches ?? []).filter((match) => match.lifecycle === "saved"),
+        );
+        setSavedMatchesState("ready");
+      } else {
+        setSavedMatches([]);
+        setSavedMatchesState("error");
       }
     });
 
@@ -282,7 +305,10 @@ export function UsPage() {
   const opponentAccent = profile?.opponent.accentFamily;
   const accountName = (id: string | null | undefined) => {
     if (!id) return "Unknown player";
-    if (!profile) return id === "A" || id === "B" ? `Account ${id}` : "Unknown player";
+    if (!profile) {
+      if (session?.profile.id === id) return session.profile.displayName;
+      return id === "A" || id === "B" ? "Other player" : "Unknown player";
+    }
     if (id === profile.profile.id) return profile.profile.displayName;
     if (id === profile.opponent.id) return profile.opponent.displayName;
     return "Unknown player";
@@ -351,6 +377,68 @@ export function UsPage() {
         <div
           style={{ display: "flex", flexDirection: "column", gap: "var(--space-xl)", minWidth: 0 }}
         >
+          <Surface variant="card" padding="xl" radius="xl">
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <Pause size={19} color="var(--color-focus)" aria-hidden="true" />
+              <h2 style={{ fontSize: 21, fontWeight: 650, margin: 0 }}>Saved matches</h2>
+            </div>
+            <p style={{ color: "var(--color-muted-text)", fontSize: 14, margin: "0 0 14px" }}>
+              Matches you paused stay here until you resume or explicitly end them.
+            </p>
+            {savedMatchesState === "loading" && (
+              <p role="status" style={{ color: "var(--color-muted-text)" }}>
+                Loading saved matches…
+              </p>
+            )}
+            {savedMatchesState === "error" && (
+              <div
+                role="alert"
+                style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}
+              >
+                <span>Saved matches could not be loaded.</span>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  leftIcon={<RefreshCw size={16} />}
+                  onClick={() => setReload((value) => value + 1)}
+                >
+                  Retry
+                </Button>
+              </div>
+            )}
+            {savedMatchesState === "ready" && savedMatches.length === 0 && (
+              <p style={{ color: "var(--color-muted-text)", margin: 0 }}>No paused matches.</p>
+            )}
+            {savedMatchesState === "ready" && savedMatches.length > 0 && (
+              <div style={{ display: "grid", gap: 10 }}>
+                {savedMatches.map((match) => {
+                  const title = gameNames[match.gameId] ?? match.gameId.replaceAll("-", " ");
+                  const modeName =
+                    match.mode === "together"
+                      ? "Together"
+                      : match.mode === "remote"
+                        ? "Remote"
+                        : match.mode;
+                  return (
+                    <article key={match.matchId} className="saved-match-row">
+                      <div className="saved-match-row__copy">
+                        <h3>{title}</h3>
+                        <p>{modeName} · Paused</p>
+                      </div>
+                      <Link
+                        to={`/matches/${encodeURIComponent(match.matchId)}`}
+                        className="arcade-btn arcade-btn--rounded arcade-btn--md arcade-btn--secondary"
+                        aria-label={`Resume paused ${title} match`}
+                      >
+                        Resume
+                      </Link>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </Surface>
+
           <Surface variant="card" padding="xl" radius="xl">
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
               <Heart size={20} color="var(--color-accent-fg)" aria-hidden="true" />

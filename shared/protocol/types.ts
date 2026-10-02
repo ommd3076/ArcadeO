@@ -185,6 +185,9 @@ export interface FilteredMatchView {
   deliveryVersion: number;
   schemaVersion?: number;
   rulesVersion?: number;
+  /** Accepted lifecycle state. Optional for compatibility with older saved views. */
+  invitationAccepted?: boolean;
+  readiness?: Record<Seat, boolean>;
   participants: {
     A: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };
     B?: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };

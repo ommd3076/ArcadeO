@@ -2,7 +2,7 @@ import { AuthProvider } from "../../../src/app/auth";
 import { describe, it, expect } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "../../../src/theme/theme-context";
 import { HomePage } from "../../../src/app/pages/home-page";
 import { GamesPage } from "../../../src/app/pages/games-page";
@@ -101,6 +101,31 @@ describe("Product Navigation and Shell Screens (Task U06)", () => {
     expect(html).toContain("Remote");
     expect(html).toContain("Together");
     expect(html).toContain("Start Match");
+  });
+
+  it("renders an authored recovery state for an unknown game route", () => {
+    const html = renderToString(
+      React.createElement(
+        MemoryRouter,
+        { initialEntries: ["/games/not-a-game"] },
+        React.createElement(
+          ThemeProvider,
+          null,
+          React.createElement(
+            Routes,
+            null,
+            React.createElement(Route, {
+              path: "/games/:gameId",
+              element: React.createElement(GameDetailScreen),
+            }),
+          ),
+        ),
+      ),
+    );
+
+    expect(html).toContain("This game is unavailable");
+    expect(html).toContain("Back to Games");
+    expect(html).not.toContain("Start Match");
   });
 
   it("renders SudokuListScreen with vault mode selector and puzzle selection", () => {

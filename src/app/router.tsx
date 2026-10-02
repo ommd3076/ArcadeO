@@ -1,11 +1,14 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { RequireAuth } from "./auth";
 import { Shell } from "./shell";
 import { LoginPage } from "./pages/login-page";
+import { NotFoundPage, RouteRecovery } from "./route-recovery";
+import { rememberAppLocation } from "./navigation-history";
 
 export const router = createBrowserRouter([
   {
     element: <RequireAuth />,
+    errorElement: <RouteRecovery />,
     children: [
       {
         path: "/",
@@ -46,9 +49,15 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+    errorElement: <RouteRecovery />,
   },
   {
     path: "*",
-    element: <Navigate to="/" replace />,
+    element: <NotFoundPage />,
   },
 ]);
+
+rememberAppLocation();
+router.subscribe((state) => {
+  if (state.navigation.state === "idle") rememberAppLocation();
+});

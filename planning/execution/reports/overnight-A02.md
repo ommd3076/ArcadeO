@@ -1,0 +1,27 @@
+# Overnight A02 — backend control, recovery, and local transport
+
+**Role:** backend engineer  
+**Tasks:** A02-T1 through A02-T5  
+**Outcome:** READY_FOR_REVIEW  
+**Changed paths:** `worker/matches/match-do.ts`, `src/sync/match-session.ts`, `src/sync/types.ts`, `scripts/dev.mjs`, `scripts/preview.mjs`, `vite.config.ts`, `tests/unit/sync/cross-device.test.ts`, `tests/unit/sync/sync.test.ts`, `tests/integration/matches/cross-device-controller.test.ts`, `tests/integration/matches/authority-regressions.test.ts`, and this report.  
+**Shared interface:** lead added optional `FilteredMatchView.invitationAccepted` and `readiness`; the MatchDO now populates them from accepted snapshot/controller state. I made no shared protocol, schema, package, or root configuration edits outside the specific Vite worker-port lease.
+
+## Implemented
+
+- **A02-T1:** `npm run dev` supports validated `ARCADE_DEV_PORT` and `ARCADE_WORKER_PORT`, an optional explicit `ARCADE_DEV_STATE` persistence path, and an exact selected `ARCADE_DEV_ORIGIN`. Vite binds that port on LAN; the Worker receives the same exact allowed Origin, WebSocket requests use the matching worker proxy port, and local dev explicitly sets `ENVIRONMENT=development` so HTTP development cookies are not marked Secure. Preview retains an exact origin and development environment. Production Origin/security behavior was not relaxed.
+- **A02-T2:** filtered views expose accepted invitation and canonical A/B readiness from `controller.invitationAccepted` and `snapshot.readiness`; participant readiness remains display/creation metadata. Viewer control status is derived from every replaced latest view, including accepted/rejected replies and receipt/recovery paths.
+- **A02-T3:** Sudoku viewer authority remains keyed by account and its `playerControllers[accountId].generation`. A takeover of one Sudoku account no longer emits a false loss-of-control notice to the other account. Stale/reordered control-generation messages are ignored (or trigger latest snapshot reconciliation when there is a version gap); stale writes remain rejected against the current generation.
+- **A02-T4:** removed the automatic 30-minute disconnected-seat forfeit and terminal projection/alarm work, and removed the 72-hour saved-match expiry and resume rejection. Projection outbox retries remain alarm-driven. Legacy `expiresAt` is ignored for still-saved matches; already-terminal expired history remains terminal. No session/auth cleanup policy was removed.
+- **A02-T5:** HTTP fallback separates transport/auth/status/timeout/malformed-response errors from game `ActionResponse` rejections, bounds both response headers and body parsing by one 12-second timeout, and correlates replies to the original action ID. Unknown acceptance remains pending with its original ID/envelope. Retry performs receipt reconciliation first: accepted/superseded receipts do not replay; only an explicit unknown receipt followed by a latest snapshot can replay the same ID and payload. Concurrent retry attempts are guarded. WebSocket timeout/send/close failures are also reported as retryable transport errors. Regression fixtures use Remote Sudoku Duel rather than the unsupported Together-Sudoku combination.
+
+## Evidence
+
+- `npx vitest run tests/unit/sync` — **4 files, 24 tests passed**. Assertions include receipt-accepted/no-replay, unknown-receipt/same-ID replay, malformed body and mismatched transport responses retaining the pending action, HTTP 403 classified as transport, response-body timeout, Sudoku account-independent control/notices, and stale takeover events.
+- `npx vitest run tests/integration/matches` — **5 files, 32 tests passed**. Assertions include canonical accepted readiness versus participant metadata, independent A/B Sudoku Duel authority across takeover/session generation, stale prior-session write rejection with current view, no disconnect transition after a delayed alarm, legacy past-expiry saved resume, and terminal expired history immutability.
+- `node --check scripts/dev.mjs`, `node --check scripts/preview.mjs`, and `node --check vite.config.ts` — **passed**.
+- Isolated actual local Worker HTTP check used Vite port **5617**, Worker port **8877**, explicit state `.local/overnight-A02-runtime`, and selected LAN Origin `http://192.168.1.12:5617`. `/api/health`, account A/B login, session, and logout returned success; local cookies were HttpOnly and SameSite=Lax with Secure=false as appropriate for HTTP development. The intentional mismatched-Origin check returned 403. Existing ports/processes and the owner’s `.wrangler` state were preserved. This is real HTTP/auth/config evidence only; it does not establish browser UI gameplay, hardware-phone certification, or deployment.
+- `npm run typecheck` currently reports only the concurrent A07 file diagnostic `src/games/ludo/visual-review.tsx(1,8): React is declared but its value is never read`. The latest typecheck before that file appeared passed; this report does not claim a clean current whole-repository typecheck.
+
+## Handoff and limits
+
+MatchDO and the additional sync/authority test leases are released for A05/A06. The lead owns final integration, the acceptance ledger, and VERIFIED status. Root’s localhost UI-only flow and the separate LAN HTTP check must not be conflated: no post-fix two-account LAN browser game or physical phone flow was run by A02. Production strictness was preserved by inspection/configuration, not by deployment testing.

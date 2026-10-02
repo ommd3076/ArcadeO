@@ -1,0 +1,19 @@
+{
+  "origin": "http://192.168.1.12:5619",
+  "accounts": "isolated A/B",
+  "ports": {
+    "vite": 5619,
+    "worker": 8879
+  },
+  "transport": "default WebSocket with authenticated HTTP fallback",
+  "flow": "UI-only login/setup/Accept/both Ready/seven moves/terminal in two contexts without reload or API progression",
+  "discs": 7,
+  "bothTerminal": true,
+  "cryptoSupport": {
+    "secure": false,
+    "uuid": "undefined",
+    "randomValues": "function"
+  },
+  "failures": [],
+  "hardware": "Chromium desktop emulation; physical phone unverified"
+}

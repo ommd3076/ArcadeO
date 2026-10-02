@@ -16,7 +16,15 @@ import { Surface } from "../components/surface";
 import { Button } from "../components/button";
 import { IconButton } from "../components/icon-button";
 import { Sheet } from "../components/sheet";
-import { MoreVertical, RotateCcw, AlertTriangle, Trophy, Home, CheckCircle2 } from "lucide-react";
+import {
+  MoreVertical,
+  RotateCcw,
+  AlertTriangle,
+  Trophy,
+  Home,
+  CheckCircle2,
+  History,
+} from "lucide-react";
 import { useMatchSession } from "../sync/use-match-session";
 import "./match.css";
 import { ConnectFourBoard } from "../games/connect-four/connect-four-board";
@@ -27,7 +35,13 @@ import { DotsBoxesBoard } from "../games/dots-boxes/dots-boxes-board";
 import { SOSBoard } from "../games/sos/sos-board";
 import { HandCricketBoard } from "../games/hand-cricket/hand-cricket-board";
 import { SudokuBoard } from "../games/sudoku/sudoku-board";
-import type { Seat, AccountId, FilteredMatchView } from "../../shared/protocol/types";
+import type {
+  Seat,
+  AccountId,
+  FilteredMatchView,
+  ActionType,
+  TerminalResult,
+} from "../../shared/protocol/types";
 import type {
   ConnectFourView,
   ConnectFourCell,
@@ -66,12 +80,69 @@ export interface MatchScreenProps {
   initialView?: FilteredMatchView | null;
 }
 
+export function matchNeedsExclusiveControl(view: FilteredMatchView | null): boolean {
+  return view?.mode === "together" || view?.gameId === "sudoku";
+}
+
+export function isHistoryOnlySudokuDuel(
+  view: FilteredMatchView | null,
+  result?: TerminalResult | null,
+): boolean {
+  const gameState = view?.gameState as { mode?: string; interrupted?: boolean } | undefined;
+  return (
+    view?.gameId === "sudoku" &&
+    gameState?.mode === "duel" &&
+    (gameState.interrupted === true || result?.details?.interrupted === true)
+  );
+}
+
+export function canUseMatchAction({
+  view,
+  action,
+  activeOnly = false,
+  lifecycle,
+  connected,
+  offline,
+  inputPaused,
+  pending,
+  syncing,
+  requiresExclusiveControl,
+  hasExclusiveControl,
+}: {
+  view: FilteredMatchView | null;
+  action: ActionType;
+  activeOnly?: boolean;
+  lifecycle: string;
+  connected: boolean;
+  offline: boolean;
+  inputPaused: boolean;
+  pending: boolean;
+  syncing: boolean;
+  requiresExclusiveControl: boolean;
+  hasExclusiveControl: boolean;
+}): boolean {
+  return (
+    !!view &&
+    view.legalActions.includes(action) &&
+    (!activeOnly || lifecycle === "active") &&
+    connected &&
+    !offline &&
+    !inputPaused &&
+    !pending &&
+    !syncing &&
+    (!requiresExclusiveControl || hasExclusiveControl)
+  );
+}
+
 export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchScreenProps) {
   const { matchId = "demo-match" } = useParams<{ matchId: string }>();
   const navigate = useNavigate();
 
   const [actionError, setActionError] = useState<string | null>(null);
   const [isAbandonSheetOpen, setIsAbandonSheetOpen] = useState(false);
+  const [isSaveSheetOpen, setIsSaveSheetOpen] = useState(false);
+  const [isSavingAndLeaving, setIsSavingAndLeaving] = useState(false);
+  const [isTakingControl, setIsTakingControl] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [colourSeat, setColourSeat] = useState<Seat>("A");
@@ -119,8 +190,8 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     participantB?.accentFamily ?? (participantB?.accountId === "A" ? "teal" : "violet");
   const accentA = resolvePlayerAccent(playerAAccent, resolvedMode);
   const accentB = resolvePlayerAccent(playerBAccent, resolvedMode);
-  const isAReady = participantA?.ready ?? false;
-  const isBReady = participantB?.ready ?? false;
+  const isAReady = view?.readiness?.A ?? participantA?.ready ?? false;
+  const isBReady = view?.readiness?.B ?? participantB?.ready ?? false;
 
   // Active seat / Turn state
   const mySeat: Seat =
@@ -145,12 +216,46 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
   // Terminal Winner determination
   const terminalResult = view?.result ?? c4State?.terminalResult;
-  const winnerSeat: Seat | null =
+  const rawWinnerSeat: Seat | null =
     c4State?.winner !== undefined ? c4State.winner : terminalResult ? terminalResult.winner : null;
+  const sudokuInterrupted = isHistoryOnlySudokuDuel(view, terminalResult);
+  const winnerSeat = rawWinnerSeat;
 
   // Readiness status
   const isWaitingForReady = lifecycle === "waiting";
   const myReady = mySeat === "A" ? isAReady : isBReady;
+  const invitationAccepted = view?.invitationAccepted ?? false;
+  const abandonAction: ActionType | null = view?.legalActions.includes("match.agree-abandon")
+    ? "match.agree-abandon"
+    : view?.legalActions.includes("match.request-abandon")
+      ? "match.request-abandon"
+      : null;
+  const hasExclusiveControl =
+    state.controllerStatus?.isController ?? view?.controller.isController ?? false;
+  const requiresExclusiveControl = matchNeedsExclusiveControl(view);
+  const canSubmit = (action: ActionType, activeOnly = false) =>
+    canUseMatchAction({
+      view,
+      action,
+      activeOnly,
+      lifecycle,
+      connected: state.connectionState === "connected",
+      offline: state.isOffline,
+      inputPaused: state.isInputPaused,
+      pending: state.pendingAction !== null,
+      syncing: state.syncStatus !== "idle",
+      requiresExclusiveControl,
+      hasExclusiveControl,
+    });
+  const boardUnavailable =
+    !view ||
+    lifecycle !== "active" ||
+    state.connectionState !== "connected" ||
+    state.isOffline ||
+    state.isInputPaused ||
+    state.pendingAction !== null ||
+    state.syncStatus !== "idle" ||
+    (requiresExclusiveControl && !hasExclusiveControl);
   const cricketView = view?.gameId === "hand-cricket" ? (view.gameState as CricketView) : undefined;
   const cricketChoosing =
     !!cricketView?.roles && !cricketView.lastDelivery && cricketView.lockedSeats.length < 2;
@@ -171,7 +276,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
       : "Bowling"
     : undefined;
   const cricketStatus =
-    cricketView?.roles && !isTerminal && !isWaitingForReady
+    cricketView?.roles && !isTerminal && lifecycle === "active"
       ? cricketView.lastDelivery
         ? cricketView.lastDelivery.outcome === "out"
           ? "Out · Switch batting"
@@ -185,6 +290,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
   // Handle Ready action
   const handleReady = async () => {
+    if (!canSubmit("match.ready")) return;
     try {
       await sendAction("match.ready", {});
     } catch (err) {
@@ -194,7 +300,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
   // Handle Column Drop
   const handleDrop = async (columnIndex: number) => {
-    if (!isMyTurn || isTerminal || isWaitingForReady || state.isInputPaused) return;
+    if (!isMyTurn || !canSubmit("connect-four.drop", true)) return;
 
     try {
       await sendAction("connect-four.drop", { column: columnIndex });
@@ -205,6 +311,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
   // Handle Resign
   const handleResign = async () => {
+    if (!canSubmit("match.resign")) return;
     try {
       await sendAction("match.resign", isTogether ? { resigningSeat } : {});
       setIsResignSheetOpen(false);
@@ -215,6 +322,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleRPSLock = async (choice: RPSChoice, _seat: Seat) => {
+    if (!canSubmit("secret.lock", true)) return;
     try {
       const rpsState = view?.gameState as RPSView | undefined;
       await sendAction("secret.lock", { choice }, { roundId: rpsState?.roundId });
@@ -225,6 +333,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleRPSReveal = async () => {
+    if (!canSubmit("secret.reveal", true)) return;
     try {
       await sendAction("secret.reveal", {});
     } catch (err) {
@@ -235,6 +344,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleRPSNext = async () => {
+    if (!canSubmit("secret.next", true)) return;
     try {
       await sendAction("secret.next", {});
     } catch (err) {
@@ -245,6 +355,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleLudoRoll = async () => {
+    if (!canSubmit("dice.roll", true)) return;
     try {
       await sendAction("dice.roll", {});
     } catch (err) {
@@ -253,6 +364,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleLudoSelectToken = async (tokenId: number) => {
+    if (!canSubmit("ludo.move", true)) return;
     try {
       await sendAction("ludo.move", { tokenId });
     } catch (err) {
@@ -261,6 +373,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSnakesLaddersRoll = async () => {
+    if (!canSubmit("dice.roll", true)) return;
     try {
       await sendAction("dice.roll", {});
     } catch (err) {
@@ -269,6 +382,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleDotsBoxesEdge = async (edge: DotsBoxesEdge) => {
+    if (!canSubmit("dots-boxes.edge", true)) return;
     try {
       await sendAction("dots-boxes.edge", edge);
     } catch (err) {
@@ -277,6 +391,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSOSPlace = async (row: number, col: number, letter: SOSLetter) => {
+    if (!canSubmit("sos.place", true)) return;
     try {
       await sendAction("sos.place", { row, col, letter });
     } catch (err) {
@@ -285,6 +400,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleCricketChooseRole = async (role: "bat" | "bowl") => {
+    if (!canSubmit("cricket.choose-role", true)) return;
     try {
       await sendAction("cricket.choose-role", { role });
     } catch (err) {
@@ -293,6 +409,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleCricketLock = async (value: number, _seat: Seat) => {
+    if (!canSubmit("secret.lock", true)) return;
     try {
       const cricketState = view?.gameState as CricketView | undefined;
       await sendAction("secret.lock", { value }, { roundId: cricketState?.deliveryId });
@@ -303,6 +420,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleCricketReveal = async () => {
+    if (!canSubmit("secret.reveal", true)) return;
     try {
       await sendAction("secret.reveal", {});
     } catch (err) {
@@ -313,6 +431,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleCricketNext = async () => {
+    if (!canSubmit("secret.next", true)) return;
     try {
       await sendAction("secret.next", {});
     } catch (err) {
@@ -328,6 +447,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     operation: SudokuOperation,
     value?: number,
   ) => {
+    if (!canSubmit("sudoku.edit", true)) return;
     try {
       await sendAction("sudoku.edit", { row, col, operation, value });
     } catch (err) {
@@ -336,6 +456,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSudokuUndo = async () => {
+    if (!canSubmit("sudoku.undo", true)) return;
     try {
       await sendAction("sudoku.undo", {});
     } catch (err) {
@@ -344,6 +465,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSudokuCheck = async () => {
+    if (!canSubmit("sudoku.check", true)) return;
     try {
       await sendAction("sudoku.check", {});
     } catch (err) {
@@ -352,6 +474,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSudokuPause = async () => {
+    if (!canSubmit("sudoku.pause", true)) return;
     try {
       await sendAction("sudoku.pause", {});
     } catch (err) {
@@ -360,6 +483,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   };
 
   const handleSudokuResume = async () => {
+    if (!canSubmit("sudoku.resume", true)) return;
     try {
       await sendAction("sudoku.resume", {});
     } catch (err) {
@@ -492,18 +616,39 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         {(actionError || state.error) && (
           <InlineNotice tone="error">{actionError || state.error?.message}</InlineNotice>
         )}
-        {state.pendingAction?.status === "retrying" && (
+        {state.pendingAction && (
           <Button
+            disabled={
+              state.connectionState !== "connected" ||
+              state.isOffline ||
+              state.pendingAction.status === "in-flight" ||
+              state.pendingAction.status === "reconciling" ||
+              state.syncStatus !== "idle"
+            }
+            aria-busy={state.pendingAction.status === "reconciling"}
             onClick={() => void retryPendingAction().catch((err) => setActionError(err.message))}
           >
-            Check saved action and retry
+            {state.pendingAction.status === "reconciling"
+              ? "Checking whether your action was saved…"
+              : state.pendingAction.status === "in-flight"
+                ? "Saving your action…"
+                : "Check saved action and retry"}
           </Button>
         )}
         {(isTogether || view?.gameId === "sudoku") &&
           state.controllerStatus &&
           !state.controllerStatus.isController && (
             <Button
+              disabled={
+                isTakingControl ||
+                state.pendingAction !== null ||
+                state.connectionState !== "connected" ||
+                state.isOffline ||
+                state.syncStatus !== "idle"
+              }
               onClick={async () => {
+                setIsTakingControl(true);
+                setActionError(null);
                 try {
                   const response = await apiFetch(
                     "/api/v1/matches/" + encodeURIComponent(matchId) + "/controller",
@@ -515,14 +660,24 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                       }),
                     },
                   );
-                  if (!response.ok) throw new Error("Unable to take control. Refresh and retry.");
+                  const result = (await response.json().catch(() => null)) as {
+                    code?: string;
+                    message?: string;
+                  } | null;
+                  if (!response.ok)
+                    throw new Error(
+                      result?.message ||
+                        `Control request failed (${result?.code || response.status}). Reconcile and try again.`,
+                    );
                   await reconcile();
                 } catch (err) {
                   setActionError((err as Error).message);
+                } finally {
+                  setIsTakingControl(false);
                 }
               }}
             >
-              Continue on this device
+              {isTakingControl ? "Taking control…" : "Continue on this device"}
             </Button>
           )}
         {view?.gameId === "sudoku" &&
@@ -530,13 +685,15 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
           (view.gameState as SudokuView)?.self.completed &&
           !(view.gameState as SudokuView)?.challenge?.published && (
             <Button
+              disabled={!canSubmit("challenge.publish", true)}
               onClick={async () => {
+                if (!canSubmit("challenge.publish", true)) return;
                 try {
                   const response = await apiFetch("/api/v1/challenges", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                      creationId: crypto.randomUUID(),
+                      creationId: generateUuid(),
                       senderAttemptId: matchId,
                     }),
                   });
@@ -580,20 +737,28 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
             statusText={
               cricketStatus ??
               (isTerminal
-                ? winnerSeat
-                  ? `${winnerSeat === "A" ? playerAName : playerBName} won the match!`
-                  : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
-                    ? "Attempt completed"
-                    : "Match ended in a draw!"
-                : isWaitingForReady
-                  ? isTogether
-                    ? "Confirm readiness to start"
-                    : myReady
-                      ? "Waiting for opponent..."
-                      : "Ready to play?"
-                  : isMyTurn
-                    ? "Your turn"
-                    : `Waiting for ${turnSeat === "A" ? playerAName : playerBName}...`)
+                ? sudokuInterrupted
+                  ? "Duel completed · history only"
+                  : winnerSeat
+                    ? `${winnerSeat === "A" ? playerAName : playerBName} won the match!`
+                    : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
+                      ? "Attempt completed"
+                      : "Match ended in a draw!"
+                : lifecycle === "saved"
+                  ? "Paused match · resume to continue"
+                  : isWaitingForReady
+                    ? isTogether
+                      ? "Confirm readiness to start"
+                      : !invitationAccepted
+                        ? mySeat === "A"
+                          ? `Invitation sent to ${playerBName}`
+                          : "Accept the invitation to continue"
+                        : myReady
+                          ? "Waiting for opponent..."
+                          : "Ready to play?"
+                    : isMyTurn
+                      ? "Your turn"
+                      : `Waiting for ${turnSeat === "A" ? playerAName : playerBName}...`)
             }
             scoreText={
               terminalResult?.scores
@@ -608,7 +773,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
           .map((action) => (
             <Button
               key={action}
-              disabled={state.isInputPaused}
+              disabled={!canSubmit(action)}
               onClick={() =>
                 void sendAction(action, {}).catch((err) => setActionError(err.message))
               }
@@ -635,14 +800,24 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                 }}
               >
                 {isTogether && (
-                  <select
-                    aria-label="Player whose colour to change"
-                    value={colourSeat}
-                    onChange={(event) => setColourSeat(event.target.value as Seat)}
+                  <div
+                    role="group"
+                    aria-label="Choose which player’s pawn colour to change"
+                    style={{ display: "flex", flexWrap: "wrap", gap: 8, width: "100%" }}
                   >
-                    <option value="A">{playerAName}</option>
-                    <option value="B">{playerBName}</option>
-                  </select>
+                    {(["A", "B"] as const).map((seat) => (
+                      <Button
+                        key={seat}
+                        size="sm"
+                        variant={colourSeat === seat ? "primary" : "secondary"}
+                        aria-pressed={colourSeat === seat}
+                        onClick={() => setColourSeat(seat)}
+                        style={{ minHeight: 44 }}
+                      >
+                        {seat === "A" ? playerAName : playerBName}
+                      </Button>
+                    ))}
+                  </div>
                 )}
                 <ColourPicker<LudoColourId>
                   label={`${displayedColourSeat === "A" ? playerAName : playerBName} pawn colour`}
@@ -651,9 +826,13 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                       (displayedColourSeat === "A" ? "blue" : "green")) as LudoColourId
                   }
                   colours={(Object.entries(LUDO_COLOUR_PALETTE) as [LudoColourId, string][]).map(
-                    ([id, color]) => ({ id, color, name: id }),
+                    ([id, color]) => ({
+                      id,
+                      color,
+                      name: id[0].toUpperCase() + id.slice(1),
+                    }),
                   )}
-                  disabled={state.isInputPaused || state.pendingAction !== null}
+                  disabled={!canSubmit("ludo.set-colour", true)}
                   disabledIds={(() => {
                     const colours = (view.gameState as LudoView)?.colours;
                     const otherSeat: Seat = displayedColourSeat === "A" ? "B" : "A";
@@ -670,12 +849,46 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                       ? [conflicting, ...(similar[conflicting] ? [similar[conflicting]!] : [])]
                       : [];
                   })()}
-                  onChange={(colourId) =>
+                  disabledDescriptions={(() => {
+                    const colours = (view.gameState as LudoView)?.colours;
+                    const otherSeat: Seat = displayedColourSeat === "A" ? "B" : "A";
+                    const conflicting = colours?.[otherSeat];
+                    return conflicting
+                      ? Object.fromEntries(
+                          (Object.keys(LUDO_COLOUR_PALETTE) as LudoColourId[]).flatMap((id) => {
+                            if (id === conflicting)
+                              return [
+                                [
+                                  id,
+                                  `Already used by ${otherSeat === "A" ? playerAName : playerBName}.`,
+                                ],
+                              ];
+                            const similar =
+                              (id === "blue" && conflicting === "cyan") ||
+                              (id === "cyan" && conflicting === "blue") ||
+                              (id === "red" && conflicting === "pink") ||
+                              (id === "pink" && conflicting === "red") ||
+                              (id === "yellow" && conflicting === "orange") ||
+                              (id === "orange" && conflicting === "yellow");
+                            return similar
+                              ? [
+                                  [
+                                    id,
+                                    `Too similar to ${otherSeat === "A" ? playerAName : playerBName}’s ${conflicting} pawns.`,
+                                  ],
+                                ]
+                              : [];
+                          }),
+                        )
+                      : {};
+                  })()}
+                  onChange={(colourId) => {
+                    if (!canSubmit("ludo.set-colour", true)) return;
                     void sendAction("ludo.set-colour", {
                       colourId,
                       ...(isTogether ? { seat: colourSeat } : {}),
-                    }).catch((error) => setActionError((error as Error).message))
-                  }
+                    }).catch((error) => setActionError((error as Error).message));
+                  }}
                 />
               </div>
             </details>
@@ -695,20 +908,49 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
             >
               {isTogether
                 ? "Both players are ready to take turns on this device."
-                : myReady
-                  ? "You are ready! Waiting for your opponent to join and confirm..."
-                  : "Confirm when you are ready to begin the match."}
+                : !invitationAccepted
+                  ? mySeat === "B"
+                    ? "Accept the invitation before you mark yourself ready."
+                    : `Invitation sent to ${playerBName}. They must accept before either player can get ready.`
+                  : `${playerAName}: ${isAReady ? "Ready" : "Not ready"} · ${playerBName}: ${isBReady ? "Ready" : "Not ready"}. ${myReady ? "You are ready; waiting for the other player." : "Mark yourself ready when you are set."}`}
             </p>
             {view?.legalActions.includes("match.ready") && (
               <Button
                 variant="primary"
                 size="md"
                 fullWidth
-                disabled={state.isInputPaused}
+                disabled={!canSubmit("match.ready")}
                 onClick={handleReady}
                 leftIcon={<CheckCircle2 size={18} />}
               >
                 {isTogether ? "We are both here" : "I am ready"}
+              </Button>
+            )}
+          </Surface>
+        )}
+
+        {view && lifecycle === "saved" && (
+          <Surface variant="card" padding="lg" radius="lg" style={{ textAlign: "center" }}>
+            <h2 style={{ margin: "0 0 8px", fontSize: 18 }}>Match paused and saved</h2>
+            <p style={{ margin: "0 0 var(--space-md)", color: "var(--color-muted-text)" }}>
+              {isTogether
+                ? "Resume this match on this shared device."
+                : `${playerAName}: ${view.resumeReadiness?.A ? "Ready to resume" : "Not ready"} · ${playerBName}: ${view.resumeReadiness?.B ? "Ready to resume" : "Not ready"}. Both players must resume this match.`}
+            </p>
+            {view.legalActions.includes("match.resume") && view.pauseId && (
+              <Button
+                variant="primary"
+                fullWidth
+                disabled={!canSubmit("match.resume") || !!view.resumeReadiness?.[mySeat]}
+                onClick={() =>
+                  void sendAction("match.resume", { pauseId: view.pauseId! }).catch((error) =>
+                    setActionError((error as Error).message),
+                  )
+                }
+              >
+                {view.resumeReadiness?.[mySeat]
+                  ? "Resume request sent · waiting for the other player"
+                  : "Resume saved match"}
               </Button>
             )}
           </Surface>
@@ -719,16 +961,18 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
           <div className="arcade-match-result">
             <ResultPanel
               title={
-                winnerSeat
-                  ? `${winnerSeat === "A" ? playerAName : playerBName} Wins!`
-                  : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
-                    ? "Attempt completed"
-                    : terminalResult?.reason === "abandonment"
-                      ? "Match abandoned"
-                      : terminalResult?.reason === "cancelled" ||
-                          terminalResult?.reason === "declined"
-                        ? "Invitation closed"
-                        : "Match Drawn"
+                sudokuInterrupted
+                  ? "Duel completed · history only"
+                  : winnerSeat
+                    ? `${winnerSeat === "A" ? playerAName : playerBName} Wins!`
+                    : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
+                      ? "Attempt completed"
+                      : terminalResult?.reason === "abandonment"
+                        ? "Match abandoned"
+                        : terminalResult?.reason === "cancelled" ||
+                            terminalResult?.reason === "declined"
+                          ? "Invitation closed"
+                          : "Match Drawn"
               }
             >
               <div
@@ -740,7 +984,11 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   marginBottom: "8px",
                 }}
               >
-                <Trophy size={32} color="var(--color-emphasis-yellow-ink, #FDE047)" />
+                {sudokuInterrupted ? (
+                  <History size={32} color="var(--color-focus)" aria-hidden="true" />
+                ) : (
+                  <Trophy size={32} color="var(--color-emphasis-yellow-ink, #FDE047)" />
+                )}
               </div>
               <p
                 style={{
@@ -749,19 +997,21 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   margin: "0 0 var(--space-lg) 0",
                 }}
               >
-                {terminalResult?.reason === "resignation"
-                  ? `Resignation by ${terminalResult.resignedBy === "A" ? playerAName : playerBName}.`
-                  : winnerSeat
-                    ? view?.gameId === "connect-four"
-                      ? "Four discs connected in a row!"
-                      : "Saved match result."
-                    : terminalResult?.reason === "abandonment"
-                      ? "Abandoned without a score."
-                      : terminalResult?.reason === "declined"
-                        ? "Invitation declined."
-                        : terminalResult?.reason === "cancelled"
-                          ? "Invitation cancelled."
-                          : "Saved draw."}
+                {sudokuInterrupted
+                  ? `${winnerSeat ? `${winnerSeat === "A" ? playerAName : playerBName} is recorded as the result winner.` : "The saved result is recorded as a draw."} Deliberately saved and resumed duels stay in history, but do not count toward competitive wins, streaks, or best times.`
+                  : terminalResult?.reason === "resignation"
+                    ? `Resignation by ${terminalResult.resignedBy === "A" ? playerAName : playerBName}.`
+                    : winnerSeat
+                      ? view?.gameId === "connect-four"
+                        ? "Four discs connected in a row!"
+                        : "Saved match result."
+                      : terminalResult?.reason === "abandonment"
+                        ? "Abandoned without a score."
+                        : terminalResult?.reason === "declined"
+                          ? "Invitation declined."
+                          : terminalResult?.reason === "cancelled"
+                            ? "Invitation cancelled."
+                            : "Saved draw."}
               </p>
 
               {view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode === "practice" && (
@@ -800,13 +1050,13 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   onClick={handleRematch}
                   leftIcon={<RotateCcw size={16} />}
                 >
-                  Rematch
+                  {sudokuInterrupted ? "Start a new duel" : "Rematch"}
                 </Button>
                 <Button
                   variant="secondary"
                   size="md"
                   fullWidth
-                  onClick={() => navigate("/games")}
+                  onClick={() => navigate("/")}
                   leftIcon={<Home size={16} />}
                 >
                   Return Home
@@ -858,7 +1108,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
               onLockChoice={handleRPSLock}
               onReveal={handleRPSReveal}
               onNextRound={handleRPSNext}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "ludo" ? (
             <LudoBoard
@@ -876,12 +1126,12 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   winner: null,
                 }
               }
-              canAct={isMyTurn && !isTerminal && !isWaitingForReady && !state.isInputPaused}
+              canAct={isMyTurn && (canSubmit("ludo.move", true) || canSubmit("dice.roll", true))}
               onRoll={handleLudoRoll}
               onSelectToken={handleLudoSelectToken}
               playerAName={playerAName}
               playerBName={playerBName}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "snakes-and-ladders" ? (
             <SnakesLaddersBoard
@@ -896,11 +1146,11 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   lastRoll: null,
                 }
               }
-              canAct={isMyTurn && !isTerminal && !isWaitingForReady && !state.isInputPaused}
+              canAct={isMyTurn && canSubmit("dice.roll", true)}
               onRoll={handleSnakesLaddersRoll}
               playerAName={playerAName}
               playerBName={playerBName}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "dots-boxes" ? (
             <DotsBoxesBoard
@@ -921,11 +1171,11 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   winner: null,
                 }
               }
-              canAct={isMyTurn && !isTerminal && !isWaitingForReady && !state.isInputPaused}
+              canAct={isMyTurn && canSubmit("dots-boxes.edge", true)}
               onPlaceEdge={handleDotsBoxesEdge}
               playerAName={playerAName}
               playerBName={playerBName}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "sos" ? (
             <SOSBoard
@@ -941,11 +1191,11 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   winner: null,
                 }
               }
-              canAct={isMyTurn && !isTerminal && !isWaitingForReady && !state.isInputPaused}
+              canAct={isMyTurn && canSubmit("sos.place", true)}
               onPlaceLetter={handleSOSPlace}
               playerAName={playerAName}
               playerBName={playerBName}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "hand-cricket" ? (
             <HandCricketBoard
@@ -978,7 +1228,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
               onLockNumber={handleCricketLock}
               onReveal={handleCricketReveal}
               onNextDelivery={handleCricketNext}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : view?.gameId === "sudoku" ? (
             <SudokuBoard
@@ -1000,7 +1250,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   },
                 }
               }
-              canAct={!isTerminal && !state.isInputPaused}
+              canAct={canSubmit("sudoku.edit", true)}
               onEditCell={handleSudokuEdit}
               onUndo={handleSudokuUndo}
               onCheck={handleSudokuCheck}
@@ -1009,13 +1259,13 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
               playerAName={playerAName}
               playerBName={playerBName}
               localSeat={mySeat ?? "A"}
-              isSubmitting={state.isInputPaused || state.pendingAction !== null}
+              isSubmitting={boardUnavailable}
             />
           ) : (
             <ConnectFourBoard
               board={board}
               activeSeat={turnSeat}
-              canDrop={isMyTurn && !isTerminal && !isWaitingForReady && !state.isInputPaused}
+              canDrop={isMyTurn && canSubmit("connect-four.drop", true)}
               winningCells={winningCells}
               acceptedEventId={state.acceptedEvent?.eventId}
               acceptedEffects={state.acceptedEvent?.effects as ConnectFourEffect[] | undefined}
@@ -1036,6 +1286,18 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         description="Settings and actions for this game session."
       >
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+          {view?.legalActions.includes("match.leave-save") && (
+            <Button
+              variant="secondary"
+              disabled={!canSubmit("match.leave-save", true)}
+              onClick={() => {
+                setIsMenuOpen(false);
+                setIsSaveSheetOpen(true);
+              }}
+            >
+              Leave and save
+            </Button>
+          )}
           {view?.legalActions.some(
             (action) => action === "match.request-abandon" || action === "match.agree-abandon",
           ) && (
@@ -1049,11 +1311,12 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
               Abandon without a score
             </Button>
           )}
-          {!isTerminal && (
+          {view?.legalActions.includes("match.resign") && (
             <Button
               variant="danger"
               size="md"
               fullWidth
+              disabled={!canSubmit("match.resign")}
               leftIcon={<AlertTriangle size={18} />}
               onClick={() => {
                 setIsMenuOpen(false);
@@ -1065,6 +1328,37 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
           )}
           <Button variant="secondary" size="md" fullWidth onClick={() => setIsMenuOpen(false)}>
             Close Menu
+          </Button>
+        </div>
+      </Sheet>
+
+      <Sheet
+        isOpen={isSaveSheetOpen}
+        onClose={() => setIsSaveSheetOpen(false)}
+        title="Leave and save this match?"
+        description="The accepted match state will be saved. You can resume it later from Home or this game’s setup."
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
+          <Button
+            disabled={!canSubmit("match.leave-save", true) || isSavingAndLeaving}
+            onClick={async () => {
+              setIsSavingAndLeaving(true);
+              setActionError(null);
+              try {
+                await sendAction("match.leave-save", {});
+                setIsSaveSheetOpen(false);
+                navigate("/games", { replace: true });
+              } catch (err) {
+                setActionError((err as Error).message);
+              } finally {
+                setIsSavingAndLeaving(false);
+              }
+            }}
+          >
+            {isSavingAndLeaving ? "Saving match…" : "Confirm leave and save"}
+          </Button>
+          <Button variant="secondary" onClick={() => setIsSaveSheetOpen(false)}>
+            Keep playing
           </Button>
         </div>
       </Sheet>
@@ -1082,15 +1376,11 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         }
       >
         <Button
-          disabled={state.isInputPaused}
+          disabled={!abandonAction || !canSubmit(abandonAction)}
           onClick={async () => {
             try {
-              await sendAction(
-                view?.legalActions.includes("match.agree-abandon")
-                  ? "match.agree-abandon"
-                  : "match.request-abandon",
-                {},
-              );
+              if (!abandonAction) return;
+              await sendAction(abandonAction, {});
               setIsAbandonSheetOpen(false);
             } catch (err) {
               setActionError((err as Error).message);
@@ -1138,6 +1428,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
             size="md"
             fullWidth
             onClick={handleResign}
+            disabled={!canSubmit("match.resign")}
             leftIcon={<AlertTriangle size={18} />}
           >
             Confirm Resignation

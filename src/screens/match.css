@@ -14,7 +14,8 @@
 }
 
 .arcade-match-header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 2;
   width: min(100%, 1080px);
   min-height: 72px;

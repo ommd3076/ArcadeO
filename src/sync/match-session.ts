@@ -266,6 +266,10 @@ export class MatchSession {
       this.ws.onclose = () => {
         if (this.isUsingPolling) return;
         if (this.pendingResolver) {
+          this.reportTransportError(
+            "TRANSPORT_NETWORK",
+            "Connection lost before the saved action was acknowledged. Reconnect to check its receipt.",
+          );
           this.pendingResolver.reject(
             new Error("Connection lost. Acceptance is unknown; reconnect to check."),
           );
@@ -421,6 +425,9 @@ export class MatchSession {
   private handleSocketMessage(msg: SocketServerMessage): void {
     this.lastContactTimestamp = Date.now();
     if ("status" in msg) {
+      if (!this.state.pendingAction || msg.actionId !== this.state.pendingAction.actionId) {
+        return;
+      }
       if (msg.status === "accepted") {
         this.handleAcceptedReply(msg);
       } else if (msg.status === "rejected") {
@@ -463,26 +470,13 @@ export class MatchSession {
       return;
     }
 
-    const previousController = this.state.controllerStatus;
-    const newController: ControllerStatus = {
-      controllingAccountId: msg.view.controller.controllingAccountId,
-      controllerGeneration: msg.view.controller.controllerGeneration,
-      isController:
-        msg.view.controller.isController ??
-        msg.view.controller.controllingAccountId === this.options.actorAccountId,
-      takeoverNotice: previousController
-        ? previousController.controllingAccountId !== msg.view.controller.controllingAccountId ||
-          previousController.controllerGeneration !== msg.view.controller.controllerGeneration
-        : false,
-    };
-
     const pendingAction = this.state.pendingAction;
 
     this.updateState({
       view: msg.view,
       deliveryVersion: msg.view.deliveryVersion,
       acceptedEvent: null,
-      controllerStatus: newController,
+      controllerStatus: this.controllerStatusFor(msg.view),
       pendingAction,
       error: null,
     });
@@ -511,25 +505,12 @@ export class MatchSession {
     // Broadcasts do not prove acceptance of our action. Only its receipt/reply does.
     const pendingAction = this.state.pendingAction;
 
-    const previousController = this.state.controllerStatus;
-    const newController: ControllerStatus = {
-      controllingAccountId: msg.view.controller.controllingAccountId,
-      controllerGeneration: msg.view.controller.controllerGeneration,
-      isController:
-        msg.view.controller.isController ??
-        msg.view.controller.controllingAccountId === this.options.actorAccountId,
-      takeoverNotice: previousController
-        ? previousController.controllingAccountId !== msg.view.controller.controllingAccountId ||
-          previousController.controllerGeneration !== msg.view.controller.controllerGeneration
-        : false,
-    };
-
     const effectiveDeliveryVersion = msg.view.deliveryVersion ?? msg.acceptedVersion;
     this.updateState({
       view: msg.view,
       deliveryVersion: effectiveDeliveryVersion,
       acceptedEvent: { eventId: msg.eventId, effects: msg.effects ?? [] },
-      controllerStatus: newController,
+      controllerStatus: this.controllerStatusFor(msg.view),
       pendingAction,
     });
   }
@@ -540,25 +521,34 @@ export class MatchSession {
     view?: FilteredMatchView;
     serverTime: number;
   }): void {
-    const previousController = this.state.controllerStatus;
-    const newController: ControllerStatus = {
-      controllingAccountId: msg.controller.controllingAccountId,
-      controllerGeneration: msg.controller.controllerGeneration,
-      isController:
-        msg.controller.isController ??
-        msg.controller.controllingAccountId === this.options.actorAccountId,
-      takeoverNotice: previousController
-        ? previousController.controllingAccountId !== msg.controller.controllingAccountId ||
-          previousController.controllerGeneration !== msg.controller.controllerGeneration
-        : true,
-    };
+    if (msg.deliveryVersion <= this.state.deliveryVersion) return;
+    if (msg.deliveryVersion > this.state.deliveryVersion + 1) {
+      void this.fetchSnapshot();
+      return;
+    }
 
+    const previous = this.state.controllerStatus;
+    const exclusiveControl =
+      this.state.view?.mode === "together" || this.state.view?.gameId === "sudoku";
     const updates: Partial<MatchSessionState> = {
-      controllerStatus: newController,
+      controllerStatus: msg.view
+        ? this.controllerStatusFor(msg.view)
+        : {
+            controllingAccountId: msg.controller.controllingAccountId,
+            controllerGeneration: msg.controller.controllerGeneration,
+            isController: msg.controller.isController,
+            takeoverNotice:
+              exclusiveControl &&
+              previous !== null &&
+              previous.isController !== msg.controller.isController,
+          },
     };
 
-    if (msg.view && msg.deliveryVersion >= this.state.deliveryVersion) {
+    if (msg.view) {
       updates.view = msg.view;
+      updates.deliveryVersion = msg.deliveryVersion;
+      updates.controllerStatus = this.controllerStatusFor(msg.view);
+    } else {
       updates.deliveryVersion = msg.deliveryVersion;
     }
 
@@ -612,6 +602,7 @@ export class MatchSession {
       this.updateState({
         view: reply.view,
         deliveryVersion: effectiveDeliveryVersion,
+        controllerStatus: this.controllerStatusFor(reply.view),
         ...(animate
           ? { acceptedEvent: { eventId: reply.eventId, effects: reply.effects ?? [] } }
           : {}),
@@ -633,6 +624,7 @@ export class MatchSession {
       code: reply.code,
       message: reply.message,
       retryable: reply.retryable,
+      category: "game",
       timestamp: Date.now(),
     };
 
@@ -644,10 +636,24 @@ export class MatchSession {
       updates.view = reply.latestView;
       updates.deliveryVersion = reply.latestView.deliveryVersion;
       updates.acceptedEvent = null;
+      updates.controllerStatus = this.controllerStatusFor(reply.latestView);
     }
 
     this.updateState(updates);
     this.options.onError(sessionError);
+  }
+
+  private controllerStatusFor(view: FilteredMatchView): ControllerStatus {
+    const previous = this.state.controllerStatus;
+    const isController = view.controller.isController;
+    const exclusiveControl = view.mode === "together" || view.gameId === "sudoku";
+    return {
+      controllingAccountId: view.controller.controllingAccountId,
+      controllerGeneration: view.controller.controllerGeneration,
+      isController,
+      takeoverNotice:
+        exclusiveControl && previous !== null && previous.isController !== isController,
+    };
   }
 
   public async sendAction<T extends ActionType>(
@@ -734,6 +740,10 @@ export class MatchSession {
         this.actionTimer = setTimeout(() => {
           this.pendingResolver = null;
           this.markPendingForRetry(pendingAction);
+          this.reportTransportError(
+            "TRANSPORT_TIMEOUT",
+            "The action acknowledgement timed out. Reconnect to check its receipt.",
+          );
           reject(new Error("Acceptance is unknown. Reconnect to check the saved action."));
         }, 12000);
         try {
@@ -741,38 +751,141 @@ export class MatchSession {
         } catch (err) {
           this.pendingResolver = null;
           this.markPendingForRetry(pendingAction);
+          this.reportTransportError(
+            "TRANSPORT_NETWORK",
+            err instanceof Error ? err.message : "The action could not be sent.",
+          );
           reject(err);
         }
       });
     }
 
-    // HTTP POST fallback
+    // HTTP POST fallback. Only an ActionResponse is a game reply; HTTP and
+    // parsing failures keep the original pending action ID for receipt recovery.
+    const url = `${this.options.baseUrl}/api/v1/matches/${encodeURIComponent(this.options.matchId)}/actions`;
+    const abort = new AbortController();
+    let timedOut = false;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let response: Response | undefined;
+    let reply: unknown;
     try {
-      const url = `${this.options.baseUrl}/api/v1/matches/${encodeURIComponent(this.options.matchId)}/actions`;
-      const res = await this.options.fetchFn(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Actor-Account": this.options.actorAccountId,
-        },
-        body: JSON.stringify(envelope),
-      });
-
-      const reply: any = await res.json();
-      if (reply.status === "accepted") {
-        this.handleAcceptedReply(reply);
-        return reply as AcceptedReply;
-      } else {
-        this.handleRejectedReply(reply);
-        throw new Error(`[${reply.code}] ${reply.message}`);
-      }
-    } catch (err: any) {
-      if (err.message && err.message.startsWith("[")) {
-        throw err;
-      }
+      const requestAndReadBody = async () => {
+        response = await this.options.fetchFn(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Actor-Account": this.options.actorAccountId,
+          },
+          body: JSON.stringify(envelope),
+          signal: abort.signal,
+        });
+        reply = await response.json();
+      };
+      await Promise.race([
+        requestAndReadBody(),
+        new Promise<never>((_, reject) => {
+          timeout = setTimeout(() => {
+            timedOut = true;
+            abort.abort();
+            reject(new Error("HTTP action timed out"));
+          }, 12000);
+        }),
+      ]);
+    } catch (error) {
       this.markPendingForRetry(pendingAction);
-      throw err;
+      this.reportTransportError(
+        timedOut
+          ? "TRANSPORT_TIMEOUT"
+          : response
+            ? "TRANSPORT_MALFORMED_JSON"
+            : "TRANSPORT_NETWORK",
+        timedOut
+          ? "Action response timed out. Its result is unknown; reconnect to check the saved action."
+          : response
+            ? "The server response could not be read. Its result is unknown; reconnect to check the saved action."
+            : "Action could not reach the server. Its result is unknown; reconnect to check the saved action.",
+        response?.status,
+      );
+      if (timedOut) throw new Error("Action response timed out; acceptance is unknown.");
+      if (response) throw new Error("Malformed action response; acceptance is unknown.");
+      throw error;
+    } finally {
+      if (timeout) clearTimeout(timeout);
     }
+
+    const actionResponse = response!;
+    const parsed = reply && typeof reply === "object" ? (reply as Record<string, unknown>) : {};
+    if (!actionResponse.ok) {
+      this.markPendingForRetry(pendingAction);
+      const backendCode = typeof parsed.code === "string" ? parsed.code : undefined;
+      this.reportTransportError(
+        `TRANSPORT_HTTP_${actionResponse.status}`,
+        typeof parsed.message === "string" || typeof parsed.error === "string"
+          ? String(parsed.message ?? parsed.error)
+          : `Server returned HTTP ${actionResponse.status}. Action acceptance is unknown; reconnect to check the saved action.`,
+        actionResponse.status,
+        backendCode,
+      );
+      throw new Error(`HTTP ${actionResponse.status}: action acceptance is unknown.`);
+    }
+
+    const acceptedView = parsed.view as Record<string, unknown> | null;
+    const acceptedController = acceptedView?.controller as Record<string, unknown> | undefined;
+    if (
+      parsed.status === "accepted" &&
+      parsed.actionId === pendingAction.actionId &&
+      typeof parsed.eventId === "string" &&
+      typeof parsed.acceptedVersion === "number" &&
+      typeof parsed.serverTime === "number" &&
+      acceptedView !== null &&
+      typeof acceptedView === "object" &&
+      typeof acceptedView.deliveryVersion === "number" &&
+      typeof acceptedView.lifecycle === "string" &&
+      acceptedController !== undefined &&
+      typeof acceptedController.isController === "boolean" &&
+      typeof acceptedController.controllerGeneration === "number" &&
+      typeof acceptedController.controllingAccountId === "string"
+    ) {
+      this.handleAcceptedReply(parsed as unknown as AcceptedReply);
+      return parsed as unknown as AcceptedReply;
+    }
+    if (
+      parsed.status === "rejected" &&
+      parsed.actionId === pendingAction.actionId &&
+      typeof parsed.code === "string" &&
+      typeof parsed.message === "string" &&
+      typeof parsed.retryable === "boolean"
+    ) {
+      this.handleRejectedReply(parsed as unknown as RejectedReply);
+      throw new Error(`[${parsed.code}] ${parsed.message}`);
+    }
+
+    this.markPendingForRetry(pendingAction);
+    this.reportTransportError(
+      "TRANSPORT_INVALID_RESPONSE",
+      "The server response was not a valid game reply. Its result is unknown; reconnect to check the saved action.",
+      actionResponse.status,
+    );
+    throw new Error("Invalid action response; acceptance is unknown.");
+  }
+
+  private reportTransportError(
+    code: string,
+    message: string,
+    httpStatus?: number,
+    backendCode?: string,
+  ): void {
+    const error: SessionError = {
+      code,
+      message,
+      retryable: true,
+      category: "transport",
+      httpStatus,
+      backendCode,
+      timestamp: Date.now(),
+    };
+    this.updateState({ error });
+    this.options.onError(error);
   }
 
   private markPendingForRetry(pendingAction: PendingAction): void {
@@ -792,6 +905,8 @@ export class MatchSession {
   public async retryPendingAction(): Promise<AcceptedReply | null> {
     const pending = this.state.pendingAction;
     if (!pending) return null;
+    if (pending.status === "in-flight" || pending.status === "reconciling")
+      throw new Error("Wait while the saved action is being checked.");
     if (
       this.state.isOffline ||
       this.state.connectionState !== "connected" ||
@@ -804,6 +919,31 @@ export class MatchSession {
       if (this.state.secretChoiceMasked) {
         await this.reconcile();
         return null;
+      }
+    } else {
+      // An action whose reply was lost may already be committed. Check its
+      // receipt first; only an explicitly unknown receipt permits replay.
+      const reconciling = { ...pending, status: "reconciling" as const };
+      this.state = { ...this.state, pendingAction: reconciling };
+      this.updateState({ syncStatus: "reconciling" });
+      try {
+        await this.reconcileNonsecretAction(pending);
+      } finally {
+        const currentPending = this.state.pendingAction;
+        this.updateState({
+          syncStatus: "idle",
+          ...(currentPending?.actionId === pending.actionId
+            ? { pendingAction: { ...currentPending, status: "retrying" } }
+            : {}),
+        });
+      }
+      if (this.state.pendingAction?.actionId !== pending.actionId) return null;
+      if (
+        this.state.isOffline ||
+        this.state.connectionState !== "connected" ||
+        (this.getState().syncStatus as MatchSessionState["syncStatus"]) === "reconciling"
+      ) {
+        throw new Error("Reconnect before retrying the unresolved action.");
       }
     }
 
@@ -900,6 +1040,7 @@ export class MatchSession {
           this.updateState({
             view: data.view,
             deliveryVersion: data.view.deliveryVersion,
+            controllerStatus: this.controllerStatusFor(data.view),
             pendingAction: null,
           });
         }
@@ -927,6 +1068,7 @@ export class MatchSession {
             this.updateState({
               view: receipt.view,
               deliveryVersion: receipt.view.deliveryVersion,
+              controllerStatus: this.controllerStatusFor(receipt.view),
               pendingAction: null,
             });
           }
@@ -937,6 +1079,7 @@ export class MatchSession {
             this.updateState({
               view: receipt.view,
               deliveryVersion: receipt.view.deliveryVersion,
+              controllerStatus: this.controllerStatusFor(receipt.view),
               pendingAction: null,
             });
           }
