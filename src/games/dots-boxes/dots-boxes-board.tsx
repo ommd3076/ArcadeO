@@ -500,7 +500,7 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
           gap: "6px",
         }}
       >
-        <Sparkles size={14} color="var(--color-emphasis-yellow-ink, #f59e0b)" />
+        <Sparkles size={14} color="var(--color-muted-text, #B9B9C4)" />
         <span>Tap an edge directly, or tap two adjacent dots to connect them.</span>
       </div>
     </div>

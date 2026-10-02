@@ -177,7 +177,7 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
           style={{
             padding: "16px",
             borderRadius: "var(--radius-full)",
-            backgroundColor: "rgba(245, 158, 11, 0.15)",
+            backgroundColor: "var(--color-emphasis-yellow-bg, #fff4bd)",
           }}
         >
           <Award size={36} color="var(--color-emphasis-yellow-ink, #f59e0b)" />
@@ -296,7 +296,7 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "4px",
-                color: "var(--color-emphasis-yellow-ink, #f59e0b)",
+                color: "var(--color-text, #F5F5F7)",
                 fontWeight: 700,
               }}
             >
