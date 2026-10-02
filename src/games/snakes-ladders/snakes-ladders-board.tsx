@@ -27,6 +27,7 @@ interface SnakesLaddersBoardProps {
   isSubmitting?: boolean;
   acceptedEventId?: string | number | null;
   acceptedEffects?: readonly SnakesAndLaddersEffect[];
+  motionEnabled?: boolean;
 }
 
 /**
@@ -97,85 +98,91 @@ export const SnakesLaddersBoard: React.FC<SnakesLaddersBoardProps> = ({
   isSubmitting = false,
   acceptedEventId,
   acceptedEffects,
+  motionEnabled = true,
 }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const { positions, activeSeat, lastRoll, status } = view;
   const { ladders, snakes } = boardMapFor(view.boardVersion);
 
-  useAcceptedMotion(acceptedEventId, acceptedEffects, (effects, reduceMotion) => {
-    const board = boardRef.current;
-    if (!board) return [];
-    const animations: Animation[] = [];
-    if (effects.some((effect) => effect.type === "dice-rolled") && !reduceMotion) {
-      const die = rootRef.current?.querySelector<HTMLElement>("[data-snl-die]");
-      if (die)
-        animations.push(
-          die.animate(
-            [{ transform: "rotate(-12deg) scale(.94)" }, { transform: "rotate(0) scale(1)" }],
-            { duration: 240, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
-          ),
-        );
-    }
-    const advance = effects.find((effect) => effect.type === "token-advanced");
-    if (!advance || advance.type !== "token-advanced" || reduceMotion) return animations;
-    const transition = effects.find(
-      (effect) => effect.type === "ladder-climbed" || effect.type === "snake-bitten",
-    );
-    const destination =
-      transition && (transition.type === "ladder-climbed" || transition.type === "snake-bitten")
-        ? transition.to
-        : advance.to;
-    const token = board.querySelector<HTMLElement>(`[data-testid="snl-token-${advance.seat}"]`);
-    if (!token || advance.from === destination) return animations;
-    const boardWidth = board.getBoundingClientRect().width;
-    const final = getCellCenterPercent(destination);
-    const positionsToShow = Array.from({ length: advance.to - advance.from + 1 }, (_, index) =>
-      Math.max(1, advance.from + index),
-    );
-    const points = positionsToShow.map(getCellCenterPercent);
-    if (
-      transition &&
-      (transition.type === "ladder-climbed" || transition.type === "snake-bitten")
-    ) {
-      const start = getCellCenterPercent(transition.from);
-      const end = getCellCenterPercent(transition.to);
-      if (transition.type === "snake-bitten") {
-        const dx = end.x - start.x;
-        const dy = end.y - start.y;
-        const length = Math.hypot(dx, dy);
-        const bend = Math.min(12, Math.max(5, length * 0.25));
-        const nx = (-dy / length) * bend;
-        const ny = (dx / length) * bend;
-        for (const t of [0.2, 0.4, 0.6, 0.8]) {
-          const mt = 1 - t;
-          points.push({
-            x:
-              mt ** 3 * start.x +
-              3 * mt ** 2 * t * (start.x + dx * 0.22 + nx) +
-              3 * mt * t ** 2 * (start.x + dx * 0.7 - nx) +
-              t ** 3 * end.x,
-            y:
-              mt ** 3 * start.y +
-              3 * mt ** 2 * t * (start.y + dy * 0.22 + ny) +
-              3 * mt * t ** 2 * (start.y + dy * 0.7 - ny) +
-              t ** 3 * end.y,
-          });
-        }
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      const board = boardRef.current;
+      if (!board) return [];
+      const animations: Animation[] = [];
+      if (effects.some((effect) => effect.type === "dice-rolled") && !reduceMotion) {
+        const die = rootRef.current?.querySelector<HTMLElement>("[data-snl-die]");
+        if (die)
+          animations.push(
+            die.animate(
+              [{ transform: "rotate(-12deg) scale(.94)" }, { transform: "rotate(0) scale(1)" }],
+              { duration: 240, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
+            ),
+          );
       }
-      points.push(end);
-    }
-    animations.push(
-      token.animate(
-        points.map((point, index) => ({
-          transform: `translate(${((point.x - final.x) * boardWidth) / 100}px, ${((point.y - final.y) * boardWidth) / 100}px)`,
-          offset: index / (points.length - 1),
-        })),
-        { duration: transition ? 640 : 320, easing: "cubic-bezier(0.4, 0, 0.2, 1)" },
-      ),
-    );
-    return animations;
-  });
+      const advance = effects.find((effect) => effect.type === "token-advanced");
+      if (!advance || advance.type !== "token-advanced" || reduceMotion) return animations;
+      const transition = effects.find(
+        (effect) => effect.type === "ladder-climbed" || effect.type === "snake-bitten",
+      );
+      const destination =
+        transition && (transition.type === "ladder-climbed" || transition.type === "snake-bitten")
+          ? transition.to
+          : advance.to;
+      const token = board.querySelector<HTMLElement>(`[data-testid="snl-token-${advance.seat}"]`);
+      if (!token || advance.from === destination) return animations;
+      const boardWidth = board.getBoundingClientRect().width;
+      const final = getCellCenterPercent(destination);
+      const positionsToShow = Array.from({ length: advance.to - advance.from + 1 }, (_, index) =>
+        Math.max(1, advance.from + index),
+      );
+      const points = positionsToShow.map(getCellCenterPercent);
+      if (
+        transition &&
+        (transition.type === "ladder-climbed" || transition.type === "snake-bitten")
+      ) {
+        const start = getCellCenterPercent(transition.from);
+        const end = getCellCenterPercent(transition.to);
+        if (transition.type === "snake-bitten") {
+          const dx = end.x - start.x;
+          const dy = end.y - start.y;
+          const length = Math.hypot(dx, dy);
+          const bend = Math.min(12, Math.max(5, length * 0.25));
+          const nx = (-dy / length) * bend;
+          const ny = (dx / length) * bend;
+          for (const t of [0.2, 0.4, 0.6, 0.8]) {
+            const mt = 1 - t;
+            points.push({
+              x:
+                mt ** 3 * start.x +
+                3 * mt ** 2 * t * (start.x + dx * 0.22 + nx) +
+                3 * mt * t ** 2 * (start.x + dx * 0.7 - nx) +
+                t ** 3 * end.x,
+              y:
+                mt ** 3 * start.y +
+                3 * mt ** 2 * t * (start.y + dy * 0.22 + ny) +
+                3 * mt * t ** 2 * (start.y + dy * 0.7 - ny) +
+                t ** 3 * end.y,
+            });
+          }
+        }
+        points.push(end);
+      }
+      animations.push(
+        token.animate(
+          points.map((point, index) => ({
+            transform: `translate(${((point.x - final.x) * boardWidth) / 100}px, ${((point.y - final.y) * boardWidth) / 100}px)`,
+            offset: index / (points.length - 1),
+          })),
+          { duration: transition ? 640 : 320, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+        ),
+      );
+      return animations;
+    },
+    { enabled: motionEnabled },
+  );
 
   // Render a single die face visually
   const renderDieFace = (num: number) => {

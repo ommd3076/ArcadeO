@@ -11,11 +11,13 @@
  * - Duel / Challenge opponent filled count HUD
  */
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import type { Seat } from "../../../shared/protocol/types";
 import type { SudokuView, SudokuOperation } from "../../../shared/games/sudoku/types";
 import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
+import { useAcceptedMotion } from "../../components/accepted-motion";
+import type { SudokuEffect } from "../../../shared/games/sudoku/types";
 import { Pause, Play, RotateCcw, CheckCircle, PenTool, Eraser, Clock } from "lucide-react";
 
 interface SudokuBoardProps {
@@ -30,6 +32,9 @@ interface SudokuBoardProps {
   playerBName: string;
   localSeat: Seat;
   isSubmitting?: boolean;
+  acceptedEventId?: string | null;
+  acceptedEffects?: readonly SudokuEffect[];
+  motionEnabled?: boolean;
 }
 
 export const SudokuBoard: React.FC<SudokuBoardProps> = ({
@@ -44,6 +49,9 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
   playerBName: _playerBName,
   localSeat: _localSeat,
   isSubmitting = false,
+  acceptedEventId,
+  acceptedEffects,
+  motionEnabled = true,
 }) => {
   const {
     puzzleId,
@@ -58,6 +66,37 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
 
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
   const [isNotesMode, setIsNotesMode] = useState(false);
+  const motionRootRef = useRef<HTMLDivElement>(null);
+
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      const animations: Animation[] = [];
+      const edited = effects.find(
+        (effect) => effect.type === "sudoku-cell-edited" || effect.type === "sudoku-undone",
+      );
+      if (edited) {
+        const cell = motionRootRef.current?.querySelector<HTMLElement>(
+          `[data-testid="sudoku-cell-${Math.floor(edited.index / 9)}-${edited.index % 9}"]`,
+        );
+        if (cell?.animate)
+          animations.push(
+            cell.animate(
+              reduceMotion
+                ? [{ opacity: 0.65 }, { opacity: 1 }]
+                : [
+                    { opacity: 0.55, transform: "scale(.96)" },
+                    { opacity: 1, transform: "scale(1)" },
+                  ],
+              { duration: reduceMotion ? 100 : 220, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          );
+      }
+      return animations;
+    },
+    { enabled: motionEnabled },
+  );
 
   // Parse 81 givens
   const givensArray = useMemo(() => {
@@ -185,6 +224,7 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
 
   return (
     <div
+      ref={motionRootRef}
       style={{
         display: "flex",
         flexDirection: "column",

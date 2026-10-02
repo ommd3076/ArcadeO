@@ -6,11 +6,12 @@
  * and live score display.
  */
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { type SOSView, type SOSLetter, type SOSEffect } from "../../../shared/games/sos/types";
 import { Surface } from "../../components/surface";
 import { PlayerScoreStrip, BoardViewport } from "../../components/game-primitives";
 import { Button } from "../../components/button";
+import { useAcceptedMotion } from "../../components/accepted-motion";
 import "./sos.css";
 
 interface SOSBoardProps {
@@ -22,6 +23,7 @@ interface SOSBoardProps {
   isSubmitting?: boolean;
   acceptedEventId?: string | null;
   acceptedEffects?: readonly SOSEffect[];
+  motionEnabled?: boolean;
 }
 
 export const SOSBoard: React.FC<SOSBoardProps> = ({
@@ -33,24 +35,61 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
   isSubmitting = false,
   acceptedEventId,
   acceptedEffects = [],
+  motionEnabled = true,
 }) => {
   const { board, lines = [], scores, activeSeat, status } = view;
   const size = view.gridSize ?? board.length ?? 5;
+  const motionRootRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(false);
 
   // Selected letter for placement ("S" or "O")
   const [selectedLetter, setSelectedLetter] = useState<SOSLetter>("S");
   const [selectedRow, setSelectedRow] = useState(0);
   const [selectedCol, setSelectedCol] = useState(0);
-  const animatedCell = acceptedEventId
-    ? acceptedEffects.find((effect) => effect.type === "letter-placed")
-    : undefined;
-  const animatedLineIds = new Set(
-    acceptedEventId
-      ? acceptedEffects.flatMap((effect) =>
-          effect.type === "lines-formed" ? effect.lines.map((line) => line.id) : [],
-        )
-      : [],
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      const animations: Animation[] = [];
+      const placed = effects.find((effect) => effect.type === "letter-placed");
+      if (placed?.type === "letter-placed") {
+        const letter = motionRootRef.current?.querySelector<HTMLElement>(
+          `[data-testid="sos-cell-${placed.row}-${placed.col}"] span`,
+        );
+        if (letter?.animate)
+          animations.push(
+            letter.animate(
+              reduceMotion
+                ? [{ opacity: 0.65 }, { opacity: 1 }]
+                : [
+                    { opacity: 0.25, transform: "scale(.82)" },
+                    { opacity: 1, transform: "scale(1)" },
+                  ],
+              { duration: reduceMotion ? 100 : 240, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          );
+      }
+      const formedLines = effects.flatMap((effect) =>
+        effect.type === "lines-formed" ? effect.lines : [],
+      );
+      for (const line of formedLines) {
+        const target = Array.from(
+          motionRootRef.current?.querySelectorAll<SVGLineElement>(`[data-testid^="sos-line-"]`) ??
+            [],
+        ).find((candidate) => candidate.dataset.testid === `sos-line-${line.id}`);
+        if (target?.animate)
+          animations.push(
+            target.animate(
+              reduceMotion
+                ? [{ opacity: 0.65 }, { opacity: 0.85 }]
+                : [{ opacity: 0.2 }, { opacity: 0.85 }],
+              { duration: reduceMotion ? 100 : 320, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          );
+      }
+      return animations;
+    },
+    { enabled: motionEnabled },
   );
 
   const handleCellClick = (r: number, c: number) => {
@@ -62,6 +101,7 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
 
   return (
     <div
+      ref={motionRootRef}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -142,20 +182,7 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
                       transition: "transform 150ms ease, background-color 150ms ease",
                     }}
                   >
-                    {cellValue && (
-                      <span
-                        style={{
-                          animation:
-                            animatedCell?.type === "letter-placed" &&
-                            animatedCell.row === r &&
-                            animatedCell.col === c
-                              ? "sos-letter-in 200ms ease"
-                              : undefined,
-                        }}
-                      >
-                        {cellValue}
-                      </span>
-                    )}
+                    {cellValue && <span>{cellValue}</span>}
                   </button>
                 );
               }),
@@ -202,11 +229,6 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
                   strokeWidth="4"
                   strokeLinecap="round"
                   opacity={0.85}
-                  style={{
-                    animation: animatedLineIds.has(line.id)
-                      ? "sos-line-in 320ms ease-out"
-                      : undefined,
-                  }}
                 />
               );
             })}

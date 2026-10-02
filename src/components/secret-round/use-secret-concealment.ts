@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 export interface UseSecretConcealmentOptions {
   onConceal?: () => void;
@@ -10,11 +10,13 @@ export function useSecretConcealment({
   enabled = true,
 }: UseSecretConcealmentOptions = {}) {
   const [isMasked, setIsMasked] = useState<boolean>(false);
+  const onConcealRef = useRef(onConceal);
+  onConcealRef.current = onConceal;
 
   const mask = useCallback(() => {
     setIsMasked(true);
-    onConceal?.();
-  }, [onConceal]);
+    onConcealRef.current?.();
+  }, []);
 
   const unmask = useCallback(() => {
     setIsMasked(false);

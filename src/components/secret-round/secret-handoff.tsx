@@ -76,10 +76,6 @@ export function SecretHandoff<T = string | number>({
     return "choosing";
   });
 
-  // Reveal animation state: 3 beats count-in then show outcome
-  const [isRevealingAnimation, setIsRevealingAnimation] = useState<boolean>(false);
-  const [revealBeat, setRevealBeat] = useState<number>(0);
-
   // Concealment hook (handles window blur, document hidden, pagehide)
   const {
     isMasked: internalMasked,
@@ -95,10 +91,14 @@ export function SecretHandoff<T = string | number>({
 
   const isMasked = forceMasked || internalMasked;
 
+  useEffect(() => {
+    if (forceMasked) setSelectedChoice(null);
+  }, [forceMasked, roundNumber]);
+
   // React to external server state updates
   useEffect(() => {
     if (mode === "together") {
-      if (isRevealed || (isResolved && isRevealed)) {
+      if (isRevealed) {
         setTogetherStep("revealed-outcome");
       } else if (isSeatALocked && isSeatBLocked) {
         setTogetherStep("both-locked-reveal");
@@ -123,30 +123,12 @@ export function SecretHandoff<T = string | number>({
     } else {
       // Remote mode
       if (isRevealed || isResolved) {
-        if (remoteStep !== "revealed-outcome" && !isRevealingAnimation) {
-          // Play synchronized reveal animation
-          setIsRevealingAnimation(true);
-          setRevealBeat(1);
-          const t1 = setTimeout(() => setRevealBeat(2), 280);
-          const t2 = setTimeout(() => setRevealBeat(3), 560);
-          const t3 = setTimeout(() => {
-            setIsRevealingAnimation(false);
-            setRemoteStep("revealed-outcome");
-          }, 840);
-          return () => {
-            clearTimeout(t1);
-            clearTimeout(t2);
-            clearTimeout(t3);
-          };
-        }
+        // Server-resolved outcomes appear immediately; visuals never gate Next.
+        setRemoteStep("revealed-outcome");
       } else {
         const myLock = localSeat === "A" ? isSeatALocked : isSeatBLocked;
-        if (myLock) {
-          setRemoteStep("locked-waiting");
-        } else {
-          setRemoteStep("choosing");
-          setSelectedChoice(null);
-        }
+        setRemoteStep(myLock ? "locked-waiting" : "choosing");
+        if (!myLock) setSelectedChoice(null);
       }
     }
   }, [
@@ -158,6 +140,8 @@ export function SecretHandoff<T = string | number>({
     firstChooserSeat,
     secondChooserSeat,
     localSeat,
+    roundNumber,
+    togetherStep,
   ]);
 
   // Resolve player accents and display data
@@ -302,88 +286,7 @@ export function SecretHandoff<T = string | number>({
     );
   }
 
-  // 2. REVEAL ANIMATION (Count-in 3 beats: 1... 2... 3... or Rock... Paper... Scissors...!)
-  if (isRevealingAnimation) {
-    return (
-      <Surface
-        variant="elevated"
-        padding="xl"
-        radius="xl"
-        className={`arcade-secret-handoff arcade-secret-handoff--revealing ${className}`.trim()}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          minHeight: "380px",
-          gap: "var(--space-xl)",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: "14px",
-            letterSpacing: "0.1em",
-            textTransform: "uppercase",
-            color: "var(--color-muted-text)",
-          }}
-        >
-          {roundNumber ? `${roundLabel} ${roundNumber}` : "Secret Handoff"}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "16px",
-            margin: "24px 0",
-          }}
-        >
-          {[1, 2, 3].map((b) => (
-            <div
-              key={b}
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "var(--radius-full)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "var(--font-heading)",
-                fontSize: "22px",
-                fontWeight: 700,
-                backgroundColor:
-                  revealBeat >= b ? "var(--color-primary-fill)" : "var(--color-raised)",
-                color: revealBeat >= b ? "var(--color-on-primary)" : "var(--color-muted-text)",
-                transform: revealBeat === b ? "scale(1.15)" : "scale(1)",
-                transition: "all 180ms cubic-bezier(0.16, 1, 0.3, 1)",
-                border: "2px solid var(--color-border)",
-              }}
-            >
-              {b}
-            </div>
-          ))}
-        </div>
-
-        <div
-          style={{
-            fontFamily: "var(--font-heading)",
-            fontSize: "24px",
-            fontWeight: 700,
-            color: "var(--color-text)",
-          }}
-        >
-          {revealBeat === 1 && "Ready..."}
-          {revealBeat === 2 && "Set..."}
-          {revealBeat >= 3 && "Reveal!"}
-        </div>
-      </Surface>
-    );
-  }
-
-  // 3. OUTCOME DISPLAY (Revealed result + Next Round button)
+  // 2. OUTCOME DISPLAY (Revealed result + Next Round button)
   const isOutcomeShown =
     (mode === "together" && togetherStep === "revealed-outcome") ||
     (mode === "remote" && remoteStep === "revealed-outcome");

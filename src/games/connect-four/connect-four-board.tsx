@@ -1,4 +1,4 @@
-import { useId, type KeyboardEvent } from "react";
+import { useId, useRef, type KeyboardEvent } from "react";
 import type { Seat } from "@shared/protocol/types";
 import type {
   ConnectFourCell,
@@ -7,6 +7,7 @@ import type {
 } from "@shared/games/connect-four/types";
 import { CONNECT_FOUR_COLS, CONNECT_FOUR_ROWS } from "@shared/games/connect-four/types";
 import { ChevronDown } from "lucide-react";
+import { useAcceptedMotion } from "../../components/accepted-motion";
 import "./connect-four.css";
 
 export interface ConnectFourBoardProps {
@@ -18,6 +19,7 @@ export interface ConnectFourBoardProps {
   lastDrop?: { row: number; col: number; seat: Seat } | null;
   acceptedEventId?: string | null;
   acceptedEffects?: readonly ConnectFourEffect[];
+  motionEnabled?: boolean;
   onDropColumn: (columnIndex: number) => void;
   playerAName?: string;
   playerBName?: string;
@@ -34,18 +36,70 @@ export function ConnectFourBoard({
   winningCells = [],
   acceptedEventId,
   acceptedEffects = [],
+  motionEnabled = true,
   onDropColumn,
   playerAName = "Player A",
   playerBName = "Player B",
   isTerminal = false,
 }: ConnectFourBoardProps) {
   const boardId = useId();
+  const boardRef = useRef<HTMLDivElement>(null);
 
   // Create a quick lookup set for winning cells: "row,col"
   const winningSet = new Set(winningCells.map(([r, c]) => `${r},${c}`));
-  const acceptedDrop = acceptedEventId
-    ? acceptedEffects.find((effect) => effect.type === "disc-dropped")
-    : undefined;
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      const animations: Animation[] = [];
+      const drop = effects.find((effect) => effect.type === "disc-dropped");
+      if (drop?.type === "disc-dropped") {
+        const disc = boardRef.current?.querySelector<HTMLElement>(
+          `[data-testid="c4-disc-${drop.row}-${drop.col}"]`,
+        );
+        if (disc && typeof disc.animate === "function") {
+          const boardHeight = boardRef.current?.getBoundingClientRect().height ?? 0;
+          const travel = Math.min(600, Math.max(120, boardHeight * ((drop.row + 1) / 6)));
+          animations.push(
+            disc.animate(
+              reduceMotion
+                ? [{ opacity: 0.45 }, { opacity: 1 }]
+                : [
+                    { transform: `translateY(-${travel}px)`, opacity: 0.35 },
+                    { transform: "translateY(0)", opacity: 1 },
+                  ],
+              {
+                duration: reduceMotion ? 120 : travel,
+                easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              },
+            ),
+          );
+        }
+      }
+      if (effects.some((effect) => effect.type === "game-won")) {
+        for (const cell of winningCells) {
+          const disc = boardRef.current?.querySelector<HTMLElement>(
+            `[data-testid="c4-disc-${cell[0]}-${cell[1]}"]`,
+          );
+          if (disc && typeof disc.animate === "function")
+            animations.push(
+              disc.animate(
+                reduceMotion
+                  ? [{ opacity: 0.7 }, { opacity: 1 }]
+                  : [
+                      { transform: "scale(1)" },
+                      { transform: "scale(1.04)" },
+                      { transform: "scale(1)" },
+                    ],
+                { duration: reduceMotion ? 100 : 620, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+              ),
+            );
+        }
+      }
+      return animations;
+    },
+    { enabled: motionEnabled },
+  );
 
   // Check if a column is full (row 0 is occupied)
   const isColumnFull = (colIdx: number): boolean => {
@@ -94,6 +148,7 @@ export function ConnectFourBoard({
 
       {/* 2. Board Grid Surface with tactile columns and holes */}
       <div
+        ref={boardRef}
         className="c4-board-surface"
         role="grid"
         aria-readonly="true"
@@ -119,12 +174,6 @@ export function ConnectFourBoard({
               {Array.from({ length: CONNECT_FOUR_ROWS }).map((_, rowIdx) => {
                 const cellValue = board[rowIdx]?.[colIdx] ?? null;
                 const isWinning = winningSet.has(`${rowIdx},${colIdx}`);
-                const isJustDropped =
-                  acceptedDrop?.type === "disc-dropped" &&
-                  acceptedDrop.row === rowIdx &&
-                  acceptedDrop.col === colIdx &&
-                  acceptedDrop.seat === cellValue;
-
                 return (
                   <div
                     key={`cell-${rowIdx}-${colIdx}`}
@@ -141,9 +190,10 @@ export function ConnectFourBoard({
                     {/* The Disc if present */}
                     {cellValue ? (
                       <div
+                        data-testid={`c4-disc-${rowIdx}-${colIdx}`}
                         className={`c4-disc c4-disc--${cellValue.toLowerCase()} ${
                           isWinning ? "c4-disc--winning" : ""
-                        } ${isJustDropped ? `c4-disc--dropping-r${rowIdx}` : ""}`}
+                        }`}
                         data-seat={cellValue}
                       >
                         <span className="c4-disc-mark" aria-hidden="true">

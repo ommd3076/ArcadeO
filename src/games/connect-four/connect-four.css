@@ -190,7 +190,6 @@
     0 0 0 3px #ffffff,
     0 0 16px 4px var(--color-focus, #a8dfe4),
     0 0 28px 8px rgba(168, 223, 228, 0.6);
-  animation: c4-pulse-win 1.2s ease-in-out infinite alternate;
 }
 
 @keyframes c4-pulse-win {

@@ -88,6 +88,159 @@ describe("Ludo Screen & Board Integration (Task U03)", () => {
     expect(html).toContain('data-testid="ludo-token-button-1"');
   });
 
+  it("keeps a solo pawn large and renders the center win-feedback target", () => {
+    const soloPawnView: LudoView = {
+      ...initialLudoView,
+      tokens: { A: [12, -1, -1, -1], B: [-1, -1, -1, -1] },
+    };
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(LudoBoard, {
+          view: soloPawnView,
+          canAct: false,
+          onRoll: vi.fn(),
+          onSelectToken: vi.fn(),
+          playerAName: "Player A",
+          playerBName: "Player B",
+        }),
+      ),
+    );
+
+    expect(html).toContain('data-stack-size="1"');
+    expect(html).toContain('data-stack-x="50"');
+    expect(html).toContain("width:82%");
+    expect(html).toContain('data-ludo-goal="true"');
+    expect(html).toContain('data-testid="ludo-center-goal"');
+  });
+
+  it("keeps an eight-pawn mixed stack numbered and individually named", () => {
+    const mixedStack: LudoView = {
+      ...initialLudoView,
+      tokens: {
+        A: [0, 0, 0, 0],
+        B: [26, 26, 26, 26],
+      },
+      phase: "choose-token",
+      pendingRoll: 1,
+      legalTokenIds: [0],
+    };
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(LudoBoard, {
+          view: mixedStack,
+          canAct: true,
+          onRoll: vi.fn(),
+          onSelectToken: vi.fn(),
+          playerAName: "Player A",
+          playerBName: "Player B",
+        }),
+      ),
+    );
+
+    expect(html).toContain('data-ludo-stack="6-1" data-stack-size="8"');
+    expect(html).toContain('data-testid="ludo-large-stack-summary"');
+    expect(html).toMatch(
+      /Player A(?:<!-- -->)*: (?:<!-- -->)*4(?:<!-- -->)* pawns · (?:<!-- -->)*Player B(?:<!-- -->)*: (?:<!-- -->)*4(?:<!-- -->)* pawns/,
+    );
+    expect(html).toContain("Choose by the numbered, named token controls below.");
+    for (const seat of ["A", "B"] as const) {
+      for (const tokenId of [1, 2, 3, 4]) {
+        expect(html).toContain(`aria-label="Player ${seat} Token ${tokenId}`);
+      }
+    }
+  });
+
+  it("announces accepted capture and turn effects without depending on animation", () => {
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(LudoBoard, {
+          view: initialLudoView,
+          canAct: true,
+          onRoll: vi.fn(),
+          onSelectToken: vi.fn(),
+          playerAName: "Player A",
+          playerBName: "Player B",
+          acceptedEventId: "accepted-17",
+          acceptedEffects: [
+            { type: "token-moved", seat: "A", tokenId: 0, from: 8, to: 10 },
+            {
+              type: "token-captured",
+              bySeat: "A",
+              byTokenId: 0,
+              capturedSeat: "B",
+              capturedTokenId: 1,
+              ringIndex: 10,
+            },
+          ],
+        }),
+      ),
+    );
+
+    expect(html).toContain('role="status" aria-live="polite" aria-atomic="true"');
+    expect(html).toContain("Player A moved Token 1.");
+    expect(html).toContain("Player A captured Player B Token 2.");
+  });
+
+  it("announces the accepted player and roll when no pawn can move", () => {
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(LudoBoard, {
+          view: {
+            ...initialLudoView,
+            activeSeat: "B",
+            lastRollNotice: "no-legal-move",
+          },
+          canAct: false,
+          onRoll: vi.fn(),
+          onSelectToken: vi.fn(),
+          playerAName: "Aisha",
+          playerBName: "Ben",
+          acceptedEventId: "accepted-roll-no-move",
+          acceptedEffects: [
+            { type: "dice-rolled", seat: "A", roll: 4 },
+            { type: "turn-changed", previousSeat: "A", nextSeat: "B" },
+          ],
+        }),
+      ),
+    );
+
+    expect(html).toContain("Aisha rolled 4.");
+    expect(html).toContain("No pawn could move.");
+    expect(html.match(/Player B moves next\./g)).toHaveLength(1);
+  });
+
+  it("announces the player and face of an ignored third six", () => {
+    const html = renderToString(
+      React.createElement(
+        ThemeProvider,
+        null,
+        React.createElement(LudoBoard, {
+          view: { ...initialLudoView, lastRollNotice: "ignored-six" },
+          canAct: true,
+          onRoll: vi.fn(),
+          onSelectToken: vi.fn(),
+          playerAName: "Aisha",
+          playerBName: "Ben",
+          acceptedEventId: "accepted-ignored-six",
+          acceptedEffects: [{ type: "dice-rolled", seat: "A", roll: 6, ignored: true }],
+        }),
+      ),
+    );
+
+    expect(html).toContain("Aisha rolled 6.");
+    expect(html).toContain(
+      "The third or later six was ignored; roll again, and earlier moves still count.",
+    );
+  });
+
   it("renders LudoBoard dynamically within MatchScreen when gameId is ludo", () => {
     const mockView = createMockFilteredView({
       matchId: "match-ludo-001",

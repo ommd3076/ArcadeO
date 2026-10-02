@@ -6,7 +6,7 @@
  * center goal, animated tokens, and tactile roll/token selection controls.
  */
 
-import React, { useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Seat } from "../../../shared/protocol/types";
 import {
   LUDO_BOARD_SIZE,
@@ -40,6 +40,7 @@ interface LudoBoardProps {
   seatColours?: { A?: string; B?: string };
   acceptedEventId?: string | number | null;
   acceptedEffects?: readonly LudoEffect[];
+  motionEnabled?: boolean;
 }
 
 // 4 Yard cell positions for each seat
@@ -58,6 +59,25 @@ const YARD_CELLS: Record<Seat, readonly [number, number][]> = {
   ],
 };
 
+function stackSlot(index: number, count: number): { x: number; y: number; size: number } {
+  if (count === 1) return { x: 50, y: 50, size: 82 };
+  if (count === 2) return { x: index === 0 ? 32 : 68, y: 50, size: 62 };
+  if (count === 3)
+    return [
+      { x: 35, y: 35, size: 46 },
+      { x: 65, y: 35, size: 46 },
+      { x: 50, y: 65, size: 46 },
+    ][index];
+  if (count === 4)
+    return [
+      { x: 35, y: 35, size: 46 },
+      { x: 65, y: 35, size: 46 },
+      { x: 35, y: 65, size: 46 },
+      { x: 65, y: 65, size: 46 },
+    ][index];
+  return { x: 17 + (index % 3) * 33, y: 17 + Math.floor(index / 3) * 33, size: 34 };
+}
+
 export const LudoBoard: React.FC<LudoBoardProps> = ({
   view,
   canAct,
@@ -69,55 +89,226 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
   seatColours,
   acceptedEventId,
   acceptedEffects,
+  motionEnabled = true,
 }) => {
   const boardRef = useRef<HTMLDivElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const activeAnimations = useRef<Animation[]>([]);
+  const mounted = useRef(true);
+  const [isTraveling, setIsTraveling] = useState(false);
   const colourA = seatColours?.A ?? LUDO_COLOUR_PALETTE[view.colours?.A ?? "blue"];
   const colourB = seatColours?.B ?? LUDO_COLOUR_PALETTE[view.colours?.B ?? "green"];
   const { tokens, activeSeat, phase, pendingRoll, legalTokenIds, consecutiveSixes, status } = view;
+  const eventFeedback = useMemo(() => {
+    if (acceptedEventId == null || !acceptedEffects?.length) return "";
+    const messages = acceptedEffects
+      .map((effect) => {
+        if (effect.type === "dice-rolled") {
+          const playerName = effect.seat === "A" ? playerAName : playerBName;
+          return effect.ignored
+            ? `${playerName} rolled ${effect.roll}. The third or later six was ignored; roll again, and earlier moves still count.`
+            : `${playerName} rolled ${effect.roll}.`;
+        }
+        if (effect.type === "token-moved")
+          return `Player ${effect.seat} moved Token ${effect.tokenId + 1}.`;
+        if (effect.type === "token-captured")
+          return `Player ${effect.bySeat} captured Player ${effect.capturedSeat} Token ${effect.capturedTokenId + 1}.`;
+        if (effect.type === "token-entered-home")
+          return `Player ${effect.seat} Token ${effect.tokenId + 1} reached home.`;
+        if (effect.type === "turn-changed") return `Player ${effect.nextSeat} moves next.`;
+        if (effect.type === "game-won") return `Player ${effect.winner} wins the match.`;
+        return "";
+      })
+      .filter(Boolean);
+    const movedToken = acceptedEffects.find((effect) => effect.type === "token-moved");
+    if (
+      movedToken?.type === "token-moved" &&
+      view.status === "active" &&
+      view.phase === "roll" &&
+      view.activeSeat === movedToken.seat
+    )
+      messages.push("Bonus roll earned. Roll again.");
+    const noMoveRoll = acceptedEffects.find((effect) => effect.type === "dice-rolled");
+    if (noMoveRoll?.type === "dice-rolled" && view.lastRollNotice === "no-legal-move")
+      messages.push(
+        view.activeSeat === noMoveRoll.seat
+          ? "No pawn could move. Roll again."
+          : "No pawn could move.",
+      );
+    return messages.join(" ");
+  }, [
+    acceptedEventId,
+    acceptedEffects,
+    view.activeSeat,
+    view.lastRollNotice,
+    view.phase,
+    view.status,
+    playerAName,
+    playerBName,
+  ]);
 
-  useAcceptedMotion(acceptedEventId, acceptedEffects, (effects, reduceMotion) => {
-    const board = boardRef.current;
-    if (!board) return [];
-    const cell = board.getBoundingClientRect().width / LUDO_BOARD_SIZE;
-    const animations: Animation[] = [];
-    for (const effect of effects) {
-      if (effect.type === "dice-rolled") {
-        const die = rootRef.current?.querySelector<HTMLElement>("[data-ludo-die]");
-        if (die && !reduceMotion)
-          animations.push(
-            die.animate(
-              [{ transform: "rotate(-12deg) scale(.94)" }, { transform: "rotate(0) scale(1)" }],
-              { duration: 240, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
-            ),
+  const settleTravel = useCallback(() => {
+    activeAnimations.current.forEach((animation) => animation.cancel());
+    activeAnimations.current = [];
+    setIsTraveling(false);
+  }, []);
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      activeAnimations.current.forEach((animation) => animation.cancel());
+      activeAnimations.current = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    if ((acceptedEventId == null || !motionEnabled) && isTraveling) settleTravel();
+  }, [acceptedEventId, isTraveling, motionEnabled, settleTravel]);
+
+  useEffect(() => {
+    const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const settleOnInterruption = () => settleTravel();
+    const settleWhenHidden = () => {
+      if (document.visibilityState !== "visible") settleTravel();
+    };
+    const settleOnReducedMotion = () => settleTravel();
+    window.addEventListener("blur", settleOnInterruption);
+    window.addEventListener("offline", settleOnInterruption);
+    window.addEventListener("online", settleOnInterruption);
+    window.addEventListener("pagehide", settleOnInterruption);
+    document.addEventListener("visibilitychange", settleWhenHidden);
+    media?.addEventListener?.("change", settleOnReducedMotion);
+    return () => {
+      window.removeEventListener("blur", settleOnInterruption);
+      window.removeEventListener("offline", settleOnInterruption);
+      window.removeEventListener("online", settleOnInterruption);
+      window.removeEventListener("pagehide", settleOnInterruption);
+      document.removeEventListener("visibilitychange", settleWhenHidden);
+      media?.removeEventListener?.("change", settleOnReducedMotion);
+    };
+  }, [settleTravel]);
+
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      settleTravel();
+      const board = boardRef.current;
+      if (!board) return [];
+      const cell = board.getBoundingClientRect().width / LUDO_BOARD_SIZE;
+      const animations: Animation[] = [];
+      const travelAnimations: Animation[] = [];
+      let acceptedMoveDuration = 0;
+      const captureInMove = effects.some((effect) => effect.type === "token-captured");
+      for (const effect of effects) {
+        if (effect.type === "dice-rolled") {
+          const die = rootRef.current?.querySelector<HTMLElement>("[data-ludo-die]");
+          if (die && !reduceMotion && typeof die.animate === "function")
+            animations.push(
+              die.animate(
+                [{ transform: "rotate(-10deg) scale(.96)" }, { transform: "rotate(0) scale(1)" }],
+                { duration: 220, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+              ),
+            );
+        }
+        if (reduceMotion) continue;
+        if (effect.type === "token-moved") {
+          const token = board.querySelector<HTMLElement>(
+            `[data-testid="ludo-token-${effect.seat}-${effect.tokenId}"]`,
           );
-      }
-      if (effect.type !== "token-moved" || reduceMotion) continue;
-      const token = board.querySelector<HTMLElement>(
-        `[data-testid="ludo-token-${effect.seat}-${effect.tokenId}"]`,
-      );
-      const target = getBoardCoordinate(effect.seat, effect.to);
-      const yard = YARD_CELLS[effect.seat][effect.tokenId];
-      const endpoint = target ?? yard;
-      if (!token) continue;
-      const points: Array<readonly [number, number]> = [];
-      for (let progress = effect.from; progress <= effect.to; progress++) {
-        const coord = getBoardCoordinate(effect.seat, progress) ?? yard;
-        points.push(coord);
-      }
-      if (points.length < 2) continue;
-      animations.push(
-        token.animate(
-          points.map(([row, col], index) => ({
-            transform: `translate(${(col - endpoint[1]) * cell}px, ${(row - endpoint[0]) * cell}px)`,
+          const endpoint = getBoardCoordinate(effect.seat, effect.to);
+          const yard = YARD_CELLS[effect.seat][effect.tokenId];
+          const destination = endpoint ?? yard;
+          if (!token) continue;
+          const slot = stackSlot(
+            Number(token.dataset.stackIndex ?? 0),
+            Number(token.dataset.stackSize ?? 1),
+          );
+          const stackOffsetX = (slot.x / 100 - 0.5) * cell;
+          const stackOffsetY = (slot.y / 100 - 0.5) * cell;
+          const points: Array<readonly [number, number]> = [];
+          for (let progress = effect.from; progress <= effect.to; progress++) {
+            points.push(getBoardCoordinate(effect.seat, progress) ?? yard);
+          }
+          if (points.length < 2) continue;
+          const keyframes = points.map(([row, col], index) => ({
+            transform: `translate(${(col - destination[1]) * cell - stackOffsetX}px, ${(row - destination[0]) * cell - stackOffsetY}px) translate(-50%, -50%)`,
             offset: index / (points.length - 1),
-          })),
-          { duration: 280, easing: "cubic-bezier(0.77, 0, 0.175, 1)" },
-        ),
-      );
-    }
-    return animations;
-  });
+          }));
+          keyframes[keyframes.length - 1] = {
+            transform: "translate(0, 0) translate(-50%, -50%)",
+            offset: 1,
+          };
+          if (typeof token.animate === "function") {
+            acceptedMoveDuration = Math.min(
+              captureInMove ? 960 : 1200,
+              Math.max(180, (effect.to - Math.max(effect.from, 0) + 1) * 120),
+            );
+            const animation = token.animate(keyframes, {
+              duration: acceptedMoveDuration,
+              easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+            });
+            animations.push(animation);
+            travelAnimations.push(animation);
+          }
+        }
+        if (effect.type === "token-captured") {
+          const captured = board.querySelector<HTMLElement>(
+            `[data-testid="ludo-token-${effect.capturedSeat}-${effect.capturedTokenId}"]`,
+          );
+          if (!captured) continue;
+          const from = LUDO_RING_COORDINATES[effect.ringIndex];
+          const yard = YARD_CELLS[effect.capturedSeat][effect.capturedTokenId];
+          if (typeof captured.animate === "function") {
+            const animation = captured.animate(
+              [
+                {
+                  transform: `translate(${(from[1] - yard[1]) * cell}px, ${(from[0] - yard[0]) * cell}px) translate(-50%, -50%)`,
+                },
+                { transform: "translate(0, 0) translate(-50%, -50%)" },
+              ],
+              {
+                duration: 240,
+                delay: acceptedMoveDuration,
+                fill: "backwards",
+                easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+              },
+            );
+            animations.push(animation);
+            travelAnimations.push(animation);
+          }
+        }
+        if (effect.type === "game-won") {
+          const goal = board.querySelector<HTMLElement>("[data-ludo-goal]");
+          if (goal && typeof goal.animate === "function")
+            animations.push(
+              goal.animate(
+                [
+                  { opacity: 0.65, transform: "scale(.96)" },
+                  { opacity: 1, transform: "scale(1.04)" },
+                  { opacity: 1, transform: "scale(1)" },
+                ],
+                { duration: 680, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+              ),
+            );
+        }
+      }
+      activeAnimations.current = animations;
+      if (travelAnimations.length > 0) {
+        setIsTraveling(true);
+        Promise.allSettled(travelAnimations.map((animation) => animation.finished)).then(() => {
+          if (
+            mounted.current &&
+            travelAnimations.every((animation) => animation.playState === "finished")
+          )
+            setIsTraveling(false);
+        });
+      }
+      return animations;
+    },
+    { enabled: motionEnabled },
+  );
 
   // Map each token to its current board coordinates [row, col]
   const tokenCoordinates = useMemo(() => {
@@ -167,6 +358,11 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
       list.push(t);
       map.set(key, list);
     }
+    map.forEach((cellTokens) =>
+      cellTokens.sort((left, right) =>
+        left.seat === right.seat ? left.tokenId - right.tokenId : left.seat === "A" ? -1 : 1,
+      ),
+    );
     return map;
   }, [tokenCoordinates]);
 
@@ -178,6 +374,34 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
     });
     return map;
   }, []);
+
+  // Keep large mixed stacks understandable when their numbered board markers
+  // become too small to distinguish on a phone. The selector below remains
+  // the direct, full-size way to choose a pawn.
+  const largeStackSummaries = useMemo(() => {
+    return Array.from(tokensByCell.entries())
+      .filter(([, cellTokens]) => cellTokens.length > 4)
+      .map(([coord, cellTokens]) => {
+        const [row, col] = coord.split(",").map(Number);
+        const ringIndex = ringIndexByCoord.get(coord);
+        const counts = cellTokens.reduce(
+          (result, token) => {
+            result[token.seat] += 1;
+            return result;
+          },
+          { A: 0, B: 0 },
+        );
+        return {
+          key: coord,
+          location:
+            ringIndex === undefined
+              ? `board square ${row + 1}, ${col + 1}`
+              : `ring square ${ringIndex + 1}`,
+          counts,
+          total: cellTokens.length,
+        };
+      });
+  }, [ringIndexByCoord, tokensByCell]);
 
   // Home lane lookup
   const isHomeLaneA = useMemo(() => {
@@ -206,6 +430,7 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
 
     return (
       <div
+        data-ludo-die
         style={{
           width: "48px",
           height: "48px",
@@ -273,6 +498,7 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
       >
         <div
           ref={boardRef}
+          data-testid="ludo-board-grid"
           style={{
             display: "grid",
             gridTemplateColumns: `repeat(${LUDO_BOARD_SIZE}, 1fr)`,
@@ -358,6 +584,25 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
                       }}
                     />
                   )}
+                  {r === 7 && c === 7 && (
+                    <span
+                      data-ludo-goal="true"
+                      data-testid="ludo-center-goal"
+                      aria-hidden="true"
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "grid",
+                        placeItems: "center",
+                        color: "var(--color-primary, #38bdf8)",
+                        opacity: 0.72,
+                        zIndex: 2,
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <Sparkles size={22} />
+                    </span>
+                  )}
                   {entryArrow && (
                     <span
                       aria-hidden="true"
@@ -420,52 +665,86 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
 
                   {/* Center trophy */}
                   {/* Tokens on this cell */}
-                  {cellTokens.map((tok) => {
-                    const isLegal =
-                      tok.seat === activeSeat &&
-                      phase === "choose-token" &&
-                      legalTokenIds.includes(tok.tokenId);
+                  {cellTokens.length > 0 && (
+                    <div
+                      data-ludo-stack={`${r}-${c}`}
+                      data-stack-size={cellTokens.length}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        zIndex: 3,
+                        pointerEvents: "none",
+                      }}
+                    >
+                      {cellTokens.map((tok, stackIndex) => {
+                        const slot = stackSlot(stackIndex, cellTokens.length);
+                        const isLegal =
+                          tok.seat === activeSeat &&
+                          phase === "choose-token" &&
+                          legalTokenIds.includes(tok.tokenId);
 
-                    const tokenColor = tok.seat === "A" ? colourA : colourB;
+                        const tokenColor = tok.seat === "A" ? colourA : colourB;
 
-                    return (
-                      <button
-                        key={`${tok.seat}-${tok.tokenId}`}
-                        data-testid={`ludo-token-${tok.seat}-${tok.tokenId}`}
-                        disabled={!isLegal || !canAct || isSubmitting}
-                        onClick={() => isLegal && onSelectToken(tok.tokenId)}
-                        aria-label={`Player ${tok.seat} Token ${tok.tokenId + 1}${
-                          isLegal ? " (Click to move)" : ""
-                        }`}
-                        style={{
-                          width: cellTokens.length > 1 ? "75%" : "85%",
-                          height: cellTokens.length > 1 ? "75%" : "85%",
-                          borderRadius: "50%",
-                          backgroundColor: tokenColor,
-                          border: isLegal ? "2px solid #ffffff" : "1px solid rgba(0,0,0,0.4)",
-                          boxShadow: isLegal
-                            ? "0 0 8px #ffffff, 0 2px 4px rgba(0,0,0,0.5)"
-                            : "0 1px 3px rgba(0,0,0,0.4)",
-                          cursor: isLegal ? "pointer" : "default",
-                          transform: isLegal ? "scale(1.15)" : "scale(1)",
-                          transition: "transform 200ms ease, box-shadow 200ms ease",
-                          zIndex: isLegal ? 10 : 2,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: 0,
-                          fontSize: "8px",
-                          fontWeight: 800,
-                          color:
-                            (tok.seat === "A" ? view.colours?.A : view.colours?.B) === "yellow"
-                              ? "#1a2927"
-                              : "#ffffff",
-                        }}
-                      >
-                        {tok.tokenId + 1}
-                      </button>
-                    );
-                  })}
+                        return (
+                          <button
+                            key={`${tok.seat}-${tok.tokenId}`}
+                            data-testid={`ludo-token-${tok.seat}-${tok.tokenId}`}
+                            disabled={!isLegal || !canAct || isSubmitting || isTraveling}
+                            onClick={() => isLegal && !isTraveling && onSelectToken(tok.tokenId)}
+                            aria-label={`Player ${tok.seat} Token ${tok.tokenId + 1}${
+                              isLegal ? " (Select to move)" : ""
+                            }`}
+                            data-stack-index={stackIndex}
+                            data-stack-size={cellTokens.length}
+                            data-stack-x={slot.x}
+                            data-stack-y={slot.y}
+                            style={{
+                              position: "absolute",
+                              left: `${slot.x}%`,
+                              top: `${slot.y}%`,
+                              width: `${slot.size}%`,
+                              height: `${slot.size}%`,
+                              minHeight: 0,
+                              aspectRatio: "1",
+                              transform: "translate(-50%, -50%)",
+                              boxSizing: "border-box",
+                              borderRadius: "50%",
+                              background: `radial-gradient(circle at 32% 24%, rgba(255,255,255,.55), transparent 36%), linear-gradient(145deg, ${tokenColor}, color-mix(in srgb, ${tokenColor} 68%, #101820))`,
+                              border: isLegal ? "1px solid #ffffff" : "1px solid rgba(0,0,0,0.55)",
+                              boxShadow: isLegal
+                                ? "0 0 0 1px rgba(255,255,255,.55), 0 1px 3px rgba(0,0,0,.55)"
+                                : "inset 0 -1px 1px rgba(0,0,0,.25), 0 1px 2px rgba(0,0,0,.45)",
+                              cursor: isLegal ? "pointer" : "default",
+                              transition: "box-shadow 160ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+                              zIndex: isLegal ? 5 : 2,
+                              pointerEvents: "auto",
+                              touchAction: "manipulation",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              lineHeight: 1,
+                              padding: 0,
+                              fontSize:
+                                cellTokens.length === 1
+                                  ? "clamp(9px, 2vw, 14px)"
+                                  : cellTokens.length === 2
+                                    ? "clamp(8px, 1.9vw, 12px)"
+                                    : cellTokens.length <= 4
+                                      ? "clamp(7px, 1.7vw, 11px)"
+                                      : "clamp(6px, 1.5vw, 10px)",
+                              fontWeight: 800,
+                              color:
+                                (tok.seat === "A" ? view.colours?.A : view.colours?.B) === "yellow"
+                                  ? "#1a2927"
+                                  : "#ffffff",
+                            }}
+                          >
+                            {tok.tokenId + 1}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             }),
@@ -487,7 +766,6 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
         }}
       >
         <div
-          data-ludo-die
           style={{
             display: "flex",
             alignItems: "center",
@@ -501,6 +779,7 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
               renderDieFace(pendingRoll)
             ) : (
               <div
+                data-ludo-die
                 style={{
                   width: "48px",
                   height: "48px",
@@ -561,19 +840,55 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
             <Button
               variant="primary"
               size="md"
-              disabled={phase !== "roll" || !canAct || isSubmitting}
+              disabled={phase !== "roll" || !canAct || isSubmitting || isTraveling}
               onClick={onRoll}
               data-testid="ludo-roll-button"
               leftIcon={<Dices size={18} />}
+              style={{ flexShrink: 0, whiteSpace: "nowrap" }}
             >
               Roll Dice
             </Button>
           )}
         </div>
 
+        {isTraveling && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={settleTravel}
+            data-testid="ludo-settle-button"
+          >
+            Settle movement
+          </Button>
+        )}
+
         {/* 3. Token Selector Buttons (for accessible direct tap) */}
         {phase === "choose-token" && status !== "completed" && (
           <div style={{ width: "100%", marginTop: "6px" }}>
+            {largeStackSummaries.map((stack) => (
+              <div
+                key={stack.key}
+                data-testid="ludo-large-stack-summary"
+                role="status"
+                style={{
+                  marginBottom: "8px",
+                  padding: "10px 12px",
+                  borderRadius: "12px",
+                  background: "var(--color-surface-raised, rgba(148,163,184,.12))",
+                  color: "var(--color-text, inherit)",
+                  fontSize: "13px",
+                  lineHeight: 1.4,
+                }}
+              >
+                <strong>
+                  Shared stack · {stack.location} · {stack.total} pawns
+                </strong>
+                <div>
+                  {playerAName}: {stack.counts.A} pawns · {playerBName}: {stack.counts.B} pawns
+                </div>
+                <div>Choose by the numbered, named token controls below.</div>
+              </div>
+            ))}
             <div
               style={{
                 fontSize: "12px",
@@ -600,15 +915,17 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
                     ? "In Yard"
                     : progress === LUDO_HOME_PROGRESS
                       ? "Home"
-                      : `Prog: ${progress}`;
+                      : progress >= 51
+                        ? `Home lane · ${LUDO_HOME_PROGRESS - progress} to home`
+                        : "On track";
 
                 return (
                   <Button
                     key={tokenId}
                     variant={isLegal ? "primary" : "secondary"}
                     size="sm"
-                    disabled={!isLegal || !canAct || isSubmitting}
-                    onClick={() => onSelectToken(tokenId)}
+                    disabled={!isLegal || !canAct || isSubmitting || isTraveling}
+                    onClick={() => !isTraveling && onSelectToken(tokenId)}
                     data-testid={`ludo-token-button-${tokenId}`}
                     style={{
                       flexDirection: "column",
@@ -625,6 +942,15 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
           </div>
         )}
       </Surface>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        data-testid="ludo-motion-feedback"
+        style={{ minHeight: "1.25em", width: "100%", fontSize: "14px" }}
+      >
+        {eventFeedback}
+      </div>
     </div>
   );
 };

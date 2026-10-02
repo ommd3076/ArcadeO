@@ -9,6 +9,16 @@
   color: var(--color-text);
 }
 
+.arcade-spin {
+  animation: arcade-spin-indicator 1s linear infinite;
+}
+
+@keyframes arcade-spin-indicator {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .arcade-match-page--focused {
   --match-content-width: 1040px;
 }
@@ -35,7 +45,6 @@
 .arcade-match-main {
   --match-content-width: 680px;
   width: min(100%, var(--match-content-width));
-  max-width: none !important;
   min-width: 0;
   margin: 0 auto;
   padding: var(--space-lg) max(var(--space-lg), var(--sal)) calc(28px + var(--sab))

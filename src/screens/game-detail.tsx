@@ -111,10 +111,9 @@ export function GameDetailScreen() {
         if (!profile?.profile || !profile.opponent)
           throw new Error("Player names are unavailable.");
         const names: Record<"A" | "B", string> = { A: "Player A", B: "Player B" };
-        if (profile.profile.id && profile.profile.displayName)
-          names[profile.profile.id] = profile.profile.displayName;
-        if (profile.opponent.id && profile.opponent.displayName)
-          names[profile.opponent.id] = profile.opponent.displayName;
+        // Match seats are relative to its creator, independently of account IDs.
+        if (profile.profile.displayName) names.A = profile.profile.displayName;
+        if (profile.opponent.displayName) names.B = profile.opponent.displayName;
         setSeatNames(names);
         setProfileState("ready");
       })

@@ -9,12 +9,13 @@
  * - Real delivery resolution presentation (WICKET / runs scored)
  */
 
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import type { Seat, AccentFamily } from "../../../shared/protocol/types";
 import type { CricketView } from "../../../shared/games/hand-cricket/types";
 import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
 import { SecretHandoff } from "../../components/secret-round/secret-handoff";
+import { useAcceptedMotion } from "../../components/accepted-motion";
 import type { SecretChoiceOption, SecretOutcomeDisplay } from "../../components/secret-round/types";
 import { Award, Shield, Target, Flame } from "lucide-react";
 
@@ -33,6 +34,8 @@ interface HandCricketBoardProps {
   isSubmitting?: boolean;
   forceMasked?: boolean;
   onMaskChange?: (masked: boolean) => void;
+  acceptedEventId?: string | null;
+  motionEnabled?: boolean;
 }
 
 export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
@@ -50,7 +53,10 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
   isSubmitting = false,
   forceMasked = false,
   onMaskChange,
+  acceptedEventId,
+  motionEnabled = true,
 }) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const {
     phase,
     innings,
@@ -65,6 +71,26 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
   } = view;
   const playUntilBothOut =
     view.completionRule === "both-out" || (mode === "together" && view.rulesVersion === 2);
+
+  useAcceptedMotion(
+    acceptedEventId,
+    view.revealed ? [{ type: "revealed" as const }] : [],
+    () => {
+      const panel = rootRef.current?.querySelector<HTMLElement>(".arcade-secret-handoff--outcome");
+      return panel?.animate
+        ? [
+            panel.animate(
+              [
+                { opacity: 0.55, transform: "scale(.98)" },
+                { opacity: 1, transform: "scale(1)" },
+              ],
+              { duration: 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          ]
+        : [];
+    },
+    { enabled: motionEnabled },
+  );
 
   // Unconditional Hooks: compute all derived values before ANY conditional return
   const allowedNumbers = useMemo(() => {
@@ -217,6 +243,7 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
 
   return (
     <div
+      ref={rootRef}
       style={{
         display: "flex",
         flexDirection: "column",

@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import type { Seat, AccentFamily } from "@shared/protocol/types";
 import type { RPSView, RPSChoice } from "@shared/games/rps/types";
 import { SecretHandoff } from "../../components/secret-round/secret-handoff";
+import { useAcceptedMotion } from "../../components/accepted-motion";
 import type { SecretChoiceOption, SecretOutcomeDisplay } from "../../components/secret-round/types";
 import { Surface } from "../../components/surface";
 import "./rps.css";
@@ -21,6 +22,8 @@ export interface RPSBoardProps {
   isSubmitting?: boolean;
   forceMasked?: boolean;
   onMaskChange?: (masked: boolean) => void;
+  acceptedEventId?: string | null;
+  motionEnabled?: boolean;
 }
 
 const RPS_CHOICE_OPTIONS: SecretChoiceOption<RPSChoice>[] = [
@@ -50,11 +53,34 @@ export function RPSBoard({
   isSubmitting = false,
   forceMasked = false,
   onMaskChange,
+  acceptedEventId,
+  motionEnabled = true,
 }: RPSBoardProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const isSeatALocked = view.lockedSeats.includes("A");
   const isSeatBLocked = view.lockedSeats.includes("B");
   const isResolved = view.phase === "resolved" || view.phase === "terminal";
   const isRevealed = view.revealed;
+
+  useAcceptedMotion(
+    acceptedEventId,
+    isRevealed ? [{ type: "revealed" as const }] : [],
+    () => {
+      const panel = rootRef.current?.querySelector<HTMLElement>(".arcade-secret-handoff--outcome");
+      return panel?.animate
+        ? [
+            panel.animate(
+              [
+                { opacity: 0.55, transform: "scale(.98)" },
+                { opacity: 1, transform: "scale(1)" },
+              ],
+              { duration: 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          ]
+        : [];
+    },
+    { enabled: motionEnabled },
+  );
 
   const outcome: SecretOutcomeDisplay | null = useMemo(() => {
     if (!view.roundResult || (!isRevealed && mode === "together")) {
@@ -85,7 +111,12 @@ export function RPSBoard({
   }, [view.roundResult, isRevealed, mode, playerAName, playerBName]);
 
   return (
-    <div className="rps-container" role="region" aria-label="Rock Paper Scissors Game">
+    <div
+      ref={rootRef}
+      className="rps-container"
+      role="region"
+      aria-label="Rock Paper Scissors Game"
+    >
       {/* Format and Target Banner */}
       <Surface variant="inset" padding="sm" radius="lg" className="rps-score-strip">
         <div className="rps-score-pill">

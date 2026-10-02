@@ -203,11 +203,7 @@ export function ConnectionStatus({
           ...style,
         }}
       >
-        <RefreshCw
-          size={18}
-          aria-hidden="true"
-          style={{ flexShrink: 0, animation: "spin 1.5s linear infinite" }}
-        />
+        <RefreshCw size={18} aria-hidden="true" className="arcade-spin" style={{ flexShrink: 0 }} />
         <span>Reconnecting...</span>
       </aside>
     );
@@ -235,11 +231,7 @@ export function ConnectionStatus({
           ...style,
         }}
       >
-        <RefreshCw
-          size={18}
-          aria-hidden="true"
-          style={{ flexShrink: 0, animation: "spin 1.5s linear infinite" }}
-        />
+        <RefreshCw size={18} aria-hidden="true" className="arcade-spin" style={{ flexShrink: 0 }} />
         <span>Connecting...</span>
       </aside>
     );
@@ -267,11 +259,7 @@ export function ConnectionStatus({
           ...style,
         }}
       >
-        <RefreshCw
-          size={16}
-          aria-hidden="true"
-          style={{ flexShrink: 0, animation: "spin 1.2s linear infinite" }}
-        />
+        <RefreshCw size={16} aria-hidden="true" className="arcade-spin" style={{ flexShrink: 0 }} />
         <span>Syncing...</span>
       </aside>
     );

@@ -53,7 +53,9 @@ test("stalled session bootstrap shows loading and Retry states, then recovers", 
       .evaluate((icon) => getComputedStyle(icon).animationName),
   ).toBe("none");
   await testInfo.attach("auth-loading-state", {
-    body: await page.screenshot(),
+    body: await page.screenshot({
+      path: "planning/review/evidence/owner-corrections/overnight-auth-loading.png",
+    }),
     contentType: "image/png",
   });
 
@@ -62,7 +64,9 @@ test("stalled session bootstrap shows loading and Retry states, then recovers", 
   await expect(page.getByRole("alert")).toContainText(/took too long/);
   await expect(page.getByText("Opening your arcade…")).toHaveCount(0);
   await testInfo.attach("auth-retry-state", {
-    body: await page.screenshot(),
+    body: await page.screenshot({
+      path: "planning/review/evidence/owner-corrections/overnight-auth-retry.png",
+    }),
     contentType: "image/png",
   });
   await retry.click();

@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { IconButton } from "./icon-button";
 
@@ -10,64 +10,130 @@ export interface SheetProps {
   children: ReactNode;
 }
 
+type SheetPhase = "closed" | "opening" | "open" | "exiting";
+
 export function Sheet({ isOpen, onClose, title, description, children }: SheetProps) {
   const panel = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  const restoreFocusTo = useRef<HTMLElement | null>(null);
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sheetId = useId();
+  const [phase, setPhase] = useState<SheetPhase>(isOpen ? "open" : "closed");
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (exitTimer.current) clearTimeout(exitTimer.current);
+    exitTimer.current = null;
+    if (isOpen) {
+      setPhase((current) => (current === "closed" ? "opening" : "open"));
+      if (phase === "closed") {
+        const frame = window.requestAnimationFrame(() => setPhase("open"));
+        return () => window.cancelAnimationFrame(frame);
+      }
+      return;
+    }
+    if (phase !== "closed") {
+      setPhase("exiting");
+      exitTimer.current = setTimeout(() => setPhase("closed"), 190);
+    }
+    return () => {
+      if (exitTimer.current) clearTimeout(exitTimer.current);
+    };
+  }, [isOpen, phase]);
+
   useEffect(() => {
     if (!isOpen) return;
 
-    const previousFocus = document.activeElement as HTMLElement | null;
+    restoreFocusTo.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const focusable = () =>
       Array.from(
         panel.current?.querySelectorAll<HTMLElement>(
-          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), [tabindex="0"]',
+          'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]',
         ) ?? [],
       );
-    focusable()[0]?.focus();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Tab") {
-        const targets = focusable();
-        const first = targets[0];
-        const last = targets[targets.length - 1];
-        if (!first) {
-          e.preventDefault();
-          return;
-        }
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+    const initialFocus = focusable()[0];
+    initialFocus?.focus();
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
       }
-      if (e.key === "Escape") {
-        onClose();
+      if (event.key !== "Tab") return;
+      const targets = focusable();
+      const first = targets[0];
+      const last = targets[targets.length - 1];
+      if (!first) {
+        event.preventDefault();
+        panel.current?.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    // Lock body scroll while sheet is open
-    const originalOverflow = document.body.style.overflow;
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const marker = `arcade-sheet:${sheetId}`;
+    const currentState = (window.history.state ?? {}) as Record<string, unknown>;
+    window.history.pushState({ ...currentState, __arcadeSheet: marker }, "", window.location.href);
+    const handlePopState = () => {
+      const state = (window.history.state ?? {}) as Record<string, unknown>;
+      if (state.__arcadeSheet !== marker) onCloseRef.current();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = originalOverflow;
-      previousFocus?.focus();
+      window.removeEventListener("popstate", handlePopState);
+      document.body.style.overflow = previousOverflow;
+      restoreFocusTo.current?.focus();
+      const state = (window.history.state ?? {}) as Record<string, unknown>;
+      if (state.__arcadeSheet === marker) window.history.back();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, sheetId]);
 
-  if (!isOpen) return null;
+  if (phase === "closed") return null;
 
+  const isExiting = phase === "exiting";
   return (
-    <div className="arcade-sheet-backdrop" onClick={onClose} role="presentation">
+    <div
+      className="arcade-sheet-backdrop"
+      onClick={() => onCloseRef.current()}
+      role="presentation"
+      aria-hidden={isExiting}
+      style={{
+        opacity: isExiting ? 0 : 1,
+        animation: isExiting ? "none" : undefined,
+        transition: "opacity 180ms var(--ease-settle, cubic-bezier(0.16, 1, 0.3, 1))",
+        pointerEvents: isExiting ? "none" : "auto",
+      }}
+    >
       <div
         ref={panel}
         className="arcade-sheet-content"
         role="dialog"
-        aria-modal="true"
-        aria-labelledby="arcade-sheet-title"
-        onClick={(e) => e.stopPropagation()}
+        aria-modal={isOpen}
+        aria-hidden={isExiting}
+        inert={isExiting}
+        aria-labelledby={`arcade-sheet-title-${sheetId}`}
+        aria-describedby={description ? `arcade-sheet-description-${sheetId}` : undefined}
+        tabIndex={-1}
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          opacity: isExiting ? 0 : 1,
+          animation: isExiting ? "none" : undefined,
+          transform: isExiting ? "translateY(12px)" : "translateY(0)",
+          transition:
+            "opacity 180ms var(--ease-settle, cubic-bezier(0.16, 1, 0.3, 1)), transform 180ms var(--ease-settle, cubic-bezier(0.16, 1, 0.3, 1))",
+          pointerEvents: isExiting ? "none" : "auto",
+        }}
       >
         <div
           style={{
@@ -80,7 +146,7 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
         >
           <div>
             <h2
-              id="arcade-sheet-title"
+              id={`arcade-sheet-title-${sheetId}`}
               style={{
                 fontSize: "20px",
                 fontWeight: 700,
@@ -92,10 +158,10 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
             </h2>
             {description && (
               <p
+                id={`arcade-sheet-description-${sheetId}`}
                 style={{
                   fontSize: "13px",
                   color: "var(--color-muted-text)",
-                  marginTop: "4px",
                   margin: "4px 0 0 0",
                 }}
               >
@@ -108,7 +174,7 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
             aria-label="Close dialog"
             icon={<X size={20} />}
             variant="ghost"
-            onClick={onClose}
+            onClick={() => onCloseRef.current()}
           />
         </div>
 

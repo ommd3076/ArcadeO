@@ -6,7 +6,7 @@
  * distinct seat coloring, box fill animations, and live score counter.
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import type { Seat } from "../../../shared/protocol/types";
 import {
   type DotsBoxesView,
@@ -22,6 +22,7 @@ import { Surface } from "../../components/surface";
 import { Button } from "../../components/button";
 import { PlayerScoreStrip, BoardViewport } from "../../components/game-primitives";
 import { Sparkles } from "lucide-react";
+import { useAcceptedMotion } from "../../components/accepted-motion";
 import "./dots-boxes.css";
 
 interface DotsBoxesBoardProps {
@@ -33,6 +34,7 @@ interface DotsBoxesBoardProps {
   isSubmitting?: boolean;
   acceptedEventId?: string | null;
   acceptedEffects?: readonly DotsBoxesEffect[];
+  motionEnabled?: boolean;
 }
 
 export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
@@ -44,11 +46,13 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
   isSubmitting = false,
   acceptedEventId,
   acceptedEffects = [],
+  motionEnabled = true,
 }) => {
   const { edges, boxes, scores, activeSeat, status } = view;
   const dotCount = view.gridSize ?? 5;
   const boxCount = dotCount - 1;
   const step = 100 / boxCount;
+  const motionRootRef = useRef<HTMLDivElement>(null);
   const [zoom, setZoom] = useState(false);
 
   // Selected dot for alternative dot-to-dot edge placement
@@ -64,17 +68,55 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
     }
     return map;
   }, [edges]);
-  const animatedBoxes = new Set(
-    acceptedEventId
-      ? acceptedEffects.flatMap((effect) =>
-          effect.type === "boxes-claimed" ? effect.boxes.map((box) => `${box.row},${box.col}`) : [],
-        )
-      : [],
+  useAcceptedMotion(
+    acceptedEventId,
+    acceptedEffects,
+    (effects, reduceMotion) => {
+      const animations: Animation[] = [];
+      const placed = effects.find((effect) => effect.type === "edge-placed");
+      if (placed?.type === "edge-placed") {
+        const horizontal = placed.edge.r1 === placed.edge.r2;
+        const selector = horizontal
+          ? `[data-testid="edge-h-${placed.edge.r1}-${Math.min(placed.edge.c1, placed.edge.c2)}"] > div`
+          : `[data-testid="edge-v-${Math.min(placed.edge.r1, placed.edge.r2)}-${placed.edge.c1}"] > div`;
+        const edge = motionRootRef.current?.querySelector<HTMLElement>(selector);
+        if (edge?.animate)
+          animations.push(
+            edge.animate(
+              reduceMotion
+                ? [{ opacity: 0.65 }, { opacity: 1 }]
+                : [
+                    { opacity: 0.35, transform: "scale(.78)" },
+                    { opacity: 1, transform: "scale(1)" },
+                  ],
+              { duration: reduceMotion ? 100 : 260, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+            ),
+          );
+      }
+      for (const effect of effects) {
+        if (effect.type !== "boxes-claimed") continue;
+        for (const box of effect.boxes) {
+          const marker = motionRootRef.current?.querySelector<HTMLElement>(
+            `[data-testid="box-${box.row}-${box.col}"] span`,
+          );
+          if (marker?.animate)
+            animations.push(
+              marker.animate(
+                reduceMotion
+                  ? [{ opacity: 0.65 }, { opacity: 1 }]
+                  : [
+                      { opacity: 0.45, transform: "scale(.9)" },
+                      { opacity: 1, transform: "scale(1)" },
+                    ],
+                { duration: reduceMotion ? 100 : 300, easing: "cubic-bezier(0.16, 1, 0.3, 1)" },
+              ),
+            );
+        }
+      }
+      return animations;
+    },
+    { enabled: motionEnabled },
   );
-  const animatedEdge = acceptedEventId
-    ? acceptedEffects.find((effect) => effect.type === "edge-placed")
-    : undefined;
-  const animatedEdgeKey = animatedEdge?.type === "edge-placed" ? edgeKey(animatedEdge.edge) : null;
 
   // Handle direct edge tap
   const handleEdgeClick = (r1: number, c1: number, r2: number, c2: number) => {
@@ -135,6 +177,7 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
 
   return (
     <div
+      ref={motionRootRef}
       style={{
         display: "flex",
         flexDirection: "column",
@@ -223,9 +266,6 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
                             claimedSeat === "A"
                               ? "var(--player-a-accent, #10b981)"
                               : "var(--player-b-accent, #a855f7)",
-                          animation: animatedBoxes.has(`${br},${bc}`)
-                            ? "dots-box-in 250ms ease"
-                            : undefined,
                         }}
                       >
                         {claimedSeat}
@@ -286,8 +326,6 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
                         boxShadow: isPlaced
                           ? `0 0 6px ${claimedBy === "A" ? "#10b981" : "#a855f7"}`
                           : "none",
-                        animation:
-                          animatedEdgeKey === key ? "dots-edge-in 240ms ease-out" : undefined,
                       }}
                     />
                   </button>
@@ -344,8 +382,6 @@ export const DotsBoxesBoard: React.FC<DotsBoxesBoardProps> = ({
                         boxShadow: isPlaced
                           ? `0 0 6px ${claimedBy === "A" ? "#10b981" : "#a855f7"}`
                           : "none",
-                        animation:
-                          animatedEdgeKey === key ? "dots-edge-in 240ms ease-out" : undefined,
                       }}
                     />
                   </button>
