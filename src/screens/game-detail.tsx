@@ -4,7 +4,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { BackHeader } from "../components/back-header";
 import { Surface } from "../components/surface";
 import { Button } from "../components/button";
-import { Play, Users, Wifi, AlertCircle } from "lucide-react";
+import { useTheme } from "../theme/theme-context";
+import { Play, Users, Wifi, AlertCircle, RefreshCw } from "lucide-react";
 
 const GAME_TITLES: Record<string, string> = {
   "connect-four": "Connect Four",
@@ -38,9 +39,12 @@ const LUDO_NEAR: Record<string, string> = {
 export function GameDetailScreen() {
   const { gameId = "connect-four" } = useParams<{ gameId: string }>();
   const navigate = useNavigate();
+  const { resolvedMode } = useTheme();
+  const [seatNames, setSeatNames] = useState({ A: "Account A", B: "Account B" });
   const [activeMatches, setActiveMatches] = useState<
     Array<{ matchId: string; mode: string; lifecycle: string }>
   >([]);
+  const [matchesState, setMatchesState] = useState<"loading" | "ready" | "error">("loading");
   const creationRequests = useRef(new Map<string, string>());
   const [selectedMode, setSelectedMode] = useState<"remote" | "together">("remote");
   const [format, setFormat] = useState("best-of-3");
@@ -53,6 +57,7 @@ export function GameDetailScreen() {
   const gameTitle = GAME_TITLES[gameId] ?? "Game Details";
 
   const fetchActiveMatches = useCallback(() => {
+    setMatchesState("loading");
     apiFetch("/api/v1/matches")
       .then((r) =>
         r.ok
@@ -64,21 +69,49 @@ export function GameDetailScreen() {
                 lifecycle: string;
               }>;
             }>)
-          : null,
+          : Promise.reject(new Error(`Unable to load saved games (${r.status})`)),
       )
       .then((data) => {
-        if (!data?.matches) return;
+        if (!data?.matches) {
+          setActiveMatches([]);
+          setMatchesState("ready");
+          return;
+        }
         const matching = data.matches.filter(
           (m) => m.gameId === gameId && (m.lifecycle === "active" || m.lifecycle === "waiting"),
         );
         setActiveMatches(matching);
       })
-      .catch(() => {});
+      .then(() => setMatchesState("ready"))
+      .catch(() => setMatchesState("error"));
   }, [gameId]);
 
   useEffect(() => {
     fetchActiveMatches();
   }, [fetchActiveMatches]);
+
+  useEffect(() => {
+    let active = true;
+    apiFetch("/api/v1/profile")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: unknown) => {
+        const profile = data as {
+          profile?: { id?: "A" | "B"; displayName?: string };
+          opponent?: { id?: "A" | "B"; displayName?: string };
+        } | null;
+        if (!active || !profile?.profile || !profile.opponent) return;
+        const names = { A: "Account A", B: "Account B" };
+        if (profile.profile.id && profile.profile.displayName)
+          names[profile.profile.id] = profile.profile.displayName;
+        if (profile.opponent.id && profile.opponent.displayName)
+          names[profile.opponent.id] = profile.opponent.displayName;
+        setSeatNames(names);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const activeMatchForMode = activeMatches.find((m) => m.mode === selectedMode);
   const currentExistingMatchId = activeMatchForMode?.matchId;
@@ -269,7 +302,7 @@ export function GameDetailScreen() {
     <div style={{ minHeight: "100dvh", display: "flex", flexDirection: "column" }}>
       <BackHeader title={gameTitle} fallbackTo="/games" />
 
-      <main
+      <div
         style={{
           flex: 1,
           display: "flex",
@@ -298,16 +331,21 @@ export function GameDetailScreen() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 220px), 1fr))",
               gap: "var(--space-md)",
             }}
           >
             <Surface
+              as="button"
+              type="button"
               variant={selectedMode === "remote" ? "elevated" : "inset"}
               padding="md"
               radius="lg"
               style={{
                 cursor: "pointer",
+                color: "var(--color-text)",
+                textAlign: "start",
+                font: "inherit",
                 border:
                   selectedMode === "remote"
                     ? "2px solid var(--color-focus)"
@@ -317,14 +355,7 @@ export function GameDetailScreen() {
                 gap: "8px",
               }}
               onClick={() => setSelectedMode("remote")}
-              role="button"
-              tabIndex={0}
               aria-pressed={selectedMode === "remote"}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  setSelectedMode("remote");
-                }
-              }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <Wifi size={18} color="var(--color-focus)" />
@@ -351,11 +382,16 @@ export function GameDetailScreen() {
             </Surface>
 
             <Surface
+              as="button"
+              type="button"
               variant={selectedMode === "together" ? "elevated" : "inset"}
               padding="md"
               radius="lg"
               style={{
                 cursor: "pointer",
+                color: "var(--color-text)",
+                textAlign: "start",
+                font: "inherit",
                 border:
                   selectedMode === "together"
                     ? "2px solid var(--color-focus)"
@@ -365,14 +401,7 @@ export function GameDetailScreen() {
                 gap: "8px",
               }}
               onClick={() => setSelectedMode("together")}
-              role="button"
-              tabIndex={0}
               aria-pressed={selectedMode === "together"}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  setSelectedMode("together");
-                }
-              }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                 <Users size={18} color="var(--color-accent-fg)" />
@@ -406,6 +435,7 @@ export function GameDetailScreen() {
                 aria-label="Match format"
                 value={format}
                 onChange={(e) => setFormat(e.target.value)}
+                style={{ colorScheme: resolvedMode, accentColor: "var(--color-focus)" }}
               >
                 {["best-of-3", "best-of-5", "best-of-7"].map((value) => (
                   <option key={value} value={value}>
@@ -438,12 +468,13 @@ export function GameDetailScreen() {
               <legend>Pawn and house colours</legend>
               {(["A", "B"] as const).map((seat) => (
                 <label key={seat} style={{ display: "block", marginTop: 8 }}>
-                  Player {seat}{" "}
+                  {seatNames[seat]}{" "}
                   <select
                     value={ludoColours[seat]}
                     onChange={(event) =>
                       setLudoColours((current) => ({ ...current, [seat]: event.target.value }))
                     }
+                    style={{ colorScheme: resolvedMode, accentColor: "var(--color-focus)" }}
                   >
                     {LUDO_COLOURS.map((colour) => (
                       <option
@@ -462,7 +493,45 @@ export function GameDetailScreen() {
               ))}
             </fieldset>
           )}
-          {currentExistingMatchId && (
+          {matchesState === "loading" && (
+            <p role="status" style={{ marginTop: 16, color: "var(--color-muted-text)" }}>
+              Checking for a saved {selectedMode} match…
+            </p>
+          )}
+          {matchesState === "error" && (
+            <div
+              role="alert"
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 12,
+                marginTop: 16,
+              }}
+            >
+              <span>Saved match status is unavailable. Retry before starting a new match.</span>
+              <Button
+                variant="secondary"
+                size="sm"
+                leftIcon={<RefreshCw size={16} />}
+                onClick={fetchActiveMatches}
+              >
+                Retry
+              </Button>
+            </div>
+          )}
+          {matchesState === "ready" && !currentExistingMatchId && (
+            <p
+              style={{
+                margin: "var(--space-md) 0 0",
+                color: "var(--color-muted-text)",
+                fontSize: 14,
+              }}
+            >
+              No saved {selectedMode} match. Your next game will use this setup.
+            </p>
+          )}
+          {matchesState === "ready" && currentExistingMatchId && (
             <div
               style={{
                 marginTop: "var(--space-md)",
@@ -481,8 +550,9 @@ export function GameDetailScreen() {
                   A saved {selectedMode} match is in progress
                 </span>
               </div>
-              <p style={{ fontSize: "12px", color: "var(--color-muted-text)", margin: 0 }}>
-                You can resume your game where you left off, or abandon it to start a new match.
+              <p style={{ fontSize: "14px", color: "var(--color-muted-text)", margin: 0 }}>
+                Continue with the Resume button below, or abandon this saved match before starting
+                fresh.
               </p>
               <div
                 style={{
@@ -493,15 +563,9 @@ export function GameDetailScreen() {
                 }}
               >
                 <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => navigate("/matches/" + currentExistingMatchId)}
-                >
-                  Resume saved match
-                </Button>
-                <Button
                   variant="secondary"
                   size="sm"
+                  style={{ minHeight: 44 }}
                   disabled={isAbandoning}
                   onClick={handleAbandonSaved}
                 >
@@ -539,7 +603,7 @@ export function GameDetailScreen() {
             fullWidth
             leftIcon={<Play size={20} />}
             onClick={handleStartMatch}
-            disabled={isSubmitting || isAbandoning}
+            disabled={isSubmitting || isAbandoning || matchesState !== "ready"}
             aria-label={currentExistingMatchId ? "Resume Match" : "Start Match"}
           >
             {isSubmitting
@@ -549,7 +613,7 @@ export function GameDetailScreen() {
                 : "Start Match"}
           </Button>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
