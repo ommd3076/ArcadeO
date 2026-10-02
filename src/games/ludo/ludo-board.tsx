@@ -805,7 +805,7 @@ export const LudoBoard: React.FC<LudoBoardProps> = ({
               </div>
               <div style={{ fontSize: "12px", color: "var(--color-muted-text, #94a3b8)" }}>
                 {consecutiveSixes > 0 && consecutiveSixes < 2 && (
-                  <span style={{ color: "var(--color-emphasis-yellow-ink, #f59e0b)" }}>
+                  <span style={{ color: "var(--color-text, #F5F5F7)" }}>
                     <Sparkles size={12} style={{ display: "inline", verticalAlign: "middle" }} />{" "}
                     Bonus roll earned!
                   </span>
