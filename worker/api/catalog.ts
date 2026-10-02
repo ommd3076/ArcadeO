@@ -75,10 +75,10 @@ export const ARCADE_GAMES: GameMetadata[] = [
   {
     id: "hand-cricket",
     title: "Hand Cricket",
-    subtitle: "Secret 1-to-6 Innings Chase",
+    subtitle: "Secret numbers · Bat and bowl",
     modes: ["remote", "together"],
     description:
-      "Toss for bat or bowl. Secretly pick fingers 1 to 6. Equal numbers are OUT; differing numbers score for the batter.",
+      "Toss for bat or bowl. Secretly choose 1 to 10. Different numbers add the batter's number; equal numbers mean OUT and a change of roles. Together, both bat until OUT, then compare totals.",
     tactilePawn: "bat",
     accent: "teal",
   },

@@ -18,6 +18,7 @@ import { IconButton } from "../components/icon-button";
 import { Sheet } from "../components/sheet";
 import { MoreVertical, RotateCcw, AlertTriangle, Trophy, Home, CheckCircle2 } from "lucide-react";
 import { useMatchSession } from "../sync/use-match-session";
+import "./match.css";
 import { ConnectFourBoard } from "../games/connect-four/connect-four-board";
 import { RPSBoard } from "../games/rps/rps-board";
 import { LudoBoard } from "../games/ludo/ludo-board";
@@ -150,6 +151,37 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
   // Readiness status
   const isWaitingForReady = lifecycle === "waiting";
   const myReady = mySeat === "A" ? isAReady : isBReady;
+  const cricketView = view?.gameId === "hand-cricket" ? (view.gameState as CricketView) : undefined;
+  const cricketChoosing =
+    !!cricketView?.roles && !cricketView.lastDelivery && cricketView.lockedSeats.length < 2;
+  const displayedTurnSeat: Seat = cricketView
+    ? isTerminal && winnerSeat
+      ? winnerSeat
+      : cricketView.roles
+        ? cricketChoosing
+          ? isTogether
+            ? (cricketView.expectedChooser ?? cricketView.roles.bat)
+            : mySeat
+          : cricketView.roles.bat
+        : cricketView.tossWinner
+    : turnSeat;
+  const cricketRole = cricketView?.roles
+    ? cricketView.roles.bat === displayedTurnSeat
+      ? "Batting"
+      : "Bowling"
+    : undefined;
+  const cricketStatus =
+    cricketView?.roles && !isTerminal && !isWaitingForReady
+      ? cricketView.lastDelivery
+        ? cricketView.lastDelivery.outcome === "out"
+          ? "Out · Switch batting"
+          : `${cricketView.roles.bat === "A" ? playerAName : playerBName} keeps batting`
+        : cricketView.lockedSeats.length === 2
+          ? "Both numbers locked · Reveal ball"
+          : !isTogether && cricketView.lockedSeats.includes(mySeat)
+            ? "Number locked · Waiting for the other player"
+            : `${cricketRole} · Choose your number`
+      : undefined;
 
   // Handle Ready action
   const handleReady = async () => {
@@ -392,6 +424,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
   return (
     <div
+      className={`arcade-match-page ${focusMode ? "arcade-match-page--focused" : ""}`.trim()}
       style={{
         ["--player-a-accent" as string]: accentA.foreground,
         ["--player-b-accent" as string]: accentB.foreground,
@@ -406,6 +439,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
     >
       {/* 1. Header: Back preserves match */}
       <GameHeader
+        className="arcade-match-header"
         title={view?.gameId ? (GAME_TITLES[view.gameId] ?? view.gameId) : "Match"}
         subtitle={isTogether ? "Together" : "Remote"}
         fallbackTo="/games"
@@ -424,7 +458,8 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         }
       />
 
-      <main
+      <div
+        className={`arcade-match-main ${["dots-boxes", "sos", "connect-four"].includes(view?.gameId ?? "") ? "arcade-match-main--wide" : ""}`.trim()}
         style={{
           flex: 1,
           display: "flex",
@@ -526,13 +561,25 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
         {/* 3. Turn Strip / Match Status */}
         {!["dots-boxes", "sos"].includes(view?.gameId ?? "") && (
           <TurnStrip
-            activePlayerName={turnSeat === "A" ? playerAName : playerBName}
-            activeSeat={turnSeat}
-            activeAccent={turnSeat === "A" ? playerAAccent : playerBAccent}
-            isYourTurn={isMyTurn && !isTerminal && !isWaitingForReady}
-            role={isTogether ? `Seat ${turnSeat}` : mySeat === "A" ? "Host" : "Guest"}
+            className="arcade-match-turn-strip"
+            activePlayerName={displayedTurnSeat === "A" ? playerAName : playerBName}
+            activeSeat={displayedTurnSeat}
+            activeAccent={displayedTurnSeat === "A" ? playerAAccent : playerBAccent}
+            isYourTurn={
+              cricketView
+                ? cricketChoosing &&
+                  !isTerminal &&
+                  !isWaitingForReady &&
+                  !state.isInputPaused &&
+                  (isTogether || !cricketView.lockedSeats.includes(mySeat))
+                : isMyTurn && !isTerminal && !isWaitingForReady
+            }
+            role={
+              cricketRole ?? (isTogether ? `Seat ${turnSeat}` : mySeat === "A" ? "Host" : "Guest")
+            }
             statusText={
-              isTerminal
+              cricketStatus ??
+              (isTerminal
                 ? winnerSeat
                   ? `${winnerSeat === "A" ? playerAName : playerBName} won the match!`
                   : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
@@ -546,7 +593,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                       : "Ready to play?"
                   : isMyTurn
                     ? "Your turn"
-                    : `Waiting for ${turnSeat === "A" ? playerAName : playerBName}...`
+                    : `Waiting for ${turnSeat === "A" ? playerAName : playerBName}...`)
             }
             scoreText={
               terminalResult?.scores
@@ -669,106 +716,109 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
 
         {/* 5. Terminal Result Card */}
         {isTerminal && (
-          <ResultPanel
-            title={
-              winnerSeat
-                ? `${winnerSeat === "A" ? playerAName : playerBName} Wins!`
-                : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
-                  ? "Attempt completed"
-                  : terminalResult?.reason === "abandonment"
-                    ? "Match abandoned"
-                    : terminalResult?.reason === "cancelled" ||
-                        terminalResult?.reason === "declined"
-                      ? "Invitation closed"
-                      : "Match Drawn"
-            }
-          >
-            <div
-              style={{
-                display: "inline-flex",
-                padding: "12px",
-                borderRadius: "var(--radius-full)",
-                backgroundColor: "var(--color-raised)",
-                marginBottom: "8px",
-              }}
+          <div className="arcade-match-result">
+            <ResultPanel
+              title={
+                winnerSeat
+                  ? `${winnerSeat === "A" ? playerAName : playerBName} Wins!`
+                  : view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode !== "duel"
+                    ? "Attempt completed"
+                    : terminalResult?.reason === "abandonment"
+                      ? "Match abandoned"
+                      : terminalResult?.reason === "cancelled" ||
+                          terminalResult?.reason === "declined"
+                        ? "Invitation closed"
+                        : "Match Drawn"
+              }
             >
-              <Trophy size={32} color="var(--color-emphasis-yellow-ink, #FDE047)" />
-            </div>
-            <p
-              style={{
-                fontSize: "13px",
-                color: "var(--color-muted-text)",
-                margin: "0 0 var(--space-lg) 0",
-              }}
-            >
-              {terminalResult?.reason === "resignation"
-                ? `Resignation by ${terminalResult.resignedBy === "A" ? playerAName : playerBName}.`
-                : winnerSeat
-                  ? view?.gameId === "connect-four"
-                    ? "Four discs connected in a row!"
-                    : "Saved match result."
-                  : terminalResult?.reason === "abandonment"
-                    ? "Abandoned without a score."
-                    : terminalResult?.reason === "declined"
-                      ? "Invitation declined."
-                      : terminalResult?.reason === "cancelled"
-                        ? "Invitation cancelled."
-                        : "Saved draw."}
-            </p>
-
-            {view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode === "practice" && (
-              <Button
-                onClick={async () => {
-                  try {
-                    const response = await apiFetch("/api/v1/records/summary");
-                    if (!response.ok) throw new Error("Unable to load completed puzzles. Retry.");
-                    const data = (await response.json()) as { ownCompletedPuzzleIds?: string[] };
-                    const bucket = (view.gameState as SudokuView).puzzleId.split("-")[0];
-                    const next =
-                      Array.from({ length: 250 }, (_, i) => i + 1).find(
-                        (number) =>
-                          !data.ownCompletedPuzzleIds?.includes(
-                            bucket + "-" + String(number).padStart(3, "0"),
-                          ),
-                      ) ?? 1;
-                    sessionStorage.setItem(
-                      "pa_sudoku_selection",
-                      JSON.stringify({ bucket, number: next, page: Math.floor((next - 1) / 50) }),
-                    );
-                    navigate("/games/sudoku");
-                  } catch (err) {
-                    setActionError((err as Error).message);
-                  }
+              <div
+                style={{
+                  display: "inline-flex",
+                  padding: "12px",
+                  borderRadius: "var(--radius-full)",
+                  backgroundColor: "var(--color-raised)",
+                  marginBottom: "8px",
                 }}
               >
-                Choose next puzzle
-              </Button>
-            )}
-            <div style={{ display: "flex", gap: "var(--space-md)" }}>
-              <Button
-                variant="primary"
-                size="md"
-                fullWidth
-                onClick={handleRematch}
-                leftIcon={<RotateCcw size={16} />}
+                <Trophy size={32} color="var(--color-emphasis-yellow-ink, #FDE047)" />
+              </div>
+              <p
+                style={{
+                  fontSize: "13px",
+                  color: "var(--color-muted-text)",
+                  margin: "0 0 var(--space-lg) 0",
+                }}
               >
-                Rematch
-              </Button>
-              <Button
-                variant="secondary"
-                size="md"
-                fullWidth
-                onClick={() => navigate("/games")}
-                leftIcon={<Home size={16} />}
-              >
-                Return Home
-              </Button>
-            </div>
-          </ResultPanel>
+                {terminalResult?.reason === "resignation"
+                  ? `Resignation by ${terminalResult.resignedBy === "A" ? playerAName : playerBName}.`
+                  : winnerSeat
+                    ? view?.gameId === "connect-four"
+                      ? "Four discs connected in a row!"
+                      : "Saved match result."
+                    : terminalResult?.reason === "abandonment"
+                      ? "Abandoned without a score."
+                      : terminalResult?.reason === "declined"
+                        ? "Invitation declined."
+                        : terminalResult?.reason === "cancelled"
+                          ? "Invitation cancelled."
+                          : "Saved draw."}
+              </p>
+
+              {view?.gameId === "sudoku" && (view.gameState as SudokuView)?.mode === "practice" && (
+                <Button
+                  onClick={async () => {
+                    try {
+                      const response = await apiFetch("/api/v1/records/summary");
+                      if (!response.ok) throw new Error("Unable to load completed puzzles. Retry.");
+                      const data = (await response.json()) as { ownCompletedPuzzleIds?: string[] };
+                      const bucket = (view.gameState as SudokuView).puzzleId.split("-")[0];
+                      const next =
+                        Array.from({ length: 250 }, (_, i) => i + 1).find(
+                          (number) =>
+                            !data.ownCompletedPuzzleIds?.includes(
+                              bucket + "-" + String(number).padStart(3, "0"),
+                            ),
+                        ) ?? 1;
+                      sessionStorage.setItem(
+                        "pa_sudoku_selection",
+                        JSON.stringify({ bucket, number: next, page: Math.floor((next - 1) / 50) }),
+                      );
+                      navigate("/games/sudoku");
+                    } catch (err) {
+                      setActionError((err as Error).message);
+                    }
+                  }}
+                >
+                  Choose next puzzle
+                </Button>
+              )}
+              <div style={{ display: "flex", gap: "var(--space-md)" }}>
+                <Button
+                  variant="primary"
+                  size="md"
+                  fullWidth
+                  onClick={handleRematch}
+                  leftIcon={<RotateCcw size={16} />}
+                >
+                  Rematch
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  fullWidth
+                  onClick={() => navigate("/games")}
+                  leftIcon={<Home size={16} />}
+                >
+                  Return Home
+                </Button>
+              </div>
+            </ResultPanel>
+          </div>
         )}
 
         {/* 6. Centered Game Board Surface */}
         <div
+          className="arcade-match-board-stage"
           style={{
             flex: 1,
             display: "flex",
@@ -976,7 +1026,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
             />
           )}
         </div>
-      </main>
+      </div>
 
       {/* Match Options Sheet */}
       <Sheet
