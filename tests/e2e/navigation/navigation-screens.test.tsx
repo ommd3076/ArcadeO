@@ -11,7 +11,7 @@ import { GameDetailScreen } from "../../../src/screens/game-detail";
 import { SudokuListScreen } from "../../../src/screens/sudoku-list";
 
 describe("Product Navigation and Shell Screens (Task U06)", () => {
-  it("renders HomePage with welcome greeting, weekly momentum and quick play grid", () => {
+  it("renders HomePage with a greeting, shared activity and all quick game links", () => {
     const html = renderToString(
       React.createElement(
         MemoryRouter,
@@ -24,14 +24,14 @@ describe("Product Navigation and Shell Screens (Task U06)", () => {
       ),
     );
 
-    expect(html).toContain("Welcome Back");
-    expect(html).toContain("Weekly shared momentum");
-    expect(html).toContain("Quick Play");
-    expect(html).toContain("All 8 Games");
+    expect(html).toContain("Welcome");
+    expect(html).toContain("This week");
+    expect(html).toContain("Play a game");
+    expect(html).toContain("All eight games");
     expect(html).toContain("Connect Four");
     expect(html).toContain("Sudoku");
     expect(html).toContain("Ludo");
-    expect(html).toContain("RPS");
+    expect(html).toContain("Rock Paper Scissors");
   });
 
   it("renders GamesPage with all eight distinct games and zero placeholder cards", () => {
@@ -55,7 +55,7 @@ describe("Product Navigation and Shell Screens (Task U06)", () => {
     expect(html).not.toContain("Coming Soon");
   });
 
-  it("renders UsPage with head-to-head records, theme palettes, modes and accents", () => {
+  it("renders UsPage with shared records, appearance controls and piece identity", () => {
     const html = renderToString(
       React.createElement(
         MemoryRouter,
@@ -68,19 +68,20 @@ describe("Product Navigation and Shell Screens (Task U06)", () => {
       ),
     );
 
-    expect(html).toContain("Us &amp; Appearance");
-    expect(html).toContain("Head-to-Head");
-    expect(html).toContain("Palette Family");
+    expect(html).toContain("Us &amp; appearance");
+    expect(html).toContain("Shared records");
+    expect(html).toContain("By game");
+    expect(html).toContain("Theme family");
     expect(html).toContain("Standard");
     expect(html).toContain("Romantic");
-    expect(html).toContain("Color Mode (Dark Default)");
+    expect(html).toContain("Display mode");
     expect(html).toContain("Dark");
     expect(html).toContain("Light");
     expect(html).toContain("System");
-    expect(html).toContain("Player Accent");
+    expect(html).toContain("Piece identity");
     expect(html).toContain("Teal");
     expect(html).toContain("Violet");
-    expect(html).toContain("Sign Out");
+    expect(html).toContain("Sign out");
   });
 
   it("renders GameDetailScreen with mode selection and Start Match button", () => {
@@ -115,7 +116,7 @@ describe("Product Navigation and Shell Screens (Task U06)", () => {
       ),
     );
 
-    expect(html).toContain("Sudoku Vault");
+    expect(html).toContain("Choose your Sudoku");
     expect(html).toContain("Practice");
     expect(html).toContain("Duel");
     expect(html).toContain("Challenge");

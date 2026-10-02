@@ -6,7 +6,7 @@ test("deep-link authentication guard, client session deadline and UI logout", as
   await page.goto("/login");
   await login(page, "A");
   await page.goto("/us");
-  await page.getByRole("button", { name: "Sign Out", exact: true }).click();
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
   await expect(page).toHaveURL(/login/);
   const r = await page.request.get("/api/v1/auth/session");
   expect((await r.json()).authenticated).toBe(false);
