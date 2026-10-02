@@ -2,7 +2,7 @@
  * Private Arcade V1 — Hand Cricket Game Types
  *
  * Server-authoritative state, effects, and views for Hand Cricket.
- * Numbers 1..6, one wicket each, two innings, no ball limit.
+ * Legacy choices 1..6; current choices 1..10. Together: both bat until OUT.
  */
 
 import {
@@ -20,8 +20,8 @@ export interface CricketDeliveryResult {
   innings: 1 | 2;
   deliveryId: number;
   runs: {
-    bat: number; // 1..6
-    bowl: number; // 1..6
+    bat: number;
+    bowl: number;
   };
   outcome: "runs" | "out";
   scoredRuns: number; // 0 if out, else runs.bat
@@ -41,11 +41,11 @@ export interface CricketState {
   } | null;
   firstInningsRuns: number;
   secondInningsRuns: number;
-  target: number | null; // Set when 1st innings concludes: firstInningsRuns + 1 (special: 0 runs -> target 1)
+  target: number | null; // Remote/legacy chase threshold. Together V2 has no chase target.
   deliveryId: number; // Current delivery number in innings (1-indexed)
   secretDeliveries: {
-    A?: number; // 1..6
-    B?: number; // 1..6
+    A?: number;
+    B?: number;
   };
   lockedSeats: Seat[];
   lastDelivery: CricketDeliveryResult | null;
@@ -96,7 +96,7 @@ export type CricketEffect =
       innings: 2;
       newBatter: Seat;
       newBowler: Seat;
-      target: number;
+      target: number | null;
     }
   | {
       type: "game-won";
@@ -112,6 +112,7 @@ export type CricketEffect =
 
 export interface CricketView {
   rulesVersion?: number;
+  completionRule?: "both-out" | "chase";
   allowedNumbers?: number[];
   expectedChooser?: Seat;
   expectedRole?: CricketRole;
