@@ -34,3 +34,6 @@ Bank README claims uniquely generated/graded puzzles; this planning pass does no
 App font files have not been fetched. Use official Space Grotesk, DM Sans and DM Mono subsets/licenses from UI-CONTRACT during P01. Lucide is the sole icon family; import used icons only. Procedural CSS/SVG symbols and an optional die/pawn suffice; no stock character/photo pipeline.
 
 Seven pinned upstream UI skills plus our build skill are installed in .agents/skills; [agents/SKILLS.md](../agents/SKILLS.md) records revisions/notices. Skills guide agents; they are not application packages. Actual host discovery is a startup check.
+
+## LibreLudo pinned reference (2026-10-03)
+`assets/libreludo/reference-425b100.zip` stores the owner-requested unmodified revision425b100097d1a113fa8d6d90e53eff6519a53edc. GNU AGPLv3 license inspected and retained alongside the archive. ArchiveSHA256372002413ce2a9cc5b20828dc66662a883f1d0a5ab50777e6cae5f1d7453f0fb. This is reference data only; no runtime/artwork adoption. Existing one-capture/six/selection/geometry rules and original CSS/SVG pawns remain authoritative. Do not run its scripts or import its Redux/motion state.
