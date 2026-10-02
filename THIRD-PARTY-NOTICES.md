@@ -1,6 +1,6 @@
 # Third-Party Notices and Attributions
 
-This project incorporates qualified data, rules algorithms, and assets from third-party open-source projects under permissible licenses.
+This project incorporates qualified data, rules algorithms, and assets from third-party open-source projects under permissible licenses. The public build ships this notice at `/THIRD-PARTY-NOTICES.md` and the complete installed React, React DOM, Scheduler, React Router, React Router DOM and Lucide licenses, plus qualified Connect Four/DotBox reference licenses, at `/licenses/DEPENDENCY-LICENSES.txt`. The build preserves the full Lucide ISC notice and its MIT notice for Feather-derived icons.
 
 ---
 

@@ -3,6 +3,27 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { build } from "vite";
 
+// Ship complete notices with the distributed app, including bundled dependencies.
+const licenseSources = [
+  ["lucide-react", "node_modules/lucide-react/LICENSE"],
+  ["react", "node_modules/react/LICENSE"],
+  ["react-dom", "node_modules/react-dom/LICENSE"],
+  ["scheduler", "node_modules/scheduler/LICENSE"],
+  ["react-router", "node_modules/react-router/LICENSE.md"],
+  ["react-router-dom", "node_modules/react-router-dom/LICENSE.md"],
+  ["Connect Four reference", "assets/connect-four-main/LICENSE"],
+  ["DotBox reference", "assets/DotBox-master/LICENSE"],
+];
+fs.mkdirSync("dist/client/licenses", { recursive: true });
+fs.copyFileSync("THIRD-PARTY-NOTICES.md", "dist/client/THIRD-PARTY-NOTICES.md");
+fs.writeFileSync(
+  "dist/client/licenses/DEPENDENCY-LICENSES.txt",
+  licenseSources
+    .map(([name, source]) => `=== ${name} ===\n\n${fs.readFileSync(source, "utf8").trim()}\n`)
+    .join("\n"),
+);
+const noticePaths = ["/THIRD-PARTY-NOTICES.md", "/licenses/DEPENDENCY-LICENSES.txt"];
+
 const assetPaths = fs
   .readdirSync("dist/client/assets")
   .map((name) => `/assets/${name}`)
@@ -34,7 +55,7 @@ const shellPaths = [
   ...entryAssets,
   ...fonts,
 ];
-const publicAssets = [...shellPaths, ...assetPaths];
+const publicAssets = [...shellPaths, ...assetPaths, ...noticePaths];
 const hash = createHash("sha256");
 for (const asset of [...new Set(publicAssets)].sort()) {
   hash
