@@ -1,16 +1,27 @@
-import { apiFetch, useAuth } from "../auth";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Surface } from "../../components/surface";
+import {
+  ArrowRight,
+  CircleDot,
+  Clock3,
+  Dices,
+  Grid2X2,
+  Hash,
+  LoaderCircle,
+  RefreshCw,
+  Shuffle,
+  Swords,
+  Target,
+} from "lucide-react";
+import { apiFetch, useAuth } from "../auth";
 import { Button } from "../../components/button";
-import { ArrowRight, Play, Zap, Clock } from "lucide-react";
-import { useTheme } from "../../theme/theme-context";
+import { Surface } from "../../components/surface";
 import { LibraryControls } from "./library-controls";
 
 interface ActiveMatchSummary {
   matchId: string;
   gameId: string;
-  mode: "remote" | "together";
+  mode: "remote" | "together" | "practice" | "duel" | "challenge";
   turnSeat?: string;
   lifecycle: string;
   startedAt?: number;
@@ -18,385 +29,246 @@ interface ActiveMatchSummary {
 
 interface RecordsSummary {
   summary: {
-    totalPlayed: number;
-    winsA: number;
-    winsB: number;
-    currentStreak: { holder: string | null; count: number };
-    thisWeek?: { total: number };
-    calcuttaWeek?: {
-      weekStartMs: number;
-      matchesThisWeek: number;
-      winsAThisWeek: number;
-      winsBThisWeek: number;
-    };
+    thisWeek?: { total: number; sentence?: string };
+    calcuttaWeek?: { matchesThisWeek: number };
   };
+}
+
+const gameNames: Record<string, string> = {
+  "connect-four": "Connect Four",
+  "rock-paper-scissors": "Rock Paper Scissors",
+  ludo: "Ludo",
+  "snakes-and-ladders": "Snakes & Ladders",
+  "dots-boxes": "Dots & Boxes",
+  sos: "SOS",
+  "hand-cricket": "Hand Cricket",
+  sudoku: "Sudoku",
+};
+
+const quickGames = [
+  { id: "connect-four", name: "Connect Four", icon: CircleDot },
+  { id: "rock-paper-scissors", name: "Rock Paper Scissors", icon: Swords },
+  { id: "ludo", name: "Ludo", icon: Dices },
+  { id: "snakes-and-ladders", name: "Snakes & Ladders", icon: Shuffle },
+  { id: "dots-boxes", name: "Dots & Boxes", icon: Grid2X2 },
+  { id: "sos", name: "SOS", icon: Hash },
+  { id: "hand-cricket", name: "Hand Cricket", icon: Target },
+  { id: "sudoku", name: "Sudoku", icon: Grid2X2 },
+] as const;
+
+function formatGameName(gameId: string) {
+  return gameNames[gameId] ?? gameId.replaceAll("-", " ");
+}
+
+function matchStatus(lifecycle: string) {
+  return lifecycle === "waiting" ? "Waiting" : "In progress";
+}
+
+function modeName(mode: ActiveMatchSummary["mode"]) {
+  return mode === "practice" || mode === "duel" || mode === "challenge"
+    ? mode === "duel"
+      ? "Live duel"
+      : mode === "challenge"
+        ? "Later challenge"
+        : "Practice"
+    : mode === "together"
+      ? "Together"
+      : "Remote";
 }
 
 export function HomePage() {
   const { session } = useAuth();
-  const { family } = useTheme();
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "ready">("loading");
+  const [matchesError, setMatchesError] = useState(false);
+  const [recordsError, setRecordsError] = useState(false);
   const [activeMatches, setActiveMatches] = useState<ActiveMatchSummary[]>([]);
   const [recordsSummary, setRecordsSummary] = useState<RecordsSummary | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const loadDashboard = useCallback(async () => {
+    setLoadState("loading");
+    const [matchesResult, recordsResult] = await Promise.allSettled([
+      apiFetch("/api/v1/matches").then((response) => {
+        if (!response.ok) throw new Error("Unable to load saved matches");
+        return response.json() as Promise<{ matches?: ActiveMatchSummary[] }>;
+      }),
+      apiFetch("/api/v1/records/summary").then((response) => {
+        if (!response.ok) throw new Error("Unable to load shared records");
+        return response.json() as Promise<RecordsSummary>;
+      }),
+    ]);
+
+    setMatchesError(matchesResult.status === "rejected");
+    setRecordsError(recordsResult.status === "rejected");
+    if (matchesResult.status === "fulfilled") {
+      setActiveMatches(
+        (matchesResult.value.matches ?? []).filter(
+          (match) => match.lifecycle === "active" || match.lifecycle === "waiting",
+        ),
+      );
+    }
+    if (recordsResult.status === "fulfilled") setRecordsSummary(recordsResult.value);
+    setLoadState("ready");
+  }, []);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadDashboard() {
-      try {
-        const [matchesRes, recordsRes] = await Promise.all([
-          apiFetch("/api/v1/matches").then((r) =>
-            r.ok
-              ? (r.json() as Promise<{ matches?: ActiveMatchSummary[] }>)
-              : Promise.reject(new Error("Unable to load saved matches")),
-          ),
-          apiFetch("/api/v1/records/summary").then((r) =>
-            r.ok ? (r.json() as Promise<RecordsSummary>) : null,
-          ),
-        ]);
-
-        if (isMounted) {
-          if (matchesRes?.matches) {
-            setActiveMatches(
-              matchesRes.matches.filter(
-                (match) => match.lifecycle === "active" || match.lifecycle === "waiting",
-              ),
-            );
-          }
-          if (recordsRes?.summary) {
-            setRecordsSummary(recordsRes);
-          }
-        }
-      } catch (err) {
-        if (isMounted) setLoadError((err as Error).message);
-      }
-    }
-
-    loadDashboard();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    void loadDashboard();
+  }, [loadDashboard, reloadKey]);
 
   const dominantMatch = activeMatches[0] ?? null;
   const weeklyCount =
     recordsSummary?.summary?.thisWeek?.total ??
-    recordsSummary?.summary?.calcuttaWeek?.matchesThisWeek ??
-    0;
+    recordsSummary?.summary?.calcuttaWeek?.matchesThisWeek;
+  const weeklySummary = recordsError
+    ? "This week’s shared activity is unavailable."
+    : weeklyCount === undefined
+      ? "Loading this week’s shared activity…"
+      : weeklyCount === 0
+        ? "No matches played yet this week."
+        : `${weeklyCount} match${weeklyCount === 1 ? "" : "es"} played this week.`;
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--space-2xl)",
-        padding: "calc(var(--space-xl) + var(--sat)) var(--space-lg) calc(96px + var(--sab))",
-        maxWidth: "960px",
-        margin: "0 auto",
-        width: "100%",
-      }}
-    >
-      {loadError && <p role="alert">{loadError}. Refresh to retry.</p>}
-      {/* Header Greeting & Weekly Sentence */}
-      <header>
-        <span
-          style={{
-            fontSize: "13px",
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.05em",
-            color: "var(--color-muted-text)",
-          }}
-        >
-          Private Arcade
-        </span>
-        <h1
-          style={{
-            fontSize: "32px",
-            lineHeight: 1.15,
-            fontWeight: 800,
-            fontFamily: "var(--font-heading)",
-            marginTop: "4px",
-          }}
-        >
-          Welcome Back
-          {session?.profile.displayName ? `, ${session.profile.displayName}` : ""}
+    <div className="home-page">
+      <header className="home-page__header">
+        <p className="eyebrow">Private Arcade</p>
+        <h1>
+          {session?.profile.displayName ? `Hello, ${session.profile.displayName}` : "Welcome"}
         </h1>
-        <p
-          style={{
-            color: family === "standard" ? "#102426" : "var(--color-muted-text)",
-            background:
-              family === "standard" ? "var(--color-emphasis-cyan-bg)" : "var(--color-raised)",
-            padding: "12px 16px",
-            borderRadius: "16px",
-            fontSize: "15px",
-            marginTop: "16px",
-          }}
-        >
-          {weeklyCount > 0
-            ? `Weekly shared momentum: ${weeklyCount} match${weeklyCount > 1 ? "es" : ""} played together this week.`
-            : "Weekly shared momentum: Start your first match together this week."}
-        </p>
+        <p className="home-page__intro">A little time for a game together.</p>
       </header>
 
-      {/* Dominant Continue Card or Start Match Invitation */}
-      {dominantMatch ? (
-        <Surface
-          variant={family === "standard" ? "emphasis-mint" : "elevated"}
-          padding="xl"
-          radius="xl"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-md)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                padding: "3px 8px",
-                borderRadius: "var(--radius-full)",
-                backgroundColor:
-                  family === "standard" ? "rgba(29, 41, 21, 0.15)" : "var(--color-accent-fill)",
-                color: family === "standard" ? "#1D2915" : "var(--color-accent-fg)",
-              }}
-            >
-              Continue Playing
-            </span>
-            <span style={{ fontSize: "13px", fontWeight: 600, textTransform: "capitalize" }}>
-              {dominantMatch.mode} Mode
-            </span>
-          </div>
-
-          <div>
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                fontFamily: "var(--font-heading)",
-                margin: "0 0 4px 0",
-                textTransform: "capitalize",
-                color: family === "standard" ? "#1D2915" : "var(--color-text)",
-              }}
-            >
-              {dominantMatch.gameId.replace("-", " ")}
-            </h2>
-            <p
-              style={{
-                fontSize: "14px",
-                margin: 0,
-                color: family === "standard" ? "rgba(29, 41, 21, 0.8)" : "var(--color-muted-text)",
-              }}
-            >
-              Match #{dominantMatch.matchId.slice(0, 8)} • In Progress
-            </p>
-          </div>
-
-          <div style={{ marginTop: "var(--space-sm)" }}>
-            <Link to={`/matches/${dominantMatch.matchId}`} style={{ textDecoration: "none" }}>
-              <Button
-                variant={family === "standard" ? "secondary" : "primary"}
-                size="md"
-                leftIcon={<Play size={16} />}
-              >
-                Resume Game
-              </Button>
-            </Link>
-          </div>
-        </Surface>
-      ) : (
-        <Surface
-          variant={family === "standard" ? "emphasis-mint" : "elevated"}
-          padding="xl"
-          radius="xl"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "var(--space-md)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span
-              style={{
-                fontSize: "12px",
-                fontWeight: 700,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                padding: "3px 8px",
-                borderRadius: "var(--radius-full)",
-                backgroundColor:
-                  family === "standard" ? "rgba(29, 41, 21, 0.15)" : "var(--color-accent-fill)",
-                color: family === "standard" ? "#1D2915" : "var(--color-accent-fg)",
-              }}
-            >
-              Ready For A Match
-            </span>
-            <span
-              style={{
-                fontSize: "13px",
-                fontWeight: 600,
-                background:
-                  family === "standard" ? "var(--color-emphasis-yellow-bg)" : "var(--color-raised)",
-                borderRadius: "12px",
-                padding: "4px 8px",
-              }}
-            >
-              Arcade Open
-            </span>
-          </div>
-
-          <div>
-            <h2
-              style={{
-                fontSize: "24px",
-                fontWeight: 700,
-                fontFamily: "var(--font-heading)",
-                margin: "0 0 4px 0",
-                color: family === "standard" ? "#1D2915" : "var(--color-text)",
-              }}
-            >
-              Connect Four
-            </h2>
-            <p
-              style={{
-                fontSize: "14px",
-                margin: 0,
-                color: family === "standard" ? "rgba(29, 41, 21, 0.8)" : "var(--color-muted-text)",
-              }}
-            >
-              Quick two-player duel. Remote over the wire or together on one phone.
-            </p>
-          </div>
-
-          <div style={{ marginTop: "var(--space-sm)" }}>
-            <Link to="/games/connect-four" style={{ textDecoration: "none" }}>
-              <Button
-                variant={family === "standard" ? "secondary" : "primary"}
-                size="md"
-                leftIcon={<Play size={16} />}
-              >
-                Start Match
-              </Button>
-            </Link>
-          </div>
-        </Surface>
-      )}
-
-      {/* Multiple Active Matches List if more than 1 */}
-      {activeMatches.length > 1 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-sm)" }}>
-          <h3 style={{ fontSize: "16px", fontWeight: 700 }}>
-            Active Matches ({activeMatches.length})
-          </h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {activeMatches.slice(1).map((m) => (
-              <Link key={m.matchId} to={`/matches/${m.matchId}`} style={{ textDecoration: "none" }}>
-                <Surface
-                  variant="card"
-                  padding="md"
-                  radius="lg"
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <Clock size={16} color="var(--color-focus)" />
-                    <div>
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          fontSize: "14px",
-                          textTransform: "capitalize",
-                          color: "var(--color-text)",
-                        }}
-                      >
-                        {m.gameId.replace("-", " ")}
-                      </div>
-                      <div style={{ fontSize: "12px", color: "var(--color-muted-text)" }}>
-                        {m.mode} • #{m.matchId.slice(0, 8)}
-                      </div>
-                    </div>
-                  </div>
-                  <Button variant="ghost" size="sm" rightIcon={<ArrowRight size={14} />}>
-                    Resume
-                  </Button>
-                </Surface>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Quick Play Grid (All 8 Games Accessible) */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-md)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h3 style={{ fontSize: "18px", fontWeight: 700 }}>Quick Play</h3>
-          <Link
-            to="/games"
-            style={{
-              fontSize: "13px",
-              fontWeight: 600,
-              color: "var(--color-muted-text)",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
-            All 8 Games <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: "var(--space-md)",
-          }}
-        >
-          {[
-            { id: "connect-four", name: "Connect Four", badge: "Grid Strategy" },
-            { id: "sudoku", name: "Sudoku", badge: "1,000 Puzzles" },
-            { id: "ludo", name: "Ludo", badge: "Board Classic" },
-            { id: "rock-paper-scissors", name: "RPS", badge: "Secret Duel" },
-            { id: "dots-boxes", name: "Dots & Boxes", badge: "Territory" },
-            { id: "hand-cricket", name: "Hand Cricket", badge: "Runs & Wickets" },
-            { id: "snakes-and-ladders", name: "Snakes & Ladders", badge: "Race Board" },
-            { id: "sos", name: "SOS", badge: "Word Grid" },
-          ].map((game) => (
-            <Link key={game.id} to={`/games/${game.id}`} style={{ textDecoration: "none" }}>
-              <Surface
-                variant="card"
-                padding="md"
-                radius="lg"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                  height: "100%",
-                  cursor: "pointer",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                  <Zap size={16} color="var(--color-focus)" />
-                  <span style={{ fontSize: "11px", color: "var(--color-muted-text)" }}>
-                    {game.badge}
-                  </span>
-                </div>
-                <span style={{ fontWeight: 700, fontSize: "15px", color: "var(--color-text)" }}>
-                  {game.name}
-                </span>
+      <div className="home-page__layout">
+        <div className="home-page__primary">
+          <section aria-labelledby="continue-heading">
+            {loadState === "loading" ? (
+              <Surface className="home-continue home-continue--loading" variant="card" padding="xl">
+                <LoaderCircle size={20} aria-hidden="true" />
+                <p role="status">Loading your saved matches…</p>
               </Surface>
-            </Link>
-          ))}
+            ) : matchesError ? (
+              <Surface className="home-continue" variant="card" padding="xl">
+                <p className="home-continue__eyebrow">Saved matches</p>
+                <h2 id="continue-heading" role="alert">
+                  Your matches couldn’t load
+                </h2>
+                <p>Try again to check for a game you can resume.</p>
+                <Button
+                  variant="secondary"
+                  leftIcon={<RefreshCw size={17} aria-hidden="true" />}
+                  onClick={() => setReloadKey((value) => value + 1)}
+                >
+                  Retry
+                </Button>
+              </Surface>
+            ) : dominantMatch ? (
+              <Surface
+                className="home-continue home-continue--mint"
+                variant="emphasis-mint"
+                padding="xl"
+              >
+                <div className="home-continue__topline">
+                  <p className="home-continue__eyebrow">Continue</p>
+                  <span className="home-status">{matchStatus(dominantMatch.lifecycle)}</span>
+                </div>
+                <h2 id="continue-heading">{formatGameName(dominantMatch.gameId)}</h2>
+                <p className="home-continue__context">
+                  {modeName(dominantMatch.mode)}
+                  {dominantMatch.turnSeat
+                    ? ` · ${dominantMatch.turnSeat === session?.profile.id ? "Your turn" : "Other player’s turn"}`
+                    : ""}
+                </p>
+                <Link
+                  className="home-continue__action arcade-btn arcade-btn--pill arcade-btn--md arcade-btn--secondary"
+                  to={`/matches/${dominantMatch.matchId}`}
+                  aria-label={`Resume ${formatGameName(dominantMatch.gameId)}`}
+                >
+                  <span>Resume game</span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </Surface>
+            ) : (
+              <Surface
+                className="home-continue home-continue--mint"
+                variant="emphasis-mint"
+                padding="xl"
+              >
+                <p className="home-continue__eyebrow">Ready when you are</p>
+                <h2 id="continue-heading">Pick a game to play</h2>
+                <p>Choose a favorite for a shared match or a Sudoku practice session.</p>
+                <Link
+                  className="home-continue__action arcade-btn arcade-btn--pill arcade-btn--md arcade-btn--secondary"
+                  to="/games"
+                >
+                  <span>Choose a game</span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              </Surface>
+            )}
+          </section>
+
+          <section className="home-quick-games" aria-labelledby="quick-games-heading">
+            <div className="home-section-heading">
+              <div>
+                <h2 id="quick-games-heading">Play a game</h2>
+                <p>All eight games, ready to choose.</p>
+              </div>
+              <Link to="/games" className="text-link">
+                Browse all <ArrowRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="home-quick-games__grid">
+              {quickGames.map(({ id, name, icon: Icon }) => (
+                <Link key={id} className="home-game-link" to={`/games/${id}`}>
+                  <span className="home-game-link__icon">
+                    <Icon size={20} aria-hidden="true" />
+                  </span>
+                  <span>{name}</span>
+                  <ArrowRight className="home-game-link__arrow" size={16} aria-hidden="true" />
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
+
+        <aside className="home-page__secondary" aria-label="Shared activity and saved games">
+          <Surface className="home-weekly" variant="emphasis-cyan" padding="lg">
+            <p className="home-continue__eyebrow">This week</p>
+            <p aria-live="polite">{weeklySummary}</p>
+          </Surface>
+
+          {activeMatches.length > 1 && !matchesError && (
+            <section className="home-active-matches" aria-labelledby="active-matches-heading">
+              <div className="home-section-heading home-section-heading--compact">
+                <h2 id="active-matches-heading">Active matches</h2>
+                <span className="home-count">{activeMatches.length}</span>
+              </div>
+              <div className="home-active-matches__list">
+                {activeMatches.slice(1).map((match) => (
+                  <Link
+                    className="home-active-match"
+                    key={match.matchId}
+                    to={`/matches/${match.matchId}`}
+                    aria-label={`Resume ${formatGameName(match.gameId)}, ${matchStatus(match.lifecycle)}`}
+                  >
+                    <span className="home-active-match__icon">
+                      <Clock3 size={18} aria-hidden="true" />
+                    </span>
+                    <span className="home-active-match__copy">
+                      <strong>{formatGameName(match.gameId)}</strong>
+                      <span>
+                        {modeName(match.mode)} · {matchStatus(match.lifecycle)}
+                      </span>
+                    </span>
+                    <ArrowRight size={17} aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          <LibraryControls />
+        </aside>
       </div>
-      <LibraryControls />
     </div>
   );
 }
