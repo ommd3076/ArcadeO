@@ -102,9 +102,9 @@ test("personal pins stay isolated, shared queue rejects stale writes, and name s
   expect(stale.r.status()).toBe(409);
   expect((await request(b, "/api/v1/library")).body.playNext.gameIds).toEqual(queue);
   await a.goto("/us");
-  await a.getByLabel("Your display name").fill("Arcade A");
+  await a.getByLabel("Display name").fill("Arcade A");
   await a.getByRole("button", { name: "Save name" }).click();
-  await expect(a.getByRole("status")).toContainText("Saved to your account");
+  await expect(a.getByRole("status")).toContainText("Account preferences saved.");
   const session = (await request(a, "/api/v1/auth/session")).body;
   expect(session.profile.id).toBe("A");
   expect(session.profile.displayName).toBe("Arcade A");

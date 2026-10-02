@@ -159,14 +159,14 @@ test.describe("owner visual matrix on real Worker", () => {
           const originals = elements.map((element) => element.style.fontSize);
           const sizes = elements.map((element) => parseFloat(getComputedStyle(element).fontSize));
           elements.forEach((element, index) => {
-            element.style.fontSize = `${sizes[index] * 1.25}px`;
+            element.style.fontSize = `${sizes[index] * 2}px`;
           });
           return originals;
         });
-        await captureScreenshot(page, path.join(evidence, `${tag}-text125-320.png`));
+        await captureScreenshot(page, path.join(evidence, `${tag}-text200-320.png`));
         const scaledWidth = await page.evaluate(() => document.documentElement.scrollWidth);
         expect(scaledWidth, `${game} text scaling horizontal overflow`).toBeLessThanOrEqual(322);
-        observations.push({ textScale: 125, scrollWidth: scaledWidth });
+        observations.push({ textScale: 200, scrollWidth: scaledWidth });
         await page.evaluate((originals) => {
           Array.from(
             document.querySelectorAll<HTMLElement>(
