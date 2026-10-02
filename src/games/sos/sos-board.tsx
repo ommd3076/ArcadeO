@@ -134,7 +134,7 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
           padding="md"
           radius="xl"
           style={{
-            width: zoom ? "max(100%, 560px)" : "100%",
+            width: zoom ? `max(100%, ${size * 64 + 64}px)` : "100%",
             maxWidth: zoom ? "none" : "min(100%, 76vh, 760px)",
             aspectRatio: "1/1",
             position: "relative",
@@ -147,8 +147,8 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: `repeat(${size}, 1fr)`,
-              gridTemplateRows: `repeat(${size}, 1fr)`,
+              gridTemplateColumns: `repeat(${size}, minmax(0, 1fr))`,
+              gridTemplateRows: `repeat(${size}, minmax(0, 1fr))`,
               width: "100%",
               height: "100%",
               gap: "4px",
@@ -174,6 +174,10 @@ export const SOSBoard: React.FC<SOSBoardProps> = ({
                       alignItems: "center",
                       justifyContent: "center",
                       fontSize: "24px",
+                      lineHeight: 1,
+                      minWidth: 0,
+                      minHeight: 0,
+                      overflow: "hidden",
                       fontWeight: 800,
                       color: "var(--color-text, #ffffff)",
                       cursor: isEmpty && canAct && status !== "completed" ? "pointer" : "default",
