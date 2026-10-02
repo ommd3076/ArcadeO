@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { RPSBoard } from "../../../src/games/rps/rps-board";
 import { MatchScreen } from "../../../src/screens/match";
 import { createMockFilteredView } from "../../fixtures/matches";
@@ -46,7 +47,7 @@ describe("RPS Screen & Board Integration (Task U02)", () => {
     expect(html).toContain("Rock Paper Scissors");
   });
 
-  it("renders RPS within MatchScreen dynamically when gameId is rock-paper-scissors", () => {
+  it("renders RPS within MatchScreen dynamically when gameId is rock-paper-scissors", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-rps-001",
       gameId: "rock-paper-scissors",
@@ -59,7 +60,7 @@ describe("RPS Screen & Board Integration (Task U02)", () => {
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-rps-001"] },

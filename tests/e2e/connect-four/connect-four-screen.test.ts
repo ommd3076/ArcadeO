@@ -1,6 +1,7 @@
-﻿import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { ConnectFourBoard } from "../../../src/games/connect-four/connect-four-board";
 import { MatchScreen } from "../../../src/screens/match";
 import { createMockFilteredView } from "../../fixtures/matches";
@@ -61,7 +62,7 @@ describe("Connect Four Screen & Board Integration", () => {
     expect(html).toContain('aria-label="Drop disc into column 7"');
   });
 
-  it("turn display updates when turn changes", () => {
+  it("turn display updates when turn changes", async () => {
     const gameStateA: ConnectFourView = {
       board: emptyBoard,
       activeSeat: "A",
@@ -80,7 +81,7 @@ describe("Connect Four Screen & Board Integration", () => {
       },
     });
 
-    const htmlA = renderToString(
+    const htmlA = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-c4-001"] },
@@ -117,7 +118,7 @@ describe("Connect Four Screen & Board Integration", () => {
       gameState: gameStateB,
     });
 
-    const htmlB = renderToString(
+    const htmlB = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-c4-001"] },
@@ -143,7 +144,7 @@ describe("Connect Four Screen & Board Integration", () => {
     expect(htmlB).toContain("Bob");
   });
 
-  it("terminal win screen shows winning player and winning disc glow", () => {
+  it("terminal win screen shows winning player and winning disc glow", async () => {
     const winBoard: ConnectFourCell[][] = Array.from({ length: 6 }, () => Array(7).fill(null));
     // Connect 4 in row 5: cols 0, 1, 2, 3
     winBoard[5][0] = "A";
@@ -182,7 +183,7 @@ describe("Connect Four Screen & Board Integration", () => {
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-c4-won"] },

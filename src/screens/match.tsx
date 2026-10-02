@@ -1,7 +1,7 @@
 import { apiFetch } from "../app/auth";
 import { generateUuid } from "../../shared/utils/uuid";
 import { useTheme, resolvePlayerAccent } from "../theme";
-import { useState, useMemo, useRef } from "react";
+import { lazy, Suspense, useState, useMemo, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   GameHeader,
@@ -15,7 +15,7 @@ import { TurnStrip } from "../components/turn-strip";
 import { Surface } from "../components/surface";
 import { Button } from "../components/button";
 import { IconButton } from "../components/icon-button";
-import { Sheet } from "../components/sheet";
+import { retainSheetHistoryForReplaceNavigation, Sheet } from "../components/sheet";
 import {
   MoreVertical,
   RotateCcw,
@@ -27,14 +27,38 @@ import {
 } from "lucide-react";
 import { useMatchSession } from "../sync/use-match-session";
 import "./match.css";
-import { ConnectFourBoard } from "../games/connect-four/connect-four-board";
-import { RPSBoard } from "../games/rps/rps-board";
-import { LudoBoard } from "../games/ludo/ludo-board";
-import { SnakesLaddersBoard } from "../games/snakes-ladders/snakes-ladders-board";
-import { DotsBoxesBoard } from "../games/dots-boxes/dots-boxes-board";
-import { SOSBoard } from "../games/sos/sos-board";
-import { HandCricketBoard } from "../games/hand-cricket/hand-cricket-board";
-import { SudokuBoard } from "../games/sudoku/sudoku-board";
+const ConnectFourBoard = lazy(() =>
+  import("../games/connect-four/connect-four-board").then((module) => ({
+    default: module.ConnectFourBoard,
+  })),
+);
+const RPSBoard = lazy(() =>
+  import("../games/rps/rps-board").then((module) => ({ default: module.RPSBoard })),
+);
+const LudoBoard = lazy(() =>
+  import("../games/ludo/ludo-board").then((module) => ({ default: module.LudoBoard })),
+);
+const SnakesLaddersBoard = lazy(() =>
+  import("../games/snakes-ladders/snakes-ladders-board").then((module) => ({
+    default: module.SnakesLaddersBoard,
+  })),
+);
+const DotsBoxesBoard = lazy(() =>
+  import("../games/dots-boxes/dots-boxes-board").then((module) => ({
+    default: module.DotsBoxesBoard,
+  })),
+);
+const SOSBoard = lazy(() =>
+  import("../games/sos/sos-board").then((module) => ({ default: module.SOSBoard })),
+);
+const HandCricketBoard = lazy(() =>
+  import("../games/hand-cricket/hand-cricket-board").then((module) => ({
+    default: module.HandCricketBoard,
+  })),
+);
+const SudokuBoard = lazy(() =>
+  import("../games/sudoku/sudoku-board").then((module) => ({ default: module.SudokuBoard })),
+);
 import type {
   Seat,
   AccountId,
@@ -1063,14 +1087,20 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
                   display: "inline-flex",
                   padding: "12px",
                   borderRadius: "var(--radius-full)",
-                  backgroundColor: "var(--color-raised)",
+                  backgroundColor: sudokuInterrupted
+                    ? "var(--color-raised)"
+                    : "var(--color-emphasis-yellow-bg, #FDE047)",
                   marginBottom: "8px",
                 }}
               >
                 {sudokuInterrupted ? (
                   <History size={32} color="var(--color-focus)" aria-hidden="true" />
                 ) : (
-                  <Trophy size={32} color="var(--color-emphasis-yellow-ink, #FDE047)" />
+                  <Trophy
+                    size={32}
+                    color="var(--color-emphasis-yellow-ink, #30290D)"
+                    aria-hidden="true"
+                  />
                 )}
               </div>
               <p
@@ -1161,231 +1191,235 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
             width: "100%",
           }}
         >
-          {!view ? (
-            <p role="status">Loading the saved match…</p>
-          ) : view.gameId === "rock-paper-scissors" ? (
-            <RPSBoard
-              acceptedEventId={acceptedEventId}
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as RPSView) ?? {
-                  targetWins: 2,
-                  scores: { A: 0, B: 0 },
-                  roundId: 1,
-                  phase: "locking",
-                  lockedSeats: [],
-                  roundResult: null,
-                  revealed: false,
-                  readiness: { A: false, B: false },
+          <Suspense fallback={<p role="status">Loading the selected game board…</p>}>
+            {!view ? (
+              <p role="status">Loading the saved match…</p>
+            ) : view.gameId === "rock-paper-scissors" ? (
+              <RPSBoard
+                acceptedEventId={acceptedEventId}
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as RPSView) ?? {
+                    targetWins: 2,
+                    scores: { A: 0, B: 0 },
+                    roundId: 1,
+                    phase: "locking",
+                    lockedSeats: [],
+                    roundResult: null,
+                    revealed: false,
+                    readiness: { A: false, B: false },
+                  }
                 }
-              }
-              mode={isTogether ? "together" : "remote"}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              localSeat={mySeat}
-              firstChooserSeat={((view.gameState as RPSView)?.roundId ?? 1) % 2 === 1 ? "A" : "B"}
-              forceMasked={state.secretChoiceMasked}
-              onMaskChange={(masked) => {
-                if (!masked) unmaskSecretChoice();
-              }}
-              playerAAccent={playerAAccent}
-              playerBAccent={playerBAccent}
-              onLockChoice={handleRPSLock}
-              onReveal={handleRPSReveal}
-              onNextRound={handleRPSNext}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "ludo" ? (
-            <LudoBoard
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled ? (motionEvent?.effects as LudoEffect[] | undefined) : undefined
-              }
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as LudoView) ?? {
-                  tokens: { A: [-1, -1, -1, -1], B: [-1, -1, -1, -1] },
-                  activeSeat: "A",
-                  phase: "roll",
-                  consecutiveSixes: 0,
-                  pendingRoll: null,
-                  legalTokenIds: [],
-                  status: "active",
-                  winner: null,
+                mode={isTogether ? "together" : "remote"}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                localSeat={mySeat}
+                firstChooserSeat={((view.gameState as RPSView)?.roundId ?? 1) % 2 === 1 ? "A" : "B"}
+                forceMasked={state.secretChoiceMasked}
+                onMaskChange={(masked) => {
+                  if (!masked) unmaskSecretChoice();
+                }}
+                playerAAccent={playerAAccent}
+                playerBAccent={playerBAccent}
+                onLockChoice={handleRPSLock}
+                onReveal={handleRPSReveal}
+                onNextRound={handleRPSNext}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "ludo" ? (
+              <LudoBoard
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled ? (motionEvent?.effects as LudoEffect[] | undefined) : undefined
                 }
-              }
-              canAct={isMyTurn && (canSubmit("ludo.move", true) || canSubmit("dice.roll", true))}
-              onRoll={handleLudoRoll}
-              onSelectToken={handleLudoSelectToken}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "snakes-and-ladders" ? (
-            <SnakesLaddersBoard
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled
-                  ? (motionEvent?.effects as SnakesAndLaddersEffect[] | undefined)
-                  : undefined
-              }
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as SnakesAndLaddersView) ?? {
-                  positions: { A: 0, B: 0 },
-                  activeSeat: "A",
-                  status: "active",
-                  winner: null,
-                  lastRoll: null,
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as LudoView) ?? {
+                    tokens: { A: [-1, -1, -1, -1], B: [-1, -1, -1, -1] },
+                    activeSeat: "A",
+                    phase: "roll",
+                    consecutiveSixes: 0,
+                    pendingRoll: null,
+                    legalTokenIds: [],
+                    status: "active",
+                    winner: null,
+                  }
                 }
-              }
-              canAct={isMyTurn && canSubmit("dice.roll", true)}
-              onRoll={handleSnakesLaddersRoll}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "dots-boxes" ? (
-            <DotsBoxesBoard
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled ? (motionEvent?.effects as DotsBoxesEffect[] | undefined) : undefined
-              }
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as DotsBoxesView) ?? {
-                  edges: [],
-                  boxes: [
-                    [null, null, null, null],
-                    [null, null, null, null],
-                    [null, null, null, null],
-                    [null, null, null, null],
-                  ],
-                  scores: { A: 0, B: 0 },
-                  activeSeat: "A",
-                  status: "active",
-                  winner: null,
+                canAct={isMyTurn && (canSubmit("ludo.move", true) || canSubmit("dice.roll", true))}
+                onRoll={handleLudoRoll}
+                onSelectToken={handleLudoSelectToken}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "snakes-and-ladders" ? (
+              <SnakesLaddersBoard
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled
+                    ? (motionEvent?.effects as SnakesAndLaddersEffect[] | undefined)
+                    : undefined
                 }
-              }
-              canAct={isMyTurn && canSubmit("dots-boxes.edge", true)}
-              onPlaceEdge={handleDotsBoxesEdge}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "sos" ? (
-            <SOSBoard
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled ? (motionEvent?.effects as SOSEffect[] | undefined) : undefined
-              }
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as SOSView) ?? {
-                  board: Array.from({ length: 5 }, () => Array(5).fill(null)),
-                  lines: [],
-                  scores: { A: 0, B: 0 },
-                  activeSeat: "A",
-                  status: "active",
-                  winner: null,
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as SnakesAndLaddersView) ?? {
+                    positions: { A: 0, B: 0 },
+                    activeSeat: "A",
+                    status: "active",
+                    winner: null,
+                    lastRoll: null,
+                  }
                 }
-              }
-              canAct={isMyTurn && canSubmit("sos.place", true)}
-              onPlaceLetter={handleSOSPlace}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "hand-cricket" ? (
-            <HandCricketBoard
-              acceptedEventId={acceptedEventId}
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as CricketView) ?? {
-                  phase: "toss",
-                  innings: 1,
-                  tossWinner: "A",
-                  roles: null,
-                  firstInningsRuns: 0,
-                  secondInningsRuns: 0,
-                  target: null,
-                  deliveryId: 1,
-                  lockedSeats: [],
-                  lastDelivery: null,
-                  readiness: { A: false, B: false },
+                canAct={isMyTurn && canSubmit("dice.roll", true)}
+                onRoll={handleSnakesLaddersRoll}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "dots-boxes" ? (
+              <DotsBoxesBoard
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled
+                    ? (motionEvent?.effects as DotsBoxesEffect[] | undefined)
+                    : undefined
                 }
-              }
-              mode={isTogether ? "together" : "remote"}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              localSeat={mySeat ?? "A"}
-              onChooseRole={handleCricketChooseRole}
-              forceMasked={state.secretChoiceMasked}
-              onMaskChange={(masked) => {
-                if (!masked) unmaskSecretChoice();
-              }}
-              playerAAccent={playerAAccent}
-              playerBAccent={playerBAccent}
-              onLockNumber={handleCricketLock}
-              onReveal={handleCricketReveal}
-              onNextDelivery={handleCricketNext}
-              isSubmitting={boardUnavailable}
-            />
-          ) : view?.gameId === "sudoku" ? (
-            <SudokuBoard
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled ? (motionEvent?.effects as SudokuEffect[] | undefined) : undefined
-              }
-              motionEnabled={motionEnabled}
-              view={
-                (view.gameState as SudokuView) ?? {
-                  puzzleId: "sudoku-easy-001",
-                  givens: "0".repeat(81),
-                  mode: "practice",
-                  hasStarted: true,
-                  self: {
-                    filledCount: 0,
-                    completed: false,
-                    elapsedMs: 0,
-                    paused: false,
-                    assisted: false,
-                    cells: Array(81).fill(0),
-                    notes: Array(81).fill(0),
-                    undoAvailable: false,
-                  },
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as DotsBoxesView) ?? {
+                    edges: [],
+                    boxes: [
+                      [null, null, null, null],
+                      [null, null, null, null],
+                      [null, null, null, null],
+                      [null, null, null, null],
+                    ],
+                    scores: { A: 0, B: 0 },
+                    activeSeat: "A",
+                    status: "active",
+                    winner: null,
+                  }
                 }
-              }
-              canAct={canSubmit("sudoku.edit", true)}
-              onEditCell={handleSudokuEdit}
-              onUndo={handleSudokuUndo}
-              onCheck={handleSudokuCheck}
-              onPause={handleSudokuPause}
-              onResume={handleSudokuResume}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              localSeat={mySeat ?? "A"}
-              isSubmitting={boardUnavailable}
-            />
-          ) : (
-            <ConnectFourBoard
-              board={board}
-              activeSeat={turnSeat}
-              canDrop={isMyTurn && canSubmit("connect-four.drop", true)}
-              winningCells={winningCells}
-              acceptedEventId={acceptedEventId}
-              acceptedEffects={
-                motionEnabled
-                  ? (motionEvent?.effects as ConnectFourEffect[] | undefined)
-                  : undefined
-              }
-              motionEnabled={motionEnabled}
-              onDropColumn={handleDrop}
-              playerAName={playerAName}
-              playerBName={playerBName}
-              isTerminal={isTerminal}
-            />
-          )}
+                canAct={isMyTurn && canSubmit("dots-boxes.edge", true)}
+                onPlaceEdge={handleDotsBoxesEdge}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "sos" ? (
+              <SOSBoard
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled ? (motionEvent?.effects as SOSEffect[] | undefined) : undefined
+                }
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as SOSView) ?? {
+                    board: Array.from({ length: 5 }, () => Array(5).fill(null)),
+                    lines: [],
+                    scores: { A: 0, B: 0 },
+                    activeSeat: "A",
+                    status: "active",
+                    winner: null,
+                  }
+                }
+                canAct={isMyTurn && canSubmit("sos.place", true)}
+                onPlaceLetter={handleSOSPlace}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "hand-cricket" ? (
+              <HandCricketBoard
+                acceptedEventId={acceptedEventId}
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as CricketView) ?? {
+                    phase: "toss",
+                    innings: 1,
+                    tossWinner: "A",
+                    roles: null,
+                    firstInningsRuns: 0,
+                    secondInningsRuns: 0,
+                    target: null,
+                    deliveryId: 1,
+                    lockedSeats: [],
+                    lastDelivery: null,
+                    readiness: { A: false, B: false },
+                  }
+                }
+                mode={isTogether ? "together" : "remote"}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                localSeat={mySeat ?? "A"}
+                onChooseRole={handleCricketChooseRole}
+                forceMasked={state.secretChoiceMasked}
+                onMaskChange={(masked) => {
+                  if (!masked) unmaskSecretChoice();
+                }}
+                playerAAccent={playerAAccent}
+                playerBAccent={playerBAccent}
+                onLockNumber={handleCricketLock}
+                onReveal={handleCricketReveal}
+                onNextDelivery={handleCricketNext}
+                isSubmitting={boardUnavailable}
+              />
+            ) : view?.gameId === "sudoku" ? (
+              <SudokuBoard
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled ? (motionEvent?.effects as SudokuEffect[] | undefined) : undefined
+                }
+                motionEnabled={motionEnabled}
+                view={
+                  (view.gameState as SudokuView) ?? {
+                    puzzleId: "sudoku-easy-001",
+                    givens: "0".repeat(81),
+                    mode: "practice",
+                    hasStarted: true,
+                    self: {
+                      filledCount: 0,
+                      completed: false,
+                      elapsedMs: 0,
+                      paused: false,
+                      assisted: false,
+                      cells: Array(81).fill(0),
+                      notes: Array(81).fill(0),
+                      undoAvailable: false,
+                    },
+                  }
+                }
+                canAct={canSubmit("sudoku.edit", true)}
+                onEditCell={handleSudokuEdit}
+                onUndo={handleSudokuUndo}
+                onCheck={handleSudokuCheck}
+                onPause={handleSudokuPause}
+                onResume={handleSudokuResume}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                localSeat={mySeat ?? "A"}
+                isSubmitting={boardUnavailable}
+              />
+            ) : (
+              <ConnectFourBoard
+                board={board}
+                activeSeat={turnSeat}
+                canDrop={isMyTurn && canSubmit("connect-four.drop", true)}
+                winningCells={winningCells}
+                acceptedEventId={acceptedEventId}
+                acceptedEffects={
+                  motionEnabled
+                    ? (motionEvent?.effects as ConnectFourEffect[] | undefined)
+                    : undefined
+                }
+                motionEnabled={motionEnabled}
+                onDropColumn={handleDrop}
+                playerAName={playerAName}
+                playerBName={playerBName}
+                isTerminal={isTerminal}
+              />
+            )}
+          </Suspense>
         </div>
       </div>
 
@@ -1457,6 +1491,7 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
               setActionError(null);
               try {
                 await submitAction("match.leave-save", {});
+                retainSheetHistoryForReplaceNavigation();
                 setIsSaveSheetOpen(false);
                 navigate("/games", { replace: true });
               } catch (err) {

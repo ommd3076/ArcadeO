@@ -396,10 +396,9 @@ export class MatchSession {
 
     this.pollTimer = setTimeout(async () => {
       if (this.isDisposed) return;
-      if (isDocumentVisible()) {
-        await this.pollSnapshot();
-      }
-      this.scheduleNextPoll();
+      if (!isDocumentVisible()) return;
+      await this.pollSnapshot();
+      if (isDocumentVisible()) this.scheduleNextPoll();
     }, this.options.pollIntervalMs);
   }
 

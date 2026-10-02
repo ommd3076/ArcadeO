@@ -72,6 +72,7 @@ describe("MatchSession & Sync Client (Task C01)", () => {
 
   afterEach(() => {
     vi.clearAllTimers();
+    vi.unstubAllGlobals();
     vi.useRealTimers();
   });
 
@@ -594,6 +595,56 @@ describe("MatchSession & Sync Client (Task C01)", () => {
 
       expect(session.getState().deliveryVersion).toBe(2);
       expect(session.getState().view?.turnSeat).toBe("B");
+    });
+
+    it("does not rearm a poll timer when a pending callback wakes after the page is hidden", async () => {
+      const visibilityTarget = Object.assign(new EventTarget(), {
+        hidden: false,
+        visibilityState: "visible",
+      });
+      vi.stubGlobal("document", visibilityTarget);
+      vi.stubGlobal("window", new EventTarget());
+
+      const session = new MatchSession({
+        matchId: "match-poll-hidden-race",
+        actorAccountId: "A",
+        initialView: createMockFilteredView({ deliveryVersion: 1 }),
+        baseUrl: "https://arcade.test",
+        transport: "polling",
+        pollIntervalMs: 2000,
+        fetchFn: mockFetch,
+        storage: mockStorage,
+      });
+      session.connect();
+      expect(vi.getTimerCount()).toBe(1);
+
+      Object.defineProperty(visibilityTarget, "hidden", { value: true, configurable: true });
+      Object.defineProperty(visibilityTarget, "visibilityState", {
+        value: "hidden",
+        configurable: true,
+      });
+      await vi.advanceTimersByTimeAsync(2000);
+
+      expect(mockFetch).not.toHaveBeenCalled();
+      expect(vi.getTimerCount()).toBe(0);
+
+      Object.defineProperty(visibilityTarget, "hidden", { value: false, configurable: true });
+      Object.defineProperty(visibilityTarget, "visibilityState", {
+        value: "visible",
+        configurable: true,
+      });
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: async () => createMockFilteredView() })
+        .mockResolvedValueOnce({ ok: true, json: async () => createMockFilteredView() });
+      visibilityTarget.dispatchEvent(new Event("visibilitychange"));
+      expect(vi.getTimerCount()).toBe(1);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(vi.getTimerCount()).toBe(1);
+      session.disconnect();
+      expect(vi.getTimerCount()).toBe(0);
     });
   });
 

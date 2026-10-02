@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { LudoBoard } from "../../../src/games/ludo/ludo-board";
 import { MatchScreen } from "../../../src/screens/match";
 import { createMockFilteredView } from "../../fixtures/matches";
@@ -241,7 +242,7 @@ describe("Ludo Screen & Board Integration (Task U03)", () => {
     );
   });
 
-  it("renders LudoBoard dynamically within MatchScreen when gameId is ludo", () => {
+  it("renders LudoBoard dynamically within MatchScreen when gameId is ludo", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-ludo-001",
       gameId: "ludo",
@@ -254,7 +255,7 @@ describe("Ludo Screen & Board Integration (Task U03)", () => {
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-ludo-001"] },

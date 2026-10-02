@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { SudokuBoard } from "../../../src/games/sudoku/sudoku-board";
 import { SudokuListScreen } from "../../../src/screens/sudoku-list";
 import { MatchScreen } from "../../../src/screens/match";
@@ -132,7 +133,7 @@ describe("Sudoku Screen & Board Integration (Task S03)", () => {
     expect(html).toContain("/81");
   });
 
-  it("renders SudokuBoard dynamically inside MatchScreen when gameId is sudoku", () => {
+  it("renders SudokuBoard dynamically inside MatchScreen when gameId is sudoku", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-sudoku-001",
       gameId: "sudoku",
@@ -145,7 +146,7 @@ describe("Sudoku Screen & Board Integration (Task S03)", () => {
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-sudoku-001"] },

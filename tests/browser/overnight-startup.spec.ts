@@ -21,11 +21,14 @@ test("stalled session bootstrap shows loading and Retry states, then recovers", 
       event.preventDefault();
       browserWindow.__arcadeUnhandledErrors?.push(String(event.reason));
     });
-    let heldFirstSessionBody = false;
     window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
       const url = input instanceof Request ? input.url : String(input);
-      if (url.endsWith("/api/v1/auth/session") && !heldFirstSessionBody) {
-        heldFirstSessionBody = true;
+      const stallMarker = "__overnight_stall_auth_session_once";
+      if (
+        url.endsWith("/api/v1/auth/session") &&
+        window.sessionStorage.getItem(stallMarker) !== "1"
+      ) {
+        window.sessionStorage.setItem(stallMarker, "1");
         return Promise.resolve(
           new Response(
             new ReadableStream<Uint8Array>({

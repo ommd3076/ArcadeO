@@ -53,7 +53,7 @@ All other copyright (c) 2022-present Lucide Contributors.
 ```
 # Self-hosted fonts added during review
 
-Space Grotesk, DM Sans and DM Mono are distributed through their @fontsource packages under the SIL Open Font License. The complete licenses are shipped in public/fonts/*-LICENSE.txt. Only the required Latin WOFF2 weights are served; reference screenshots remain unshipped design provenance.
+Plus Jakarta Sans, Barlow Condensed, DM Mono, DM Sans and Space Grotesk are self-hosted under the SIL Open Font License. Their complete licenses are shipped in `public/fonts/*-LICENSE.txt`. The current interface uses Plus Jakarta Sans for body text, Barlow Condensed for display text and DM Mono for numeric/monospaced text; reviewed fallback font files remain available. The service worker precaches only the four currently used Latin WOFF2 faces. Reference screenshots remain unshipped design provenance.
 
 ### LibreLudo reference archive
-The unmodified reference archive under assets/libreludo is GNU AGPLv3 at verified revision425b100097d1a113fa8d6d90e53eff6519a53edc. Full upstream license is retained there and inside the archive. It is excluded from application imports and production assets; no LibreLudo runtime/artwork is used by our original Ludo implementation.
+The unmodified reference archive under assets/libreludo is GNU AGPLv3 at verified revision 425b100097d1a113fa8d6d90e53eff6519a53edc. Full upstream license is retained there and inside the archive. It is excluded from application imports and production assets; no LibreLudo runtime/artwork is used by our original Ludo implementation.

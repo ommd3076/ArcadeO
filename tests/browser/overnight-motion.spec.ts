@@ -231,6 +231,58 @@ test("match option sheet consumes browser Back before leaving the match and rest
   await expect(page).toHaveURL(/\/games\/connect-four$/);
 });
 
+test("options-to-confirmation sheet replacement preserves Back and accepted match state", async ({
+  page,
+}) => {
+  await login(page, "A");
+  const id = await uiCreate(page, "connect-four");
+  activeMatchId = id;
+  const matchUrl = page.url();
+
+  const beforeDrop = await view(page, id);
+  await page.getByRole("button", { name: "Drop disc into column 1", exact: true }).click();
+  await expect
+    .poll(() => view(page, id).then((snapshot) => snapshot.deliveryVersion))
+    .toBeGreaterThan(beforeDrop.deliveryVersion);
+  await expect(page.getByTestId("c4-disc-5-0")).toBeVisible();
+
+  const trigger = page.getByRole("button", { name: "Match Options", exact: true });
+  await trigger.click();
+  await page.getByRole("button", { name: "Leave and save", exact: true }).click();
+  const saveDialog = page.getByRole("dialog", { name: "Leave and save this match?" });
+  await expect(saveDialog).toBeVisible();
+  await expect(page).toHaveURL(matchUrl);
+  await page.getByRole("button", { name: "Keep playing", exact: true }).click();
+  await expect(saveDialog).toBeHidden();
+  await expect(page).toHaveURL(matchUrl);
+  await expect(page.getByTestId("c4-disc-5-0")).toBeVisible();
+
+  await trigger.click();
+  await page.getByRole("button", { name: "Leave and save", exact: true }).click();
+  await expect(saveDialog).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(matchUrl);
+  await expect(saveDialog).toBeHidden();
+  await expect(page.getByTestId("c4-disc-5-0")).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/games\/connect-four$/);
+  await page.goForward();
+  await expect(page).toHaveURL(matchUrl);
+  await expect(page.getByTestId("c4-disc-5-0")).toBeVisible();
+
+  await trigger.click();
+  await page.getByRole("button", { name: "Leave and save", exact: true }).click();
+  await page.getByRole("button", { name: "Confirm leave and save", exact: true }).click();
+  await expect(page).toHaveURL(/\/games$/);
+  const saved = await view(page, id);
+  expect(saved.lifecycle).toBe("saved");
+  expect(saved.gameState.board[5][0]).toBe("A");
+
+  const resumed = await action(page, id, "match.resume", { pauseId: saved.pauseId });
+  expect(resumed.lifecycle).toBe("active");
+  await action(page, id, "match.agree-abandon");
+});
+
 test("Ludo accepted roll and board fit a narrow phone viewport", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, "A");

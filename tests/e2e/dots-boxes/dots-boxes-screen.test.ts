@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { DotsBoxesBoard } from "../../../src/games/dots-boxes/dots-boxes-board";
 import { MatchScreen } from "../../../src/screens/match";
 import { createMockFilteredView } from "../../fixtures/matches";
@@ -92,7 +93,7 @@ describe("Dots & Boxes Screen & Board Integration (Task U04)", () => {
     expect(html).toContain(">1<"); // Score A is 1
   });
 
-  it("renders DotsBoxesBoard dynamically within MatchScreen when gameId is dots-boxes", () => {
+  it("renders DotsBoxesBoard dynamically within MatchScreen when gameId is dots-boxes", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-db-001",
       gameId: "dots-boxes",
@@ -105,7 +106,7 @@ describe("Dots & Boxes Screen & Board Integration (Task U04)", () => {
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-db-001"] },

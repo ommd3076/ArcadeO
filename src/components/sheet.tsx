@@ -12,6 +12,62 @@ export interface SheetProps {
 
 type SheetPhase = "closed" | "opening" | "open" | "exiting";
 
+let pendingSheetHistoryPop: { marker: string; href: string; timer: number } | undefined;
+let retainedSheetHistoryMarker: { marker: string; href: string } | undefined;
+
+export function retainSheetHistoryForReplaceNavigation() {
+  const state = (window.history.state ?? {}) as Record<string, unknown>;
+  if (typeof state.__arcadeSheet !== "string") return;
+
+  if (pendingSheetHistoryPop) {
+    clearTimeout(pendingSheetHistoryPop.timer);
+    pendingSheetHistoryPop = undefined;
+  }
+  retainedSheetHistoryMarker = {
+    marker: state.__arcadeSheet,
+    href: window.location.href,
+  };
+}
+
+function addSheetHistoryMarker(marker: string, href: string) {
+  if (pendingSheetHistoryPop) {
+    clearTimeout(pendingSheetHistoryPop.timer);
+    const state = (window.history.state ?? {}) as Record<string, unknown>;
+    const isReplacingClosingSheet =
+      state.__arcadeSheet === pendingSheetHistoryPop.marker &&
+      href === pendingSheetHistoryPop.href &&
+      window.location.href === pendingSheetHistoryPop.href;
+    pendingSheetHistoryPop = undefined;
+    if (isReplacingClosingSheet) {
+      window.history.replaceState({ ...state, __arcadeSheet: marker }, "", window.location.href);
+      return;
+    }
+  }
+
+  const currentState = (window.history.state ?? {}) as Record<string, unknown>;
+  window.history.pushState({ ...currentState, __arcadeSheet: marker }, "", window.location.href);
+}
+
+function removeSheetHistoryMarker(marker: string, href: string) {
+  if (retainedSheetHistoryMarker?.marker === marker && retainedSheetHistoryMarker.href === href) {
+    retainedSheetHistoryMarker = undefined;
+    return;
+  }
+
+  const state = (window.history.state ?? {}) as Record<string, unknown>;
+  if (state.__arcadeSheet !== marker) return;
+
+  if (pendingSheetHistoryPop) clearTimeout(pendingSheetHistoryPop.timer);
+  const timer = window.setTimeout(() => {
+    pendingSheetHistoryPop = undefined;
+    const currentState = (window.history.state ?? {}) as Record<string, unknown>;
+    if (currentState.__arcadeSheet === marker && window.location.href === href) {
+      window.history.back();
+    }
+  }, 0);
+  pendingSheetHistoryPop = { marker, href, timer };
+}
+
 export function Sheet({ isOpen, onClose, title, description, children }: SheetProps) {
   const panel = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -80,8 +136,8 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const marker = `arcade-sheet:${sheetId}`;
-    const currentState = (window.history.state ?? {}) as Record<string, unknown>;
-    window.history.pushState({ ...currentState, __arcadeSheet: marker }, "", window.location.href);
+    const markerHref = window.location.href;
+    addSheetHistoryMarker(marker, markerHref);
     const handlePopState = () => {
       const state = (window.history.state ?? {}) as Record<string, unknown>;
       if (state.__arcadeSheet !== marker) onCloseRef.current();
@@ -94,8 +150,7 @@ export function Sheet({ isOpen, onClose, title, description, children }: SheetPr
       window.removeEventListener("popstate", handlePopState);
       document.body.style.overflow = previousOverflow;
       restoreFocusTo.current?.focus();
-      const state = (window.history.state ?? {}) as Record<string, unknown>;
-      if (state.__arcadeSheet === marker) window.history.back();
+      removeSheetHistoryMarker(marker, markerHref);
     };
   }, [isOpen, sheetId]);
 

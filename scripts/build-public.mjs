@@ -3,8 +3,16 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { build } from "vite";
 
-const assetPaths = fs.readdirSync("dist/client/assets").map((name) => `/assets/${name}`);
-const fonts = [400, 500, 600].map((weight) => `/fonts/dm-sans-latin-${weight}.woff2`);
+const assetPaths = fs
+  .readdirSync("dist/client/assets")
+  .map((name) => `/assets/${name}`)
+  .sort();
+const fonts = [
+  "/fonts/plus-jakarta-sans-latin-variable.woff2",
+  "/fonts/barlow-condensed-latin-600.woff2",
+  "/fonts/barlow-condensed-latin-700.woff2",
+  "/fonts/dm-mono-latin-400.woff2",
+];
 const manifest = JSON.parse(fs.readFileSync("dist/client/.vite/manifest.json", "utf8"));
 const entryAssets = new Set();
 function collectEntry(key) {
@@ -14,7 +22,9 @@ function collectEntry(key) {
   for (const css of entry.css ?? []) entryAssets.add(`/${css}`);
   for (const dependency of entry.imports ?? []) collectEntry(dependency);
 }
-for (const key of Object.keys(manifest)) collectEntry(key);
+const appEntry = manifest["index.html"];
+if (!appEntry?.isEntry) throw new Error("Could not find the index.html application entry");
+collectEntry("index.html");
 const shellPaths = [
   "/index.html",
   "/manifest.json",
@@ -26,8 +36,12 @@ const shellPaths = [
 ];
 const publicAssets = [...shellPaths, ...assetPaths];
 const hash = createHash("sha256");
-for (const asset of shellPaths)
-  hash.update(asset).update(fs.readFileSync(path.join("dist/client", asset)));
+for (const asset of [...new Set(publicAssets)].sort()) {
+  hash
+    .update(asset)
+    .update("\0")
+    .update(fs.readFileSync(path.join("dist/client", asset)));
+}
 const revision = hash.digest("hex").slice(0, 16);
 await build({
   configFile: false,
@@ -53,6 +67,7 @@ console.log("PUBLIC_SHELL_BUILT");
 console.log(
   "PUBLIC_CACHE_BYTES",
   JSON.stringify({
+    revision,
     precache: shellPaths.reduce(
       (sum, asset) => sum + fs.statSync(path.join("dist/client", asset)).size,
       0,

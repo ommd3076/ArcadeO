@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import React from "react";
 import { renderToString } from "react-dom/server";
+import { renderToHtml } from "../../fixtures/render-stream";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "../../../src/theme/theme-context";
 import {
@@ -200,7 +201,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("Both players must resume this match");
   });
 
-  it("renders Connect Four together match screen with drop buttons and cells", () => {
+  it("renders Connect Four together match screen with drop buttons and cells", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-c4",
       gameId: "connect-four",
@@ -213,7 +214,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-c4"] },
@@ -239,7 +240,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("c4-cell-slot");
   });
 
-  it("renders Rock Paper Scissors match screen with Pass and Play controls", () => {
+  it("renders Rock Paper Scissors match screen with Pass and Play controls", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-rps",
       gameId: "rock-paper-scissors",
@@ -253,7 +254,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-rps"] },
@@ -281,7 +282,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("Scissors");
   });
 
-  it("renders Ludo match screen with 15x15 board and dice roll control", () => {
+  it("renders Ludo match screen with 15x15 board and dice roll control", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-ludo",
       gameId: "ludo",
@@ -300,7 +301,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-ludo"] },
@@ -326,7 +327,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("Roll Dice");
   });
 
-  it("renders Snakes & Ladders match screen with 10x10 board and roll button", () => {
+  it("renders Snakes & Ladders match screen with 10x10 board and roll button", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-snl",
       gameId: "snakes-and-ladders",
@@ -339,7 +340,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-snl"] },
@@ -365,7 +366,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("Roll Dice");
   });
 
-  it("renders Dots & Boxes match screen with 5x5 dots, edges and scores", () => {
+  it("renders Dots & Boxes match screen with 5x5 dots, edges and scores", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-db",
       gameId: "dots-boxes",
@@ -379,7 +380,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-db"] },
@@ -406,7 +407,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain('data-testid="dots-score-A"');
   });
 
-  it("renders SOS match screen with 5x5 grid and S/O selector", () => {
+  it("renders SOS match screen with 5x5 grid and S/O selector", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-sos",
       gameId: "sos",
@@ -420,7 +421,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-sos"] },
@@ -448,7 +449,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain('data-testid="sos-select-o"');
   });
 
-  it("renders Hand Cricket match screen with toss role selection and live scoreboard", () => {
+  it("renders Hand Cricket match screen with toss role selection and live scoreboard", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-cricket",
       gameId: "hand-cricket",
@@ -467,7 +468,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-cricket"] },
@@ -494,7 +495,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
     expect(html).toContain("14"); // current runs
   });
 
-  it("renders Sudoku match screen with 9x9 board, numpad and practice controls", () => {
+  it("renders Sudoku match screen with 9x9 board, numpad and practice controls", async () => {
     const mockView = createMockFilteredView({
       matchId: "match-sudoku",
       gameId: "sudoku",
@@ -511,7 +512,7 @@ describe("All Eight Games & Modes Browser Journey Verification (Task Q02)", () =
       },
     });
 
-    const html = renderToString(
+    const html = await renderToHtml(
       React.createElement(
         MemoryRouter,
         { initialEntries: ["/matches/match-sudoku"] },

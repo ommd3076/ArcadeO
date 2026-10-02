@@ -106,6 +106,16 @@ function AuthStateView({
   message: string;
   onRetry?: () => void;
 }) {
+  const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
+  useEffect(() => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    return () => {
+      window.removeEventListener("online", update);
+      window.removeEventListener("offline", update);
+    };
+  }, []);
   const StatusIcon = loading ? RefreshCw : WifiOff;
   return (
     <main
@@ -131,6 +141,7 @@ function AuthStateView({
             variant="primary"
             size="lg"
             fullWidth
+            disabled={!online}
             leftIcon={<RefreshCw size={17} aria-hidden="true" />}
             onClick={onRetry}
           >
@@ -338,7 +349,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     expireAuthSessionAfterServerRevocation(logoutEpoch, logoutCsrfToken);
   };
   if (error)
-    return <AuthStateView loading={false} message={error} onRetry={() => void refresh()} />;
+    return (
+      <AuthStateView loading={false} message={error} onRetry={() => window.location.reload()} />
+    );
   return (
     <AuthContext.Provider value={{ session, loading, refresh, logout }}>
       {children}

@@ -1,11 +1,39 @@
 import { test, expect } from "@playwright/test";
+import fs from "node:fs";
+import path from "node:path";
+import { gzipSync } from "node:zlib";
 import { login, create, action, writeJsonWithRetry } from "./helpers";
+
+function getInitialAppJsGzipBytes(): number {
+  const manifest = JSON.parse(fs.readFileSync("dist/client/.vite/manifest.json", "utf8")) as Record<
+    string,
+    { file?: string; imports?: string[] }
+  >;
+  const files = new Set<string>();
+  function collect(key: string) {
+    if (files.has(key)) return;
+    const entry = manifest[key];
+    if (!entry) throw new Error(`Missing static dependency ${key} from the Vite manifest`);
+    files.add(key);
+    for (const dependency of entry.imports ?? []) collect(dependency);
+  }
+  collect("index.html");
+  return [...files]
+    .map((key) => manifest[key].file)
+    .filter((file): file is string => !!file && file.endsWith(".js"))
+    .reduce(
+      (sum, file) => sum + gzipSync(fs.readFileSync(path.join("dist/client", file))).byteLength,
+      0,
+    );
+}
 
 test("measure comparable loading, input, frames and route resource lifetime", async ({
   browser,
 }) => {
   test.setTimeout(120000);
   const label = process.env.ARCADE_PERF_LABEL ?? "current";
+  const initialAppJsGzipBytes = getInitialAppJsGzipBytes();
+  expect(initialAppJsGzipBytes).toBeLessThan(250 * 1024);
   const loading: unknown[] = [];
   for (let repeat = 0; repeat < 3; repeat++) {
     const context = await browser.newContext({
@@ -117,12 +145,18 @@ test("measure comparable loading, input, frames and route resource lifetime", as
           path: new URL(link.href).pathname,
         })),
       ),
+      loadedScriptPaths: await page.evaluate(() =>
+        (performance.getEntriesByType("resource") as PerformanceResourceTiming[])
+          .map((entry) => new URL(entry.name).pathname)
+          .filter((pathname) => pathname.endsWith(".js")),
+      ),
       traffic: await page.evaluate(() => (window as any).__arcadeTraffic),
     };
   }
   const beforeCycles = await memory();
   for (let repeat = 0; repeat < 6; repeat++) {
     await page.getByRole("button", { name: "Go back", exact: true }).click();
+    await page.getByRole("link", { name: "Home", exact: true }).click();
     await expect(
       page.getByRole("link", { name: "Resume Connect Four", exact: true }),
     ).toBeVisible();
@@ -186,6 +220,7 @@ test("measure comparable loading, input, frames and route resource lifetime", as
       loadingLatencyMs: 50,
       loadingBytesPerSecond: 1048576,
       serviceWorkers: "blocked for comparable cache measurements",
+      initialAppJsGzipBytes,
       input: "unthrottled local Worker; pointerdown to accepted disc DOM insertion",
       frames: "headless Chromium requestAnimationFrame samples; includes capture overhead",
     },
