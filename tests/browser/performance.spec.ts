@@ -123,8 +123,10 @@ test("measure comparable loading, input, frames and route resource lifetime", as
   const beforeCycles = await memory();
   for (let repeat = 0; repeat < 6; repeat++) {
     await page.getByRole("button", { name: "Go back", exact: true }).click();
-    await expect(page.getByRole("link", { name: "Resume Game", exact: true })).toBeVisible();
-    await page.getByRole("link", { name: "Resume Game", exact: true }).click();
+    await expect(
+      page.getByRole("link", { name: "Resume Connect Four", exact: true }),
+    ).toBeVisible();
+    await page.getByRole("link", { name: "Resume Connect Four", exact: true }).click();
     await expect(
       page.getByRole("button", { name: "Drop disc into column 1", exact: true }),
     ).toBeEnabled();
