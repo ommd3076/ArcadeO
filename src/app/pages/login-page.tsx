@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { useAuth } from "../auth";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Surface } from "../../components/surface";
@@ -10,6 +10,7 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const usernameRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { refresh } = useAuth();
@@ -18,6 +19,7 @@ export function LoginPage() {
     e.preventDefault();
     if (!username.trim() || !password) {
       setError("Please provide username and password");
+      if (!username.trim()) usernameRef.current?.focus();
       return;
     }
 
@@ -59,7 +61,8 @@ export function LoginPage() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        padding: "var(--space-xl) var(--space-lg)",
+        padding:
+          "calc(var(--space-xl) + var(--sat)) max(16px, var(--space-lg)) calc(var(--space-xl) + var(--sab))",
         backgroundColor: "var(--color-canvas)",
       }}
     >
@@ -69,7 +72,7 @@ export function LoginPage() {
         radius="xl"
         style={{
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "440px",
           display: "flex",
           flexDirection: "column",
           gap: "var(--space-xl)",
@@ -78,8 +81,9 @@ export function LoginPage() {
         <div style={{ textAlign: "center" }}>
           <h1
             style={{
-              fontSize: "28px",
-              fontWeight: 800,
+              fontSize: "clamp(32px, 8vw, 40px)",
+              lineHeight: 1.05,
+              fontWeight: 700,
               fontFamily: "var(--font-heading)",
               margin: "0 0 6px 0",
             }}
@@ -87,20 +91,22 @@ export function LoginPage() {
             Private Arcade
           </h1>
           <p style={{ fontSize: "14px", color: "var(--color-muted-text)", margin: 0 }}>
-            Enter your credentials to enter the arcade.
+            Sign in to your private two-player arcade.
           </p>
         </div>
 
         {error && (
           <div
             role="alert"
+            id="login-error"
             style={{
               padding: "10px 14px",
               borderRadius: "var(--radius-md)",
               backgroundColor: "var(--color-danger-surface)",
               color: "var(--color-danger-text)",
-              fontSize: "13px",
+              fontSize: "14px",
               fontWeight: 500,
+              lineHeight: 1.5,
             }}
           >
             {error}
@@ -116,8 +122,8 @@ export function LoginPage() {
               htmlFor="username"
               style={{
                 display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
+                fontSize: "14px",
+                fontWeight: 600,
                 color: "var(--color-muted-text)",
                 marginBottom: "6px",
               }}
@@ -137,11 +143,23 @@ export function LoginPage() {
               />
               <input
                 id="username"
+                ref={usernameRef}
                 type="text"
+                name="username"
+                required
                 autoComplete="username"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username (e.g. player_a)"
+                onChange={(e) => {
+                  setUsername(e.target.value);
+                  if (error === "Please provide username and password") setError(null);
+                }}
+                placeholder="Account username"
+                aria-invalid={
+                  error === "Please provide username and password" && !username.trim()
+                    ? true
+                    : undefined
+                }
+                aria-describedby={error ? "login-error" : undefined}
                 style={{
                   width: "100%",
                   height: "44px",
@@ -152,7 +170,8 @@ export function LoginPage() {
                   backgroundColor: "var(--color-inset)",
                   color: "var(--color-text)",
                   fontSize: "15px",
-                  outline: "none",
+                  minHeight: "48px",
+                  outlineColor: "var(--color-focus)",
                 }}
               />
             </div>
@@ -163,8 +182,8 @@ export function LoginPage() {
               htmlFor="password"
               style={{
                 display: "block",
-                fontSize: "12px",
-                fontWeight: 500,
+                fontSize: "14px",
+                fontWeight: 600,
                 color: "var(--color-muted-text)",
                 marginBottom: "6px",
               }}
@@ -185,10 +204,19 @@ export function LoginPage() {
               <input
                 id="password"
                 type="password"
+                name="password"
+                required
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error === "Please provide username and password") setError(null);
+                }}
                 placeholder="Password"
+                aria-invalid={
+                  error === "Please provide username and password" && !password ? true : undefined
+                }
+                aria-describedby={error ? "login-error" : undefined}
                 style={{
                   width: "100%",
                   height: "44px",
@@ -199,7 +227,8 @@ export function LoginPage() {
                   backgroundColor: "var(--color-inset)",
                   color: "var(--color-text)",
                   fontSize: "15px",
-                  outline: "none",
+                  minHeight: "48px",
+                  outlineColor: "var(--color-focus)",
                 }}
               />
             </div>
