@@ -49,8 +49,11 @@ import { CricketDeliveryResult, CricketEffect, CricketState, CricketView } from 
  */
 export function createInitialState(startFacts: SuppliedStartFacts): CricketState {
   const tossWinner = startFacts.startingSeat;
+  const rulesVersion =
+    typeof startFacts.config?.rulesVersion === "number" ? startFacts.config.rulesVersion : 1;
 
   return {
+    rulesVersion,
     mode: startFacts.config?.mode === "together" ? "together" : "remote",
     revealed: false,
     phase: "toss",
@@ -199,14 +202,16 @@ export function validateAndReduce(
       };
     }
 
+    const rulesVersion = state.rulesVersion ?? 1;
+    const maxVal = rulesVersion === 2 ? 10 : 6;
     const payload = action.payload as SecretLockPayload | undefined;
     const value = payload?.value;
-    if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 6) {
+    if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > maxVal) {
       return {
         success: false,
         error: createError(
           ErrorCode.INVALID_ACTION,
-          "Delivery number must be an integer between 1 and 6",
+          `Delivery number must be an integer between 1 and ${maxVal}`,
         ),
       };
     }
@@ -783,10 +788,55 @@ export function legalActions(
  * Guarantees secret delivery numbers are NEVER exposed in any way until resolved in lastDelivery.
  */
 export function toPublicView(state: CricketState, _viewer?: ViewerContext): CricketView {
+  const rulesVersion = state.rulesVersion ?? 1;
+  const maxNumber = rulesVersion === 2 ? 10 : 6;
+  const allowedNumbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
+
+  let expectedChooser: Seat | undefined = undefined;
+  let expectedRole: "bat" | "bowl" | undefined = undefined;
+
+  if (
+    state.roles &&
+    (state.phase === "first_innings" || state.phase === "second_innings") &&
+    state.lastDelivery === null
+  ) {
+    if (rulesVersion === 2) {
+      // Version 2: Batter chooses first, bowler second
+      if (!state.lockedSeats.includes(state.roles.bat)) {
+        expectedChooser = state.roles.bat;
+        expectedRole = "bat";
+      } else if (!state.lockedSeats.includes(state.roles.bowl)) {
+        expectedChooser = state.roles.bowl;
+        expectedRole = "bowl";
+      }
+    } else {
+      // Version 1 legacy: deliveryId % 2 === 1 ? "A" : "B"
+      const first: Seat = state.deliveryId % 2 === 1 ? "A" : "B";
+      const second: Seat = first === "A" ? "B" : "A";
+      if (!state.lockedSeats.includes(first)) {
+        expectedChooser = first;
+        expectedRole = state.roles.bat === first ? "bat" : "bowl";
+      } else if (!state.lockedSeats.includes(second)) {
+        expectedChooser = second;
+        expectedRole = state.roles.bat === second ? "bat" : "bowl";
+      }
+    }
+  }
+
   const hidden = state.mode === "together" && Boolean(state.lastDelivery) && !state.revealed;
+  const publicPhase = hidden
+    ? state.innings === 1
+      ? "first_innings"
+      : "second_innings"
+    : state.phase;
+
   return {
+    rulesVersion,
+    allowedNumbers,
+    expectedChooser,
+    expectedRole,
     revealed: Boolean(state.revealed),
-    phase: state.phase,
+    phase: publicPhase,
     innings: state.innings,
     tossWinner: state.tossWinner,
     roles: state.roles ? { ...state.roles } : null,

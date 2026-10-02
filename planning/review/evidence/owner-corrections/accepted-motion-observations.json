@@ -5,17 +5,17 @@
     "targets": [
       "div"
     ],
-    "savedVersion": 7,
+    "savedVersion": 5,
     "refreshRunning": 0
   },
   {
     "game": "snakes-and-ladders",
-    "animationSamples": 35,
+    "animationSamples": 54,
     "targets": [
       "span",
       "snl-token-A"
     ],
-    "savedVersion": 15,
+    "savedVersion": 14,
     "refreshRunning": 0
   },
   {

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=800, initial-scale=1.0">
+  <title>Private Arcade - Desktop Home (Porcelain Kinetic)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            grotesque: ['"Barlow Condensed"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif']
+          },
+          colors: {
+            porcelain: {
+              DEFAULT: '#F7F7F5',
+              dim: '#ECECE8',
+              card: '#FFFFFF',
+              subtle: '#F2F2EE'
+            },
+            acid: '#D4FE00',
+            citrus: '#FF6B00'
+          },
+          boxShadow: {
+            'squircle-sm': '0 2px 10px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            'squircle-md': '0 12px 36px -8px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03)',
+            'squircle-lg': '0 24px 60px -12px rgba(0, 0, 0, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.04)',
+            'acid-glow': '0 10px 28px -6px rgba(212, 254, 0, 0.45)',
+            'citrus-glow': '0 8px 22px -4px rgba(255, 107, 0, 0.35)',
+            'dice-3d': 'inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -3px 5px rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.12)'
+          },
+          borderRadius: {
+            'squircle': '28px',
+            'squircle-lg': '36px',
+            'squircle-sm': '18px'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Scalloped badge with SVG mask / geometry */
+    .scallop-badge {
+      position: relative;
+      background: #FF6B00;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 13px;
+      border-radius: 9999px;
+      box-shadow: 0 4px 14px rgba(255, 107, 0, 0.35);
+      border: 2px solid #FFFFFF;
+    }
+    
+    /* Speech bubble tail */
+    .bubble-tail::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 38px;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 10px solid #D4FE00;
+    }
+
+    /* Subtle subtle ceramic noise & gradient */
+    body {
+      background-color: #F8F8F5;
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(212, 254, 0, 0.04) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(255, 107, 0, 0.03) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, #FAF9F6 0%, #F4F3EE 100%);
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      letter-spacing: -0.01em;
+    }
+    
+    /* Custom scrollbar hidden */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+</head>
+<body class="w-[1280px] h-[800px] overflow-hidden text-neutral-900 font-sans antialiased select-none flex flex-col justify-between p-7">
+
+  <!-- TOP FLOATING GLASS NAVIGATION BAR -->
+  <header class="w-full flex items-center justify-between z-30">
+    <!-- Brand Mark & Pair indicator -->
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-squircle-sm border border-black/[0.06]">
+        <div class="w-3 h-3 bg-neutral-950 rounded-sm rotate-45 transform"></div>
+        <span class="font-grotesque font-black tracking-wider text-[22px] leading-none uppercase text-neutral-950">PRIVATE ARCADE</span>
+      </div>
+      <div class="px-3 py-1.5 bg-white/80 backdrop-blur-md rounded-full border border-black/[0.05] flex items-center gap-1.5 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span class="font-grotesque font-bold text-[13px] tracking-widest text-neutral-600 uppercase">SYNCED WITH SARAH</span>
+      </div>
+    </div>
+
+    <!-- Centered Glass Nav Pills -->
+    <nav class="flex items-center p-1.5 bg-white/90 backdrop-blur-xl rounded-full shadow-squircle-sm border border-black/[0.07] gap-1">
+      <button class="px-6 py-2 bg-neutral-950 text-white rounded-full font-grotesque font-bold text-[15px] tracking-widest uppercase transition-all shadow-md">
+        [ HOME ]
+      </button>
+      <button class="px-6 py-2 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-full font-grotesque font-bold text-[15px] tracking-widest uppercase transition-all">
+        [ GAMES ]
+      </button>
+      <button class="px-6 py-2 text-neutral-600 hover:text-neutral-950 hover:bg-neutral-100 rounded-full font-grotesque font-bold text-[15px] tracking-widest uppercase transition-all flex items-center gap-1.5">
+        [ US ]
+        <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+      </button>
+    </nav>
+
+    <!-- Right Controls: Partner Telemetry + Profile -->
+    <div class="flex items-center gap-2.5">
+      <!-- Status Chip -->
+      <div class="px-4 py-2 bg-white/90 backdrop-blur-md rounded-full border border-black/[0.06] shadow-squircle-sm flex items-center gap-2">
+        <span class="font-grotesque font-bold text-[14px] tracking-widest text-neutral-900 uppercase">[ SARAH <span class="text-emerald-500 text-xs inline-block mx-0.5">●</span> 24MS ]</span>
+      </div>
+
+      <!-- Turn Counter -->
+      <div class="px-3.5 py-2 bg-neutral-100/90 rounded-full border border-black/[0.04] font-grotesque font-extrabold text-[14px] tracking-wider text-neutral-700 uppercase">
+        TURN 14 OF 30
+      </div>
+
+      <!-- Daniel Avatar -->
+      <div class="w-10 h-10 rounded-full bg-neutral-950 text-white flex items-center justify-center font-grotesque font-black text-[16px] border-2 border-white shadow-squircle-sm">
+        D
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN 2-COLUMN BENTO GRID (1280x800 OPTIMIZED) -->
+  <main class="w-full grid grid-cols-12 gap-6 my-auto pt-2 pb-1 items-stretch h-[660px]">
+
+    <!-- LEFT COLUMN: 7 COLUMNS (HERO DUEL CARD) -->
+    <section class="col-span-7 flex flex-col">
+      <div class="h-full bg-white rounded-squircle-lg p-8 shadow-squircle-lg border border-black/[0.06] flex flex-col justify-between relative overflow-hidden group">
+        
+        <!-- Subtle porcelain ambient watermarks -->
+        <div class="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-neutral-100/60 pointer-events-none blur-3xl"></div>
+        <div class="absolute -left-12 -bottom-12 w-64 h-64 rounded-full bg-acid/15 pointer-events-none blur-3xl"></div>
+
+        <!-- Card Top Bar: Badges + Countdown -->
+        <div class="flex items-center justify-between relative z-10">
+          <div class="flex items-center gap-2.5">
+            <span class="px-3.5 py-1.5 bg-neutral-100 rounded-full font-grotesque font-black text-[13px] tracking-widest text-neutral-900 uppercase border border-black/[0.06] flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              [ CLASSIC DUEL · LIVE ]
+            </span>
+            <div class="scallop-badge shadow-citrus-glow">
+              <span class="material-symbols-outlined text-[16px]">coffee</span>
+              ICED MATCHA WAGER
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5 px-3 py-1 bg-neutral-100 rounded-full border border-black/[0.05] font-grotesque font-bold text-[14px] text-neutral-700 tracking-wider">
+            <span class="material-symbols-outlined text-[16px] text-neutral-500">schedule</span>
+            04:18
+          </div>
+        </div>
+
+        <!-- Hero Duel Content Area -->
+        <div class="my-auto relative z-10 flex flex-col gap-5 pt-3">
+          
+          <!-- Title & Round Meta -->
+          <div>
+            <div class="flex items-baseline justify-between mb-0.5">
+              <h1 class="font-grotesque font-black text-[56px] leading-[0.92] tracking-tight uppercase text-neutral-950">
+                LUDO DUEL
+              </h1>
+              <span class="font-grotesque font-bold text-[16px] tracking-wider text-neutral-500 uppercase">
+                ROUND 2 OF 3 · GOLDEN YARD PURSUIT
+              </span>
+            </div>
+            <p class="text-neutral-500 text-[14px] font-medium">Synchronized peer-to-peer session #384 · Turn 14 awaits Daniel</p>
+          </div>
+
+          <!-- PLAYFUL ACCENT #1: Acid-lime Speech Bubble (#D4FE00) -->
+          <div class="relative bg-acid text-neutral-950 p-4 rounded-2xl shadow-acid-glow border-2 border-black/[0.08] bubble-tail transform -rotate-0.5 hover:rotate-0 transition-transform">
+            <div class="flex items-center justify-between mb-1">
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-neutral-950"></span>
+                <span class="font-grotesque font-black text-[13px] tracking-wider uppercase text-neutral-950">SARAH JUST MOVED</span>
+              </div>
+              <span class="text-[12px] font-semibold text-neutral-700">1m ago</span>
+            </div>
+            <p class="text-[16px] font-semibold text-neutral-950 leading-snug">
+              Hey Daniel! Sarah just rolled a 5 and entered your home stretch 🎲
+            </p>
+          </div>
+
+          <!-- PLAYFUL ACCENT #3: Tactile 3D Token & Dice Board Snippet -->
+          <div class="bg-neutral-50 rounded-2xl p-4 border border-black/[0.06] flex items-center justify-between gap-4 mt-1">
+            <!-- Player Daniel Status -->
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center font-grotesque font-black text-[22px] shadow-md border-2 border-white ring-2 ring-emerald-500/20">
+                D
+              </div>
+              <div>
+                <span class="font-grotesque font-black text-[13px] tracking-widest text-neutral-500 uppercase block">YOUR TOKEN</span>
+                <span class="font-sans font-bold text-[16px] text-neutral-900 leading-tight">#30 In Pursuit</span>
+                <span class="text-[12px] text-neutral-500 block">Safe star sanctuary</span>
+              </div>
+            </div>
+
+            <!-- VS / Live Roll Indicator -->
+            <div class="flex items-center gap-3 px-5 py-2.5 bg-white rounded-xl border border-black/[0.06] shadow-sm">
+              <!-- Tactile 3D Die Piece with 5 dots -->
+              <div class="w-11 h-11 bg-white rounded-xl shadow-dice-3d border border-black/10 flex flex-col justify-between p-2 transform rotate-3">
+                <div class="flex justify-between">
+                  <span class="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
+                </div>
+                <div class="flex justify-center">
+                  <span class="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
+                  <span class="w-1.5 h-1.5 rounded-full bg-neutral-950"></span>
+                </div>
+              </div>
+              <div class="text-left">
+                <span class="font-grotesque font-bold text-[12px] tracking-wider text-neutral-400 uppercase block">ROLLED</span>
+                <span class="font-grotesque font-black text-[20px] text-neutral-950 leading-none block">+5 STEP</span>
+              </div>
+            </div>
+
+            <!-- Sarah Opponent Status -->
+            <div class="flex items-center gap-3 text-right">
+              <div>
+                <span class="font-grotesque font-black text-[13px] tracking-widest text-neutral-500 uppercase block">SARAH</span>
+                <span class="font-sans font-bold text-[16px] text-amber-600 leading-tight">#34 (Goal Ring)</span>
+                <span class="text-[12px] text-neutral-500 block">Threatens finish line</span>
+              </div>
+              <div class="w-12 h-12 rounded-2xl bg-amber-400 text-neutral-950 flex items-center justify-center font-grotesque font-black text-[22px] shadow-md border-2 border-white ring-2 ring-amber-400/20">
+                S
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card Footer Action: 52px Solid Black Pill -->
+        <div class="relative z-10 pt-2 flex items-center gap-3">
+          <button class="flex-1 h-[52px] bg-neutral-950 hover:bg-neutral-800 text-white rounded-full font-grotesque font-black text-[18px] tracking-[0.12em] uppercase flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl active:scale-[0.99]">
+            [ JUMP IN · RESUME → ]
+          </button>
+          <button class="h-[52px] px-6 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-full font-grotesque font-bold text-[15px] tracking-wider uppercase transition-colors border border-black/[0.06] flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px]">visibility</span>
+            SPECTATE
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: 5 COLUMNS (VERTICAL BENTO STACK) -->
+    <section class="col-span-5 flex flex-col gap-6">
+
+      <!-- TOP RIGHT CARD: DUO STREAK RECORD (SHARED MOMENTUM) -->
+      <div class="flex-1 bg-white rounded-squircle-lg p-7 shadow-squircle-md border border-black/[0.06] flex flex-col justify-between relative overflow-hidden">
+        
+        <!-- Top header row -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-citrus text-[22px]">local_fire_department</span>
+            <span class="font-grotesque font-black text-[16px] tracking-widest text-neutral-900 uppercase">
+              [ DUO STREAK RECORD ]
+            </span>
+          </div>
+          <!-- Mini Gold Trophy Playful Accent -->
+          <div class="flex items-center gap-1 px-3 py-1 bg-amber-50 rounded-full border border-amber-200/60 shadow-sm">
+            <span class="text-[14px]">🏆</span>
+            <span class="font-grotesque font-extrabold text-[12px] tracking-wider text-amber-800 uppercase">TOP 2%</span>
+          </div>
+        </div>
+
+        <!-- Big Streak Numbers & Sync Telemetry -->
+        <div class="my-auto py-2">
+          <div class="flex items-baseline justify-between">
+            <div class="flex items-baseline gap-2.5">
+              <span class="font-grotesque font-black text-[64px] leading-none text-neutral-950 tracking-tight">14</span>
+              <span class="font-grotesque font-extrabold text-[28px] text-neutral-400 tracking-wider uppercase">DAYS</span>
+            </div>
+            <!-- Telemetry Pill -->
+            <div class="text-right">
+              <span class="inline-block px-3 py-1 bg-acid/35 rounded-full font-grotesque font-black text-[13px] tracking-widest text-neutral-950 uppercase border border-black/[0.08]">
+                [ 84% SYNC ]
+              </span>
+              <span class="block text-[11px] font-semibold text-neutral-400 mt-1 uppercase tracking-wider">Highest in 3 months</span>
+            </div>
+          </div>
+          <p class="text-neutral-500 text-[13px] mt-1 font-medium">Soulmates in Connect Four, ruthless rivals in Ludo.</p>
+        </div>
+
+        <!-- 7-Day Bubble Tracking Rhythm -->
+        <div class="pt-2 border-t border-black/[0.05]">
+          <div class="flex items-center justify-between gap-1.5">
+            <!-- Mon -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-400 uppercase">M</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[12px] font-bold border border-emerald-300/40">✓</div>
+            </div>
+            <!-- Tue -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-400 uppercase">T</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[12px] font-bold border border-emerald-300/40">✓</div>
+            </div>
+            <!-- Wed -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-400 uppercase">W</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[12px] font-bold border border-emerald-300/40">✓</div>
+            </div>
+            <!-- Thu -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-400 uppercase">T</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[12px] font-bold border border-emerald-300/40">✓</div>
+            </div>
+            <!-- Fri -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-400 uppercase">F</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[12px] font-bold border border-emerald-300/40">✓</div>
+            </div>
+            <!-- Sat (Today - Completed) -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-900 uppercase">S</span>
+              <div class="w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[12px] font-bold shadow-sm ring-2 ring-emerald-500/20">✓</div>
+            </div>
+            <!-- Sun (Active Target) -->
+            <div class="flex flex-col items-center gap-1.5 flex-1">
+              <span class="font-grotesque font-bold text-[12px] text-neutral-900 uppercase">S</span>
+              <div class="w-8 h-8 rounded-full bg-neutral-950 text-white flex items-center justify-center text-[12px] font-bold shadow-md">●</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTTOM RIGHT CARD: QUICK VAULT (GAME SHORTCUTS) -->
+      <div class="flex-1 bg-white rounded-squircle-lg p-7 shadow-squircle-md border border-black/[0.06] flex flex-col justify-between">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-neutral-900 text-[20px]">sports_esports</span>
+            <span class="font-grotesque font-black text-[18px] tracking-widest text-neutral-950 uppercase">
+              QUICK VAULT
+            </span>
+          </div>
+          <span class="font-grotesque font-bold text-[13px] tracking-wider text-neutral-400 uppercase">
+            3 ACTIVE DUELS
+          </span>
+        </div>
+
+        <!-- 3 Squircle Shortcut Rows -->
+        <div class="flex flex-col gap-2.5 my-auto">
+          
+          <!-- Connect Four Row -->
+          <div class="flex items-center justify-between p-3 bg-neutral-50 hover:bg-neutral-100 rounded-squircle-sm border border-black/[0.04] transition-colors cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">blur_on</span>
+              </div>
+              <div>
+                <span class="font-grotesque font-black text-[15px] tracking-wider uppercase text-neutral-900 block leading-tight">CONNECT FOUR</span>
+                <span class="text-[12px] text-neutral-500">Decider Game 4 · Lead 2–1</span>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 bg-neutral-950 text-white rounded-full font-grotesque font-bold text-[12px] tracking-widest uppercase transition-all shadow-xs group-hover:bg-neutral-800">
+              DROP DISC
+            </button>
+          </div>
+
+          <!-- Sudoku Row -->
+          <div class="flex items-center justify-between p-3 bg-neutral-50 hover:bg-neutral-100 rounded-squircle-sm border border-black/[0.04] transition-colors cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">grid_4x4</span>
+              </div>
+              <div>
+                <span class="font-grotesque font-black text-[15px] tracking-wider uppercase text-neutral-900 block leading-tight">SUDOKU CO-OP</span>
+                <span class="text-[12px] text-neutral-500">Puzzle #042 · Row 7 Sync</span>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 bg-neutral-200 text-neutral-900 rounded-full font-grotesque font-bold text-[12px] tracking-widest uppercase transition-all group-hover:bg-neutral-300">
+              SOLVE
+            </button>
+          </div>
+
+          <!-- RPS Blitz Row -->
+          <div class="flex items-center justify-between p-3 bg-neutral-50 hover:bg-neutral-100 rounded-squircle-sm border border-black/[0.04] transition-colors cursor-pointer group">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold shadow-xs">
+                <span class="material-symbols-outlined text-[20px]">front_hand</span>
+              </div>
+              <div>
+                <span class="font-grotesque font-black text-[15px] tracking-wider uppercase text-neutral-900 block leading-tight">RPS BLITZ</span>
+                <span class="text-[12px] text-neutral-500">Fast choice decider · Ready</span>
+              </div>
+            </div>
+            <button class="px-4 py-1.5 bg-neutral-200 text-neutral-900 rounded-full font-grotesque font-bold text-[12px] tracking-widest uppercase transition-all group-hover:bg-neutral-300">
+              SECRET DUEL
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Footer status -->
+        <div class="pt-2 flex items-center justify-between text-neutral-400 text-[12px] border-t border-black/[0.04]">
+          <span class="flex items-center gap-1 font-grotesque font-bold uppercase tracking-wider text-neutral-500">
+            <span class="material-symbols-outlined text-[14px]">lock</span>
+            PEER ENCRYPTED DUO VAULT
+          </span>
+          <span class="font-grotesque font-bold text-neutral-900 uppercase tracking-widest hover:underline cursor-pointer">
+            VIEW ALL 8 GAMES →
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- BOTTOM STATUS FOOTER -->
+  <footer class="w-full flex items-center justify-between text-neutral-400 text-[12px] px-2 z-20">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="font-grotesque font-bold tracking-widest uppercase text-neutral-600">CLOUD SYNC ACTIVE</span>
+      <span class="text-neutral-300">·</span>
+      <span>Cloudflare Durable Object Consensus #9e4f18c</span>
+    </div>
+
+    <div class="flex items-center gap-4 font-grotesque font-bold tracking-widest uppercase text-neutral-500">
+      <span>DANIEL (HOST)</span>
+      <span class="text-neutral-300">&amp;</span>
+      <span>SARAH (PEER)</span>
+      <span class="text-neutral-300">·</span>
+      <span class="text-neutral-900">SEASON 02</span>
+    </div>
+  </footer>
+
+</body>
+</html>

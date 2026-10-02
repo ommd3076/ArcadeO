@@ -1,5 +1,10 @@
 import { ActionType, RPSChoice } from "./types";
 import { ErrorCode, ErrorDetails, createError } from "./errors";
+import { isValidUuid } from "../utils/uuid";
+
+export interface ActionValidationOptions {
+  maxSecretValue?: number;
+}
 
 /**
  * Validates action envelope format and payload integrity.
@@ -7,6 +12,7 @@ import { ErrorCode, ErrorDetails, createError } from "./errors";
 export function validateActionPayload(
   action: ActionType,
   payload: unknown,
+  options?: ActionValidationOptions,
 ): { valid: true; error?: undefined } | { valid: false; error: ErrorDetails } {
   if (typeof payload !== "object" || payload === null || Array.isArray(payload)) {
     return {
@@ -26,6 +32,8 @@ export function validateActionPayload(
     "cricket.choose-role": ["role"],
     "sudoku.edit": ["row", "col", "operation", "value"],
     "match.resign": ["resigningSeat"],
+    "match.leave-save": [],
+    "match.resume": ["pauseId"],
     "challenge.publish": ["senderAttemptId"],
     "match.accept": [],
     "match.decline": [],
@@ -50,6 +58,17 @@ export function validateActionPayload(
   }
 
   switch (action) {
+    case "match.resume": {
+      const pauseId = p.pauseId;
+      if (typeof pauseId !== "string" || !isValidUuid(pauseId)) {
+        return {
+          valid: false,
+          error: createError(ErrorCode.INVALID_ACTION, "pauseId must be a valid UUID"),
+        };
+      }
+      return { valid: true };
+    }
+
     case "connect-four.drop": {
       const col = p.column;
       if (typeof col !== "number" || !Number.isInteger(col) || col < 0 || col > 6) {
@@ -80,12 +99,13 @@ export function validateActionPayload(
       }
       if (p.value !== undefined) {
         const val = p.value;
-        if (typeof val !== "number" || !Number.isInteger(val) || val < 1 || val > 6) {
+        const maxVal = options?.maxSecretValue ?? 6;
+        if (typeof val !== "number" || !Number.isInteger(val) || val < 1 || val > maxVal) {
           return {
             valid: false,
             error: createError(
               ErrorCode.INVALID_ACTION,
-              "Hand cricket value must be an integer from 1 to 6",
+              `Hand cricket value must be an integer from 1 to ${maxVal}`,
             ),
           };
         }

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { test, expect } from "@playwright/test";
-import { login, create, view, action, request } from "./helpers";
+import { login, create, view, action, request, captureScreenshot } from "./helpers";
 
 for (const game of ["dots-boxes", "sos"] as const) {
   test(`${game}: zoom pans to the outer column and accepts an outer action at 320px`, async ({
@@ -29,10 +29,7 @@ for (const game of ["dots-boxes", "sos"] as const) {
         .toBe(game === "sos" ? "S" : 1);
       const evidence = path.resolve("planning/review/evidence/owner-corrections");
       fs.mkdirSync(evidence, { recursive: true });
-      await page.screenshot({
-        path: path.join(evidence, `${game}-zoom-panned-320.png`),
-        fullPage: true,
-      });
+      await captureScreenshot(page, path.join(evidence, `${game}-zoom-panned-320.png`));
       await page.getByRole("button", { name: "Reset board zoom", exact: true }).click();
       expect(
         await viewport.evaluate((element) => element.scrollWidth <= element.clientWidth + 1),

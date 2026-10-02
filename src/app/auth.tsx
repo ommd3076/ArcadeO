@@ -33,10 +33,6 @@ function publish(session: Session | null) {
   for (const listener of changes) listener();
 }
 export function clearPrivateSession() {
-  if (typeof sessionStorage !== "undefined") {
-    for (const key of Object.keys(sessionStorage))
-      if (key.startsWith("pa_pending_")) sessionStorage.removeItem(key);
-  }
   publish(null);
 }
 export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {}) {

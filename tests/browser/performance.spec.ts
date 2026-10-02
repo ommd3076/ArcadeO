@@ -1,6 +1,5 @@
-import fs from "node:fs";
 import { test, expect } from "@playwright/test";
-import { login, create, action } from "./helpers";
+import { login, create, action, writeJsonWithRetry } from "./helpers";
 
 test("measure comparable loading, input, frames and route resource lifetime", async ({
   browser,
@@ -194,10 +193,9 @@ test("measure comparable loading, input, frames and route resource lifetime", as
     samples,
     traffic,
   };
-  fs.mkdirSync("planning/review/evidence/owner-corrections", { recursive: true });
-  fs.writeFileSync(
+  await writeJsonWithRetry(
     `planning/review/evidence/owner-corrections/performance-${label}.json`,
-    JSON.stringify(result, null, 2),
+    result,
   );
   console.log("PERFORMANCE_MEASURED", label);
 });

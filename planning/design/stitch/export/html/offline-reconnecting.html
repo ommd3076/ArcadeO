@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Offline Reconnecting &amp; State Recovery - Private Arcade</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Plus Jakarta Sans Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration verbatim as provided -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-tint": "#b8cf8e",
+            "on-error-container": "#ffdad6",
+            "error-container": "#93000a",
+            "secondary-fixed-dim": "#dbc673",
+            "on-primary": "#253505",
+            "surface-bright": "#39393c",
+            "inverse-surface": "#e5e1e6",
+            "on-primary-fixed": "#131f00",
+            "inverse-on-surface": "#303033",
+            "primary-container": "#cfe6a3",
+            "primary-fixed": "#d4eba8",
+            "inverse-primary": "#52652f",
+            "surface-container-highest": "#353438",
+            "on-tertiary-fixed": "#002022",
+            "on-error": "#690005",
+            "background": "#131316",
+            "primary": "#f3ffd6",
+            "primary-fixed-dim": "#b8cf8e",
+            "secondary-container": "#594b00",
+            "tertiary": "#ebfdff",
+            "surface-dim": "#131316",
+            "surface-variant": "#353438",
+            "on-tertiary-fixed-variant": "#124e53",
+            "on-secondary-fixed-variant": "#544600",
+            "surface-container-high": "#2a2a2d",
+            "surface": "#131316",
+            "tertiary-container": "#b0e7ec",
+            "on-background": "#e5e1e6",
+            "surface-container-low": "#1b1b1e",
+            "secondary-fixed": "#f8e28c",
+            "secondary": "#dbc673",
+            "tertiary-fixed": "#b5ecf1",
+            "on-tertiary": "#00363a",
+            "on-secondary-container": "#d0bb69",
+            "on-primary-container": "#546832",
+            "outline": "#8f9284",
+            "surface-container": "#1f1f22",
+            "error": "#ffb4ab",
+            "on-secondary": "#3a3000",
+            "surface-container-lowest": "#0e0e11",
+            "on-tertiary-container": "#33696e",
+            "on-surface-variant": "#c5c8b9",
+            "outline-variant": "#45483d",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "on-surface": "#e5e1e6",
+            "on-secondary-fixed": "#221b00",
+            "tertiary-fixed-dim": "#99d0d5"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.25rem",
+            "space-md": "1rem",
+            "space-sm": "0.75rem",
+            "space-xl": "1.5rem",
+            "margin": "1.25rem",
+            "space-2xl": "2rem",
+            "margin-mobile": "1rem",
+            "space-3xl": "3rem",
+            "space-2xs": "0.25rem",
+            "gutter": "1rem",
+            "space-xs": "0.5rem",
+            "gutter-sm": "0.75rem"
+          },
+          "fontFamily": {
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-micro": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @keyframes pulseProgress {
+      0% { width: 15%; opacity: 0.8; }
+      50% { width: 78%; opacity: 1; }
+      100% { width: 100%; opacity: 0.85; }
+    }
+    .animate-retry-bar {
+      animation: pulseProgress 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+    @keyframes amberPing {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; filter: drop-shadow(0 0 6px rgba(244, 222, 136, 0.7)); }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-amber-glow {
+      animation: amberPing 1.8s ease-in-out infinite;
+    }
+    .tactile-board-grid {
+      background: radial-gradient(circle at 50% 50%, rgba(22, 22, 27, 0.95) 0%, rgba(14, 14, 17, 0.98) 100%);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface antialiased font-body-md min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Viewport Canvas Container (iPhone 390x844 Frame) -->
+<main class="w-full max-w-[390px] min-h-[844px] bg-[#0C0C0F] relative flex flex-col justify-between overflow-x-hidden border-x border-white/[0.04] shadow-2xl">
+<!-- Ambient Subtle Atmosphere Vignette -->
+<div class="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-80 h-72 bg-secondary-fixed/5 rounded-full blur-3xl"></div>
+<div class="pointer-events-none absolute top-1/3 -right-20 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl"></div>
+<!-- Header Section (Top Navigation Bar) -->
+<header class="sticky top-0 z-40 bg-[#0C0C0F]/85 backdrop-blur-md px-space-md pt-3 pb-2.5 flex items-center justify-between border-b border-white/[0.06]">
+<!-- Left: Back Navigation Pill -->
+<a class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#16161B] border border-white/[0.12] text-on-surface hover:bg-surface-container-high transition-colors active:scale-95 text-label-md font-label-md" href="#">
+<span class="material-symbols-outlined text-[14px] leading-none" data-icon="arrow_back">arrow_back</span>
+<span>Games</span>
+</a>
+<!-- Center: Screen Context -->
+<div class="text-center px-1">
+<h1 class="font-headline-sm text-headline-sm text-on-surface leading-tight tracking-tight">Connect Four</h1>
+<p class="font-label-micro text-label-micro text-outline tracking-wider uppercase mt-0.5">Daniel vs Sarah · Remote Duel</p>
+</div>
+<!-- Right: Network Status Reconnecting Pill -->
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-[#1F1F26] border border-secondary-fixed/30 text-secondary-fixed text-label-md font-label-md shadow-[0_0_12px_rgba(248,226,140,0.12)]">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-amber-glow"></span>
+<span class="tracking-wide">Reconnecting...</span>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 px-space-md py-3 flex flex-col gap-3.5 z-10">
+<!-- 2. Reconnection Alert Banner (Warm Yellow Pastel Card) -->
+<section class="bg-secondary-fixed rounded-2xl p-3.5 shadow-sm border border-black/10 relative overflow-hidden text-[#2E2305]">
+<!-- Micro Index Card Framing Accent -->
+<div class="flex items-start justify-between gap-2 mb-1.5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#2E2305] font-bold" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="font-headline-sm text-[15px] font-bold tracking-tight text-[#2E2305]">
+              Connection Lost · Reconnecting
+            </h2>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-widest px-2 py-0.5 rounded-full bg-black/10 text-[#2E2305] font-bold">
+            Attempt 2 of 5
+          </span>
+</div>
+<p class="font-body-md text-[13px] leading-[18px] text-[#2E2305]/90 mb-3">
+          Your session is safely preserved in the Cloudflare Durable Object. No moves were lost.
+        </p>
+<!-- Dynamic Retry Progress Track -->
+<div class="w-full bg-black/15 rounded-full h-1.5 overflow-hidden relative">
+<div class="bg-[#2E2305] h-full rounded-full animate-retry-bar"></div>
+</div>
+<div class="flex items-center justify-between text-label-micro font-label-micro text-[#2E2305]/75 mt-1.5 uppercase tracking-wider">
+<span>Targeting edge relay</span>
+<span>Next retry in 2.8s</span>
+</div>
+</section>
+<!-- 3. Frosted Game Board (Connect Four Frozen State) -->
+<section class="relative rounded-2xl bg-[#16161B] border border-white/[0.08] p-3 overflow-hidden shadow-inner">
+<!-- Board Header Meta -->
+<div class="flex items-center justify-between mb-2 px-1">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-micro text-label-micro text-outline tracking-wider uppercase">Duel Turn 18 · Active Consensus</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline-variant uppercase tracking-widest">Grid 7×6</span>
+</div>
+<!-- The 7x6 Connect Four Matrix Canvas with Frost Scrim -->
+<div class="relative tactile-board-grid p-2.5 rounded-xl border border-white/[0.05]">
+<!-- Grid of slots: 6 rows, 7 columns -->
+<div class="grid grid-cols-7 gap-1.5 aspect-[7/6] w-full">
+<!-- Row 1 -->
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<!-- Row 2 -->
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<!-- Row 3 -->
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<!-- Row 4 -->
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<!-- Row 5 -->
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-surface-container-lowest/80 border border-white/[0.04] aspect-square"></div>
+<!-- Row 6 -->
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-[#FF7A7A] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+<div class="rounded-full bg-secondary-fixed shadow-[inset_0_2px_4px_rgba(255,255,255,0.4)] aspect-square"></div>
+</div>
+<!-- Frosted Scrim Overlay -->
+<div class="absolute inset-0 bg-[#0C0C0F]/70 backdrop-blur-[3px] rounded-xl flex items-center justify-center p-3">
+<!-- Authoritative Locked Consensus Badge -->
+<div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#16161B]/95 border border-white/20 shadow-2xl backdrop-blur-md">
+<span class="material-symbols-outlined text-[16px] text-primary-container" data-icon="lock" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold tracking-tight">
+                State Locked at Turn 18 · Authoritative DO Consensus
+              </span>
+</div>
+</div>
+</div>
+<!-- Discs Legend Footer -->
+<div class="mt-2.5 flex items-center justify-between text-label-micro font-label-micro px-1 text-outline">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#FF7A7A]"></span>
+<span class="text-on-surface-variant font-medium">Sarah (Coral)</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-outline-variant font-mono">HASH: 9e4f..18c</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary-fixed"></span>
+<span class="text-on-surface-variant font-medium">Daniel (Yellow)</span>
+</div>
+</div>
+</section>
+<!-- 4. Real-Time Telemetry & Recovery Audit Card -->
+<section class="bg-[#16161B] rounded-2xl border border-white/[0.08] p-4 flex flex-col gap-2.5 shadow-sm">
+<!-- Telemetry Header -->
+<div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary-container text-[14px]" data-icon="sync_saved_locally">sync_saved_locally</span>
+<span class="font-label-micro text-label-micro text-primary-container tracking-widest uppercase font-bold">
+              Session Resilience Telemetry
+            </span>
+</div>
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-60"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
+</span>
+</div>
+<!-- Telemetry Audit Rows -->
+<div class="flex flex-col divide-y divide-white/[0.04] text-[12px] leading-5">
+<!-- Row 1 -->
+<div class="py-1.5 flex items-center justify-between">
+<span class="text-outline font-body-md text-[12px]">Last Move</span>
+<span class="text-on-surface font-mono font-medium text-[11px] text-right">
+              Sarah Col 4 <span class="text-outline-variant">(14:32:05 UTC)</span>
+</span>
+</div>
+<!-- Row 2 -->
+<div class="py-1.5 flex items-center justify-between">
+<span class="text-outline font-body-md text-[12px]">Pending Inputs</span>
+<span class="text-primary-container font-mono font-medium text-[11px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]" data-icon="check_circle">check_circle</span>
+              None (0 in queue)
+            </span>
+</div>
+<!-- Row 3 -->
+<div class="py-1.5 flex items-center justify-between">
+<span class="text-outline font-body-md text-[12px]">Controller Status</span>
+<span class="text-on-surface font-mono font-medium text-[11px]">
+              Daniel <span class="text-secondary-fixed">(Lease 120s)</span>
+</span>
+</div>
+<!-- Row 4 -->
+<div class="py-1.5 flex items-center justify-between">
+<span class="text-outline font-body-md text-[12px]">Target Node</span>
+<span class="text-outline font-mono text-[11px] text-right truncate max-w-[170px]">
+              Durable Object SQLite
+            </span>
+</div>
+</div>
+</section>
+</div>
+<!-- 5. Bottom Control Zone (No Bottom Navigation Dock) -->
+<footer class="p-space-md pt-2 pb-6 bg-[#0C0C0F] border-t border-white/[0.06] flex flex-col gap-2.5 z-30">
+<!-- Large Tactile Mint CTA Button -->
+<button class="w-full h-12 rounded-full bg-primary-container text-[#0C0C0F] font-headline-sm text-headline-sm font-bold flex items-center justify-center gap-2 hover:opacity-95 active:scale-[0.98] transition-all shadow-[0_4px_16px_rgba(207,230,163,0.18)]" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="bolt" data-weight="fill" style="font-variation-settings: 'FILL' 1;">bolt</span>
+<span>FORCE RECONNECT NOW</span>
+</button>
+<!-- Secondary Dark Pill Button -->
+<button class="w-full h-11 rounded-full bg-[#1F1F26] text-on-surface border border-white/[0.12] font-label-lg text-label-lg font-medium flex items-center justify-center gap-2 hover:bg-surface-container-high active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[16px] text-outline" data-icon="bookmark">bookmark</span>
+<span>Save &amp; Exit to Home (Resume Later)</span>
+</button>
+<!-- Edge Safe Area Footer Microcopy -->
+<div class="text-center mt-0.5">
+<p class="font-label-micro text-[9px] text-outline-variant uppercase tracking-widest">
+          End-to-End Encrypted Session · Duo Protocol v2.4
+        </p>
+</div>
+</footer>
+</main>
+<script>
+    // Lightweight tactile feedback for buttons
+    document.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (window.navigator && window.navigator.vibrate) {
+          window.navigator.vibrate(20);
+        }
+      });
+    });
+  </script>
+</body></html>

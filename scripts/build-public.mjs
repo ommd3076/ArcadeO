@@ -9,12 +9,12 @@ const manifest = JSON.parse(fs.readFileSync("dist/client/.vite/manifest.json", "
 const entryAssets = new Set();
 function collectEntry(key) {
   const entry = manifest[key];
-  if (entryAssets.has(`/${entry.file}`)) return;
+  if (!entry || !entry.file || entryAssets.has(`/${entry.file}`)) return;
   entryAssets.add(`/${entry.file}`);
   for (const css of entry.css ?? []) entryAssets.add(`/${css}`);
   for (const dependency of entry.imports ?? []) collectEntry(dependency);
 }
-for (const [key, entry] of Object.entries(manifest)) if (entry.isEntry) collectEntry(key);
+for (const key of Object.keys(manifest)) collectEntry(key);
 const shellPaths = [
   "/index.html",
   "/manifest.json",

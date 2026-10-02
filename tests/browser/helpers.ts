@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { expect, type Page } from "@playwright/test";
 export const origin = "http://localhost:8789";
@@ -83,4 +84,53 @@ export async function solve(page: Page, id: string) {
       });
   expect(v.lifecycle).toBe("completed");
   return v;
+}
+
+export async function saveFileWithRetry(
+  targetPath: string,
+  data: Buffer | string,
+  maxAttempts = 10,
+  initialDelayMs = 50,
+): Promise<void> {
+  const dir = path.dirname(targetPath);
+  fs.mkdirSync(dir, { recursive: true });
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await fs.promises.writeFile(targetPath, data);
+      return;
+    } catch (err: unknown) {
+      if (attempt === maxAttempts) throw err;
+      const delay = initialDelayMs * Math.pow(1.5, attempt - 1) + Math.random() * 25;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
+export async function captureScreenshot(
+  page: Page,
+  targetPath: string,
+  options: { fullPage?: boolean } = { fullPage: true },
+  maxAttempts = 10,
+): Promise<void> {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const buffer = await page.screenshot({ fullPage: options.fullPage ?? true });
+      await saveFileWithRetry(targetPath, buffer, maxAttempts);
+      return;
+    } catch (err: unknown) {
+      if (attempt === maxAttempts) throw err;
+      const delay = 50 * Math.pow(1.5, attempt - 1) + Math.random() * 25;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
+export async function writeJsonWithRetry(
+  targetPath: string,
+  data: unknown,
+  maxAttempts = 10,
+): Promise<void> {
+  const content = JSON.stringify(data, null, 2);
+  await saveFileWithRetry(targetPath, content, maxAttempts);
 }

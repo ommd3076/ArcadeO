@@ -850,4 +850,156 @@ describe("Hand Cricket Engine", () => {
       expect(typeof handCricketEngineAdapter.isTerminal).toBe("function");
     });
   });
+
+  describe("Hand Cricket V2 (1..10 Choices & Batter-First Chooser Order)", () => {
+    it("rejects values > 6 in rulesVersion 1, but accepts 1..10 in rulesVersion 2", () => {
+      // V1
+      const v1 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 1 },
+      });
+      const v1Role = validateAndReduce(
+        v1,
+        { action: "cricket.choose-role", payload: { role: "bat" } },
+        { serverTime: 1005, actorSeat: "A" },
+      );
+      expect(v1Role.success).toBe(true);
+      if (!v1Role.success) return;
+
+      const v1Reject7 = validateAndReduce(
+        v1Role.newState,
+        { action: "secret.lock", payload: { value: 7 } },
+        { serverTime: 1010, actorSeat: "A" },
+      );
+      expect(v1Reject7.success).toBe(false);
+      if (v1Reject7.success) return;
+      expect(v1Reject7.error.code).toBe(ErrorCode.INVALID_ACTION);
+
+      // V2
+      const v2 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 2 },
+      });
+      expect(v2.rulesVersion).toBe(2);
+
+      const v2Role = validateAndReduce(
+        v2,
+        { action: "cricket.choose-role", payload: { role: "bat" } },
+        { serverTime: 1005, actorSeat: "A" },
+      );
+      expect(v2Role.success).toBe(true);
+      if (!v2Role.success) return;
+
+      const v2Accept10 = validateAndReduce(
+        v2Role.newState,
+        { action: "secret.lock", payload: { value: 10 } },
+        { serverTime: 1010, actorSeat: "A" },
+      );
+      expect(v2Accept10.success).toBe(true);
+
+      const v2Reject11 = validateAndReduce(
+        v2Role.newState,
+        { action: "secret.lock", payload: { value: 11 } },
+        { serverTime: 1010, actorSeat: "A" },
+      );
+      expect(v2Reject11.success).toBe(false);
+    });
+
+    it("scores runs correctly with 1..10 in V2", () => {
+      const v2 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 2 },
+      });
+      const v2Role = validateAndReduce(
+        v2,
+        { action: "cricket.choose-role", payload: { role: "bat" } },
+        { serverTime: 1005, actorSeat: "A" },
+      );
+      if (!v2Role.success) throw new Error("setup failed");
+
+      // Batter A plays 9, Bowler B plays 4
+      const lockA = validateAndReduce(
+        v2Role.newState,
+        { action: "secret.lock", payload: { value: 9 } },
+        { serverTime: 1010, actorSeat: "A" },
+      );
+      if (!lockA.success) throw new Error("lockA failed");
+
+      const lockB = validateAndReduce(
+        lockA.newState,
+        { action: "secret.lock", payload: { value: 4 } },
+        { serverTime: 1015, actorSeat: "B" },
+      );
+      expect(lockB.success).toBe(true);
+      if (!lockB.success) return;
+
+      expect(lockB.newState.firstInningsRuns).toBe(9);
+      expect(lockB.newState.lastDelivery?.outcome).toBe("runs");
+      expect(lockB.newState.lastDelivery?.scoredRuns).toBe(9);
+    });
+
+    it("triggers wicket on equal 10 in V2", () => {
+      const v2 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 2 },
+      });
+      const v2Role = validateAndReduce(
+        v2,
+        { action: "cricket.choose-role", payload: { role: "bat" } },
+        { serverTime: 1005, actorSeat: "A" },
+      );
+      if (!v2Role.success) throw new Error("setup failed");
+
+      const lockA = validateAndReduce(
+        v2Role.newState,
+        { action: "secret.lock", payload: { value: 10 } },
+        { serverTime: 1010, actorSeat: "A" },
+      );
+      if (!lockA.success) throw new Error("lockA failed");
+
+      const lockB = validateAndReduce(
+        lockA.newState,
+        { action: "secret.lock", payload: { value: 10 } },
+        { serverTime: 1015, actorSeat: "B" },
+      );
+      expect(lockB.success).toBe(true);
+      if (!lockB.success) return;
+
+      expect(lockB.newState.firstInningsRuns).toBe(0);
+      expect(lockB.newState.target).toBe(1);
+      expect(lockB.newState.lastDelivery?.outcome).toBe("out");
+    });
+
+    it("exposes correct allowedNumbers in public view", () => {
+      const v1 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 1 },
+      });
+      const v1View = toPublicView(v1, {
+        viewerAccountId: "A",
+        viewerSeat: "A",
+        isController: true,
+        mode: "remote",
+      });
+      expect(v1View.allowedNumbers).toEqual([1, 2, 3, 4, 5, 6]);
+
+      const v2 = createInitialState({
+        serverTime: 1000,
+        startingSeat: "A",
+        config: { rulesVersion: 2 },
+      });
+      const v2View = toPublicView(v2, {
+        viewerAccountId: "A",
+        viewerSeat: "A",
+        isController: true,
+        mode: "remote",
+      });
+      expect(v2View.allowedNumbers).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    });
+  });
 });

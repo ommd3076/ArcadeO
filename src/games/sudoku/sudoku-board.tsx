@@ -95,11 +95,17 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
     return () => clearInterval(interval);
   }, [self?.elapsedMs, self?.paused, terminalResult, hasStarted]);
 
-  // Format time mm:ss
+  // Format time mm:ss or hh:mm:ss if >= 1 hour
   const formattedTime = useMemo(() => {
-    const mins = Math.floor(displaySeconds / 60);
-    const secs = displaySeconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    const validSeconds = Math.max(0, Number.isFinite(displaySeconds) ? displaySeconds : 0);
+    const totalMins = Math.floor(validSeconds / 60);
+    const secs = validSeconds % 60;
+    if (totalMins >= 60) {
+      const hours = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      return `${hours}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+    }
+    return `${totalMins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   }, [displaySeconds]);
 
   // Handle cell click

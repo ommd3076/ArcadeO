@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Snakes &amp; Ladders - Private Arcade Duel</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-dim": "#131316",
+            "surface-container-lowest": "#0e0e11",
+            "on-error-container": "#ffdad6",
+            "tertiary-container": "#b0e7ec",
+            "surface-container-high": "#2a2a2d",
+            "secondary": "#dbc673",
+            "on-primary": "#253505",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "outline": "#8f9284",
+            "surface": "#131316",
+            "on-secondary": "#3a3000",
+            "error-container": "#93000a",
+            "on-tertiary-fixed-variant": "#124e53",
+            "surface-container": "#1f1f22",
+            "on-tertiary-container": "#33696e",
+            "on-background": "#e5e1e6",
+            "inverse-surface": "#e5e1e6",
+            "outline-variant": "#45483d",
+            "tertiary-fixed": "#b5ecf1",
+            "surface-tint": "#b8cf8e",
+            "on-primary-fixed": "#131f00",
+            "secondary-container": "#594b00",
+            "on-tertiary-fixed": "#002022",
+            "on-error": "#690005",
+            "secondary-fixed": "#f8e28c",
+            "inverse-on-surface": "#303033",
+            "surface-variant": "#353438",
+            "on-secondary-fixed": "#221b00",
+            "surface-container-low": "#1b1b1e",
+            "surface-bright": "#39393c",
+            "background": "#131316",
+            "on-primary-container": "#546832",
+            "inverse-primary": "#52652f",
+            "error": "#ffb4ab",
+            "secondary-fixed-dim": "#dbc673",
+            "primary-fixed": "#d4eba8",
+            "primary-container": "#cfe6a3",
+            "on-tertiary": "#00363a",
+            "surface-container-highest": "#353438",
+            "tertiary-fixed-dim": "#99d0d5",
+            "on-surface": "#e5e1e6",
+            "on-secondary-container": "#d0bb69",
+            "on-secondary-fixed-variant": "#544600",
+            "primary-fixed-dim": "#b8cf8e",
+            "primary": "#f3ffd6",
+            "on-surface-variant": "#c5c8b9",
+            "tertiary": "#ebfdff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-2xl": "2rem",
+            "margin-mobile": "1rem",
+            "space-md": "1rem",
+            "margin": "1.25rem",
+            "gutter": "1rem",
+            "space-xs": "0.5rem",
+            "gutter-sm": "0.75rem",
+            "space-xl": "1.5rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.25rem",
+            "space-2xs": "0.25rem",
+            "space-3xl": "3rem"
+          },
+          "fontFamily": {
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "label-micro": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .board-cell {
+      position: relative;
+      aspect-ratio: 1 / 1;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      50% { transform: scale(1.15); opacity: 0.35; }
+      100% { transform: scale(0.95); opacity: 0.9; }
+    }
+    .glow-pulse {
+      animation: pulse-ring 2s infinite ease-in-out;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface antialiased flex justify-center selection:bg-primary-container selection:text-on-primary">
+<!-- Mobile Viewport Container: 390px canonical width -->
+<main class="w-full max-w-[390px] min-h-screen bg-[#0C0C0F] flex flex-col relative pb-6 border-x border-outline-variant/20 shadow-2xl">
+<!-- Top Navigation Bar (Shared Component Anchor Compliant: small, arrow_back, more_horiz, flat no shadows) -->
+<header class="flex justify-between items-center w-full px-margin-mobile py-space-sm bg-surface sticky top-0 z-30 border-b border-outline-variant/30">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container border border-outline-variant/40 hover:bg-surface-container-high transition-colors duration-150 active:scale-95 text-on-surface" type="button">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="font-label-md text-label-md text-on-surface font-medium">Games</span>
+</button>
+<div class="flex flex-col items-center justify-center text-center">
+<h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Four in a Row</h1>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider mt-0.5">Snakes &amp; Ladders · Live</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container border border-outline-variant/40">
+<span class="w-1.5 h-1.5 rounded-full bg-[#CFE6A3] animate-pulse"></span>
+<span class="font-label-micro text-label-micro text-on-surface font-medium">Sarah Live</span>
+</div>
+<button class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-surface-container-high transition-colors duration-150 active:scale-95 text-outline" type="button">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</header>
+<!-- Duo Player Scoreboard & Progress Section -->
+<section class="px-margin-mobile pt-3 pb-2 flex flex-col gap-2.5">
+<!-- Player Header Cards -->
+<div class="grid grid-cols-2 gap-2">
+<!-- Daniel (Player / Left) -->
+<div class="bg-[#16161B] border border-[#CFE6A3]/30 rounded-2xl p-2.5 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -right-3 -top-3 w-10 h-10 rounded-full bg-[#CFE6A3]/10 pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-[#CFE6A3] text-[#1D2915] flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-[#CFE6A3]/30">
+                D
+              </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Daniel</span>
+<span class="font-label-micro text-label-micro text-[#CFE6A3] uppercase font-bold tracking-widest">You</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-primary-container text-base" data-weight="fill" style="font-variation-settings: 'FILL' 1;">stars</span>
+</div>
+<div class="mt-2.5 flex items-baseline justify-between border-t border-white/5 pt-1.5">
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Tile Position</span>
+<div class="flex items-baseline gap-1">
+<span class="font-stat-counter text-xl font-light text-[#CFE6A3] leading-none">42</span>
+<span class="font-label-micro text-label-micro text-outline">/ 100</span>
+</div>
+</div>
+</div>
+<!-- Sarah (Opponent / Right) -->
+<div class="bg-[#16161B] border border-[#F4DE88]/30 rounded-2xl p-2.5 relative overflow-hidden flex flex-col justify-between">
+<div class="absolute -right-3 -top-3 w-10 h-10 rounded-full bg-[#F4DE88]/10 pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-[#F4DE88] text-[#2E2305] flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-[#F4DE88]/30">
+                S
+              </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Sarah</span>
+<span class="font-label-micro text-label-micro text-[#F4DE88] uppercase font-bold tracking-widest">Opponent</span>
+</div>
+</div>
+<span class="font-label-micro text-label-micro px-1.5 py-0.5 rounded bg-[#F4DE88]/15 text-[#F4DE88] font-semibold">+16 Lead</span>
+</div>
+<div class="mt-2.5 flex items-baseline justify-between border-t border-white/5 pt-1.5">
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Tile Position</span>
+<div class="flex items-baseline gap-1">
+<span class="font-stat-counter text-xl font-light text-[#F4DE88] leading-none">58</span>
+<span class="font-label-micro text-label-micro text-outline">/ 100</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Linear Micro Progress Track (1 to 100) -->
+<div class="bg-[#16161B] border border-white/[0.06] rounded-xl px-3 py-2 flex flex-col gap-1.5">
+<div class="flex justify-between items-center text-outline font-label-micro text-label-micro">
+<span>Start (Tile 1)</span>
+<span class="text-tertiary-fixed font-semibold">Trophy Goal (100) 🏆</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full relative overflow-visible">
+<!-- Sarah progress bar background -->
+<div class="absolute left-0 top-0 h-full bg-[#F4DE88]/25 rounded-full" style="width: 58%;"></div>
+<!-- Daniel progress bar -->
+<div class="absolute left-0 top-0 h-full bg-[#CFE6A3] rounded-full" style="width: 42%;"></div>
+<!-- Daniel pin marker -->
+<div class="absolute top-1/2 -translate-y-1/2 -ml-2.5 w-5 h-5 rounded-full bg-[#CFE6A3] text-[#1D2915] font-bold text-[9px] flex items-center justify-center shadow-md ring-2 ring-[#0C0C0F]" style="left: 42%;">
+            D
+          </div>
+<!-- Sarah pin marker -->
+<div class="absolute top-1/2 -translate-y-1/2 -ml-2.5 w-5 h-5 rounded-full bg-[#F4DE88] text-[#2E2305] font-bold text-[9px] flex items-center justify-center shadow-md ring-2 ring-[#0C0C0F]" style="left: 58%;">
+            S
+          </div>
+</div>
+</div>
+<!-- Active Turn Pastel Banner (Hero Mint Card) -->
+<div class="bg-[#CFE6A3] text-[#1D2915] rounded-2xl p-3 flex items-center justify-between shadow-lg relative overflow-hidden">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-[#1D2915]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px] text-[#1D2915]">casino</span>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm font-bold leading-none">Daniel's Turn</span>
+<span class="w-1.5 h-1.5 rounded-full bg-[#1D2915]"></span>
+<span class="font-label-md text-label-md font-bold">Square 42</span>
+</div>
+<p class="font-label-md text-label-md opacity-85 mt-0.5 font-medium">Roll 9 to climb Ladder at #51!</p>
+</div>
+</div>
+<div class="flex items-center gap-1 bg-[#1D2915]/10 px-2.5 py-1 rounded-full border border-[#1D2915]/15">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+<span class="font-label-lg text-label-lg font-bold">0:24</span>
+</div>
+</div>
+</section>
+<!-- Central Game Board (10x10 Serpentine Grid with SVG Ladders & Snakes Overlays) -->
+<section class="px-margin-mobile py-1">
+<div class="bg-[#16161B] border border-white/[0.12] rounded-2xl p-2 relative shadow-inner overflow-hidden select-none">
+<!-- Authentic Serpentine 10x10 Grid Layout -->
+<div class="grid grid-cols-10 gap-1 w-full relative z-10" id="board-grid">
+<!-- ROW 10 (Tiles 100 to 91: left to right) -->
+<div class="board-cell rounded bg-[#252530] border border-[#CFE6A3]/60 flex flex-col items-center justify-center p-0.5">
+<span class="font-label-micro text-[8px] font-bold text-[#CFE6A3]">100</span>
+<span class="text-[10px]">🏆</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">99</span>
+</div>
+<!-- 98: Snake Head -->
+<div class="board-cell rounded bg-[#2D161A] border border-[#ffb4ab]/50 flex items-start justify-between p-0.5">
+<span class="font-label-micro text-[8px] text-[#ffb4ab] font-bold">98</span>
+<span class="text-[8px]">🐍</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">97</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">96</span>
+</div>
+<!-- 95: Snake Head -->
+<div class="board-cell rounded bg-[#2D161A] border border-[#ffb4ab]/50 flex items-start justify-between p-0.5">
+<span class="font-label-micro text-[8px] text-[#ffb4ab] font-bold">95</span>
+<span class="text-[8px]">🐍</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">94</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">93</span>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5">
+<span class="font-label-micro text-[8px] text-[#8C8C9A]">92</span>
+</div>
+<!-- 91: Ladder Top -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3]/60 flex items-start justify-between p-0.5">
+<span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">91</span>
+<span class="text-[8px]">🪜</span>
+</div>
+<!-- ROW 9 (Tiles 81 to 90: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">81</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">82</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">83</span></div>
+<!-- 84: Ladder Top -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3]/60 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">84</span><span class="text-[8px]">🪜</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">85</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">86</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">87</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">88</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">89</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">90</span></div>
+<!-- ROW 8 (Tiles 80 to 71: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">80</span></div>
+<!-- 79: Snake Tail -->
+<div class="board-cell rounded bg-[#1D171C] border border-[#ffb4ab]/30 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab]">79</span><span class="text-[7px] text-[#ffb4ab]">▼</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">78</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">77</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">76</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">75</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">74</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">73</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">72</span></div>
+<!-- 71: Ladder Base -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3] flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">71</span><span class="text-[8px] text-[#CFE6A3]">▲</span></div>
+<!-- ROW 7 (Tiles 61 to 70: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">61</span></div>
+<!-- 62: Snake Head -->
+<div class="board-cell rounded bg-[#2D161A] border border-[#ffb4ab]/60 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab] font-bold">62</span><span class="text-[8px]">🐍</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">63</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">64</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">65</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">66</span></div>
+<!-- 67: Ladder Top -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3]/60 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">67</span><span class="text-[8px]">🪜</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">68</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">69</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">70</span></div>
+<!-- ROW 6 (Tiles 60 to 51: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">60</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">59</span></div>
+<!-- 58: SARAH PAWN POSITION -->
+<div class="board-cell rounded bg-[#242116] border-2 border-[#F4DE88] flex items-center justify-center p-0.5 relative shadow-md">
+<span class="absolute top-0.5 left-1 font-label-micro text-[7px] text-[#F4DE88] font-bold">58</span>
+<!-- Sarah Pawn Disc with glow -->
+<div class="w-5 h-5 rounded-full bg-[#F4DE88] text-[#2E2305] font-extrabold text-[10px] flex items-center justify-center shadow-lg ring-2 ring-[#F4DE88]/60 relative z-20">
+              S
+            </div>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">57</span></div>
+<!-- 56: Snake Tail -->
+<div class="board-cell rounded bg-[#1D171C] border border-[#ffb4ab]/30 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab]">56</span><span class="text-[7px] text-[#ffb4ab]">▼</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">55</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">54</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">53</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">52</span></div>
+<!-- 51: Ladder Base -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3] flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">51</span><span class="text-[8px] text-[#CFE6A3]">▲</span></div>
+<!-- ROW 5 (Tiles 41 to 50: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">41</span></div>
+<!-- 42: DANIEL PAWN POSITION -->
+<div class="board-cell rounded bg-[#1E2718] border-2 border-[#CFE6A3] flex items-center justify-center p-0.5 relative shadow-md">
+<span class="absolute top-0.5 left-1 font-label-micro text-[7px] text-[#CFE6A3] font-bold">42</span>
+<!-- Daniel Pawn Disc with active neon glow -->
+<div class="w-5 h-5 rounded-full bg-[#CFE6A3] text-[#1D2915] font-extrabold text-[10px] flex items-center justify-center shadow-lg ring-2 ring-[#CFE6A3] relative z-20">
+              D
+            </div>
+<div class="absolute inset-0 rounded bg-[#CFE6A3]/20 glow-pulse pointer-events-none"></div>
+</div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">43</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">44</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">45</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">46</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">47</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">48</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">49</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">50</span></div>
+<!-- ROW 4 (Tiles 40 to 31: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">40</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">39</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">38</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">37</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">36</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">35</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">34</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">33</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">32</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">31</span></div>
+<!-- ROW 3 (Tiles 21 to 30: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">21</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">22</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">23</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">24</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">25</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">26</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">27</span></div>
+<!-- 28: Ladder Base -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3] flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">28</span><span class="text-[8px] text-[#CFE6A3]">▲</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">29</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">30</span></div>
+<!-- ROW 2 (Tiles 20 to 11: left to right) -->
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">20</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">19</span></div>
+<!-- 18: Snake Tail -->
+<div class="board-cell rounded bg-[#1D171C] border border-[#ffb4ab]/30 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab]">18</span><span class="text-[7px] text-[#ffb4ab]">▼</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">17</span></div>
+<!-- 16: Snake Head -->
+<div class="board-cell rounded bg-[#2D161A] border border-[#ffb4ab]/60 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab] font-bold">16</span><span class="text-[8px]">🐍</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">15</span></div>
+<!-- 14: Ladder Top -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3]/60 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">14</span><span class="text-[8px]">🪜</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">13</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">12</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">11</span></div>
+<!-- ROW 1 (Tiles 1 to 10: bottom row, left to right) -->
+<div class="board-cell rounded bg-[#1C1F16] border border-[#CFE6A3]/40 flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">1</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">2</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">3</span></div>
+<!-- 4: Ladder Base -->
+<div class="board-cell rounded bg-[#1F261B] border border-[#CFE6A3] flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#CFE6A3] font-bold">4</span><span class="text-[8px] text-[#CFE6A3]">▲</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">5</span></div>
+<!-- 6: Snake Tail -->
+<div class="board-cell rounded bg-[#1D171C] border border-[#ffb4ab]/30 flex items-start justify-between p-0.5"><span class="font-label-micro text-[8px] text-[#ffb4ab]">6</span><span class="text-[7px] text-[#ffb4ab]">▼</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">7</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">8</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">9</span></div>
+<div class="board-cell rounded bg-[#181820] border border-[#282833] flex items-start justify-start p-0.5"><span class="font-label-micro text-[8px] text-[#8C8C9A]">10</span></div>
+</div>
+<!-- Atmospheric Board Overlay: Fine tactile details -->
+<div class="mt-2 pt-2 border-t border-white/[0.06] flex items-center justify-between text-outline">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-sm bg-[#CFE6A3]"></span>
+<span class="font-label-micro text-label-micro">Ladder Climbs: 4/14, 28/84, 51/67</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-sm bg-[#ffb4ab]"></span>
+<span class="font-label-micro text-label-micro">Snake Traps: 98, 95, 62, 16</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Move History & Danger Telemetry Cards -->
+<section class="px-margin-mobile pt-2 pb-1 flex flex-col gap-2">
+<!-- Recent Roll Ticker -->
+<div class="bg-[#16161B] border border-white/[0.08] rounded-xl px-3 py-2 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-[#F4DE88]"></span>
+<p class="font-body-md text-xs text-on-surface font-medium leading-none">
+            Sarah rolled <span class="font-bold text-[#F4DE88]">⚂ 3</span> · Tile #55 → <span class="font-bold text-[#F4DE88]">#58</span>
+</p>
+</div>
+<span class="font-label-micro text-label-micro text-outline">24s ago</span>
+</div>
+<!-- Threat / Opportunity Telemetry Chip -->
+<div class="bg-[#1F1F26] border border-white/[0.12] rounded-xl px-3 py-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#ffb4ab]" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div class="flex flex-col">
+<span class="font-label-micro text-[9px] uppercase tracking-wider text-[#ffb4ab] font-bold">Tactical Telemetry</span>
+<p class="font-label-md text-label-md text-on-surface-variant leading-tight">
+            Snake pit ahead at <span class="text-[#ffb4ab] font-bold">#62</span> (3 away) · Ladder at <span class="text-[#CFE6A3] font-bold">#51</span> (+9 boost)
+          </p>
+</div>
+</div>
+</section>
+<!-- Bottom Action & Control Zone (Strictly no generic bottom navigation tabs) -->
+<section class="mt-auto px-margin-mobile pt-3 pb-2 flex flex-col gap-2.5">
+<!-- Primary Action: Big Tactile 3D Mint Dice Button -->
+<button class="w-full h-14 bg-[#CFE6A3] text-[#0C0C0F] rounded-full flex items-center justify-center gap-2.5 font-bold font-headline-sm text-headline-sm tracking-wide shadow-[0_8px_20px_rgba(207,230,163,0.25)] active:scale-[0.98] transition-all duration-150 relative overflow-hidden group" type="button">
+<span class="material-symbols-outlined text-[26px] group-hover:rotate-12 transition-transform duration-200" data-weight="fill" style="font-variation-settings: 'FILL' 1;">casino</span>
+<span>ROLL DICE</span>
+<span class="px-2 py-0.5 rounded-full bg-[#1D2915]/15 text-[11px] font-extrabold tracking-wider ml-1">⚅ 1-6</span>
+</button>
+<!-- Quick Action Secondary Utility Pills -->
+<div class="grid grid-cols-3 gap-2">
+<button class="h-10 rounded-full bg-[#16161B] border border-white/[0.12] hover:bg-surface-container-high transition-colors duration-150 flex items-center justify-center gap-1.5 active:scale-95 text-on-surface" type="button">
+<span class="material-symbols-outlined text-[15px] text-[#F4DE88]">notifications_active</span>
+<span class="font-label-md text-label-md font-medium">Nudge</span>
+</button>
+<button class="h-10 rounded-full bg-[#16161B] border border-white/[0.12] hover:bg-surface-container-high transition-colors duration-150 flex items-center justify-center gap-1.5 active:scale-95 text-on-surface" type="button">
+<span class="material-symbols-outlined text-[15px] text-tertiary-fixed">handshake</span>
+<span class="font-label-md text-label-md font-medium">Draw</span>
+</button>
+<button class="h-10 rounded-full bg-[#16161B] border border-white/[0.12] hover:bg-surface-container-high transition-colors duration-150 flex items-center justify-center gap-1.5 active:scale-95 text-[#ffb4ab]" type="button">
+<span class="material-symbols-outlined text-[15px]">flag</span>
+<span class="font-label-md text-label-md font-medium">Resign</span>
+</button>
+</div>
+</section>
+</main>
+<script>
+    // Lightweight tactile sound or micro-haptic simulation
+    document.addEventListener('DOMContentLoaded', () => {
+      const rollBtn = document.querySelector('button:has(.material-symbols-outlined)');
+      if (rollBtn) {
+        rollBtn.addEventListener('click', () => {
+          rollBtn.classList.add('scale-95');
+          setTimeout(() => rollBtn.classList.remove('scale-95'), 120);
+        });
+      }
+    });
+  </script>
+</body></html>
