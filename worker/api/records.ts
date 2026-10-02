@@ -110,10 +110,50 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
     let currentStreak: { holder: "A" | "B"; count: number } | null = null;
     const playDays = new Set<number>();
 
+    // Cricket records
+    let highestCompletedInnings = 0;
+    const cricketBattingRuns: Record<string, number> = { A: 0, B: 0 };
+    const cricketBowlingWickets: Record<string, number> = { A: 0, B: 0 };
+
     for (const r of rows) {
       const details = parseDetails(r.details);
       if (r.mode === "practice" || details.scored === false || details.senderAttempt === true)
         continue;
+
+      // Cricket metrics: only completed matches (rules_win / rules_draw), excluding resignation and unscored
+      if (r.gameId === "hand-cricket" && (r.reason === "rules_win" || r.reason === "rules_draw")) {
+        const batting = details.battingRuns as Record<string, number> | undefined;
+        const bowling = details.bowlingWickets as Record<string, number> | undefined;
+        let scores: Record<string, number> = {};
+        try {
+          scores = JSON.parse(r.scores);
+        } catch {}
+
+        const runsA = batting?.A ?? scores.A ?? 0;
+        const runsB = batting?.B ?? scores.B ?? 0;
+        cricketBattingRuns.A += runsA;
+        cricketBattingRuns.B += runsB;
+
+        const maxInnings = Math.max(
+          typeof details.highestInnings === "number" ? details.highestInnings : 0,
+          typeof details.firstInningsRuns === "number" ? details.firstInningsRuns : 0,
+          typeof details.secondInningsRuns === "number" ? details.secondInningsRuns : 0,
+          runsA,
+          runsB,
+        );
+        highestCompletedInnings = Math.max(highestCompletedInnings, maxInnings);
+
+        if (bowling) {
+          cricketBowlingWickets.A += bowling.A ?? 0;
+          cricketBowlingWickets.B += bowling.B ?? 0;
+        } else if (Array.isArray(details.innings)) {
+          for (const inn of details.innings as Array<{ bowlerSeat?: string; wickets?: number }>) {
+            if (inn.bowlerSeat === "A") cricketBowlingWickets.A += inn.wickets ?? 0;
+            if (inn.bowlerSeat === "B") cricketBowlingWickets.B += inn.wickets ?? 0;
+          }
+        }
+      }
+
       const winner = winnerAccount(r.participants, r.winner);
       playDays.add(Math.floor((r.finishedAt + 19_800_000) / 86_400_000));
 
@@ -242,6 +282,11 @@ export async function handleRecordsRequest(request: Request, env: Env): Promise<
       byGame,
       sudokuBestTimes,
       soloRecords,
+      cricketRecords: {
+        highestCompletedInnings,
+        battingRuns: cricketBattingRuns,
+        bowlingWickets: cricketBowlingWickets,
+      },
     });
   }
 

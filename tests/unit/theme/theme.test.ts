@@ -212,8 +212,9 @@ describe("Theme System & Semantic Tokens", () => {
 
   describe("Typography, Radii, Spacing & Motion Tokens", () => {
     it("specifies the three mandatory font roles per DESIGN.md", () => {
-      expect(typography.fonts.heading).toContain("Space Grotesk");
-      expect(typography.fonts.body).toContain("DM Sans");
+      expect(typography.fonts.display).toContain("Barlow Condensed");
+      expect(typography.fonts.heading).toContain("Plus Jakarta Sans");
+      expect(typography.fonts.body).toContain("Plus Jakarta Sans");
       expect(typography.fonts.mono).toContain("DM Mono");
     });
 

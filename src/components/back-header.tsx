@@ -51,8 +51,7 @@ export function BackHeader({
               fontFamily: "var(--font-heading)",
               color: "var(--color-text)",
               whiteSpace: "normal",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
+              overflowWrap: "anywhere",
               margin: 0,
             }}
           >
@@ -64,9 +63,8 @@ export function BackHeader({
                 fontSize: "12px",
                 color: "var(--color-muted-text)",
                 margin: "2px 0 0 0",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
+                whiteSpace: "normal",
+                overflowWrap: "anywhere",
               }}
             >
               {subtitle}

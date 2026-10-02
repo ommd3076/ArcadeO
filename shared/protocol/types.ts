@@ -27,10 +27,10 @@ export type ThemeMode = "light" | "dark" | "system";
 export type AccentFamily = "teal" | "violet" | "cyan" | "mint" | "pink" | "yellow";
 
 export type MatchLifecycle =
-  "waiting" | "active" | "completed" | "resigned" | "abandoned" | "cancelled";
+  "waiting" | "active" | "saved" | "completed" | "resigned" | "abandoned" | "cancelled" | "expired";
 
 export type TerminalReason =
-  "rules_win" | "rules_draw" | "resignation" | "abandonment" | "declined" | "cancelled";
+  "rules_win" | "rules_draw" | "resignation" | "abandonment" | "declined" | "cancelled" | "expired";
 
 export interface TerminalResult {
   winner: Seat | null; // null indicates draw or unranked/abandoned
@@ -50,6 +50,8 @@ export type ActionType =
   | "match.resign"
   | "match.request-abandon"
   | "match.agree-abandon"
+  | "match.leave-save"
+  | "match.resume"
   | "dice.roll"
   | "ludo.move"
   | "ludo.set-colour"
@@ -115,6 +117,10 @@ export interface ChallengePublishPayload {
   senderAttemptId: string;
 }
 
+export interface MatchResumePayload {
+  pauseId: string;
+}
+
 export type ActionPayloadMap = {
   "match.accept": Record<string, never>;
   "match.decline": Record<string, never>;
@@ -123,6 +129,8 @@ export type ActionPayloadMap = {
   "match.resign": MatchResignPayload;
   "match.request-abandon": Record<string, never>;
   "match.agree-abandon": Record<string, never>;
+  "match.leave-save": Record<string, never>;
+  "match.resume": MatchResumePayload;
   "dice.roll": Record<string, never>;
   "ludo.move": LudoMovePayload;
   "ludo.set-colour": {
@@ -146,7 +154,7 @@ export type ActionPayloadMap = {
 
 // Envelope
 export interface ActionEnvelope<T extends ActionType = ActionType> {
-  protocolVersion: 1;
+  protocolVersion: 1 | 2;
   matchId: string;
   actionId: string; // UUID v4
   action: T;
@@ -156,6 +164,7 @@ export interface ActionEnvelope<T extends ActionType = ActionType> {
   roundId?: number;
   progressRevision?: number;
   controllerGeneration?: number;
+  pauseId?: string;
 }
 
 // Viewer Context for filtering
@@ -174,6 +183,8 @@ export interface FilteredMatchView {
   mode: PlayMode;
   lifecycle: MatchLifecycle;
   deliveryVersion: number;
+  schemaVersion?: number;
+  rulesVersion?: number;
   participants: {
     A: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };
     B?: { accountId: AccountId; displayName: string; ready: boolean; accentFamily?: AccentFamily };
@@ -187,6 +198,11 @@ export interface FilteredMatchView {
   turnSeat?: Seat;
   turnId?: number;
   roundId?: number;
+  pauseId?: string;
+  savedAt?: number;
+  expiresAt?: number;
+  resumeReadiness?: Record<Seat, boolean>;
+  disconnectEligibility?: { seat: Seat; eligibleAt: number };
   legalActions: ActionType[];
   result?: TerminalResult;
   serverTime: number;

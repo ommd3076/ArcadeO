@@ -7,7 +7,7 @@ import { snakesAndLaddersEngineAdapter } from "./snakes-and-ladders/adapter";
 import { dotsBoxesEngineAdapter } from "./dots-boxes/adapter";
 import { sosEngineAdapter } from "./sos/adapter";
 import { sudokuEngineAdapter } from "./sudoku/adapter";
-import { handCricketEngineAdapter } from "./hand-cricket/adapter";
+import { handCricketV1EngineAdapter, handCricketV2EngineAdapter } from "./hand-cricket/adapter";
 
 export interface SuppliedStartFacts {
   serverTime: number;
@@ -44,6 +44,7 @@ export interface GameEngineAdapter<
   TView = unknown,
 > {
   gameId: GameId;
+  rulesVersion?: number;
   createInitialState(startFacts: SuppliedStartFacts): TState;
   validateAndReduce(
     state: TState,
@@ -55,7 +56,35 @@ export interface GameEngineAdapter<
   isTerminal(state: TState): TerminalResult | null;
 }
 
-const engineRegistry = new Map<GameId, GameEngineAdapter<any, any, any, any>>();
+const engineRegistry = new Map<string, GameEngineAdapter<any, any, any, any>>();
+const defaultVersions = new Map<GameId, number>();
+
+export function registerGameEngine(adapter: GameEngineAdapter<any, any, any, any>): void {
+  const version = adapter.rulesVersion ?? 1;
+  const key = `${adapter.gameId}@${version}`;
+  engineRegistry.set(key, adapter);
+
+  // If this version is >= current default, it becomes the default lookup
+  const currentDefault = defaultVersions.get(adapter.gameId) ?? 0;
+  if (version >= currentDefault) {
+    defaultVersions.set(adapter.gameId, version);
+  }
+}
+
+export function getGameEngine(
+  gameId: GameId,
+  rulesVersion?: number,
+): GameEngineAdapter<any, any, any, any> | undefined {
+  if (rulesVersion !== undefined) {
+    return engineRegistry.get(`${gameId}@${rulesVersion}`);
+  }
+  const defaultVersion = defaultVersions.get(gameId) ?? 1;
+  return engineRegistry.get(`${gameId}@${defaultVersion}`);
+}
+
+export function getAllRegisteredGameIds(): GameId[] {
+  return Array.from(defaultVersions.keys());
+}
 
 // Auto-register available engine adapters
 registerGameEngine(connectFourEngineAdapter);
@@ -65,16 +94,5 @@ registerGameEngine(snakesAndLaddersEngineAdapter);
 registerGameEngine(dotsBoxesEngineAdapter);
 registerGameEngine(sosEngineAdapter);
 registerGameEngine(sudokuEngineAdapter);
-registerGameEngine(handCricketEngineAdapter);
-
-export function registerGameEngine(adapter: GameEngineAdapter<any, any, any, any>): void {
-  engineRegistry.set(adapter.gameId, adapter);
-}
-
-export function getGameEngine(gameId: GameId): GameEngineAdapter<any, any, any, any> | undefined {
-  return engineRegistry.get(gameId);
-}
-
-export function getAllRegisteredGameIds(): GameId[] {
-  return Array.from(engineRegistry.keys());
-}
+registerGameEngine(handCricketV1EngineAdapter);
+registerGameEngine(handCricketV2EngineAdapter);

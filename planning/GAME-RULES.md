@@ -84,7 +84,11 @@ Best of 3 by default; best of 5/7 selectable at creation. First to 2/3/4 round w
 
 ## Hand Cricket
 
-Numbers 1–6, one wicket each, no ball limit. A saved server coin toss selects who chooses Bat or Bowl; the choice fixes first innings roles. Every delivery uses two secret locked numbers. Equal values dismiss the batter and score zero; otherwise add the batter's number. After first dismissal, swap roles; target is first innings total plus one. Second innings ends immediately on reaching target or dismissal. On dismissal below the first total, first batter wins; equal totals draw. Zero in the first innings means one run wins the chase. No overs, super-over or extra wickets. Both acknowledge each result before the next delivery/innings, using the shared readiness protocol.
+Current rules version 2 uses numbers 1–10; saved legacy version 1 uses 1–6. A saved server coin toss selects who chooses Bat or Bowl. Each ball has two secret locked numbers. Different numbers add the batter's number to their total; matching numbers mean OUT and add zero. There is no ball limit, overs, super-over or extra wicket.
+
+**Together owner correction, 2026-10-02:** the batter chooses first, then the bowler. Reveal both accepted numbers explicitly. After a scoring ball, the same person keeps batting. Only OUT ends that batting turn; reveal it, then Switch batting to exchange roles. The second person also keeps batting until OUT, even after exceeding the first person's total. After both have been out once, compare totals: higher score wins; equal scores draw. There is no chase target or early target win in Together version 2. UI uses named batting/bowling roles, Next ball and Switch batting. Old active version-2 matches retain their accepted runs and locks while using this correction; already completed outcomes remain immutable.
+
+Remote and legacy version-1 games retain the chase: after first dismissal, swap roles and chase first total plus one. The second batting turn ends on reaching that target or dismissal. A dismissal below the first total loses; equality draws. Remote players both acknowledge each ball; the Together controller acknowledges once for both. Every Next clears the preceding reveal state, locks and readiness before accepting new choices.
 
 ## SOS
 

@@ -4,13 +4,13 @@ import { UsCoupleIcon } from "./icons/us-couple-icon";
 
 export function NavTabs() {
   const tabs = [
-    { to: "/", label: "Home", icon: <Home size={18} /> },
-    { to: "/games", label: "Games", icon: <Gamepad2 size={18} /> },
-    { to: "/us", label: "Us", icon: <UsCoupleIcon size={18} /> },
+    { to: "/", label: "Home", icon: <Home size={20} aria-hidden="true" /> },
+    { to: "/games", label: "Games", icon: <Gamepad2 size={20} aria-hidden="true" /> },
+    { to: "/us", label: "Us", icon: <UsCoupleIcon size={20} aria-hidden="true" /> },
   ];
 
   return (
-    <nav className="arcade-nav-tabs" aria-label="Main Navigation">
+    <nav className="arcade-nav-tabs" aria-label="Primary">
       {tabs.map((tab) => (
         <NavLink
           key={tab.to}

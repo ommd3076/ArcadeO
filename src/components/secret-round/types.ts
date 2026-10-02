@@ -1,4 +1,4 @@
-﻿import type { ReactNode } from "react";
+import type { ReactNode } from "react";
 import type { Seat, AccentFamily } from "@shared/protocol/types";
 
 export type SecretRoundGameType = "rps" | "cricket" | "custom";
@@ -37,6 +37,9 @@ export type RemoteHandoffStep = "choosing" | "locked-waiting" | "revealed-outcom
 export interface SecretHandoffProps<T = string | number> {
   mode: "together" | "remote";
   roundNumber?: number;
+  roundLabel?: string;
+  nextRoundLabel?: string;
+  revealLabel?: string;
   gameTitle?: string;
 
   // Players info
@@ -64,6 +67,7 @@ export interface SecretHandoffProps<T = string | number> {
   isSeatBLocked?: boolean;
   isResolved?: boolean;
   isRevealed?: boolean;
+  readiness?: Record<Seat, boolean>;
 
   // Outcome data (populated when resolved/revealed)
   outcome?: SecretOutcomeDisplay | null;

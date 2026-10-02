@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ludo · Private Arcade</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "tertiary": "#ebfdff",
+            "surface-container-low": "#1b1b1e",
+            "error": "#ffb4ab",
+            "on-tertiary-container": "#33696e",
+            "tertiary-fixed-dim": "#99d0d5",
+            "tertiary-container": "#b0e7ec",
+            "on-secondary-fixed": "#221b00",
+            "primary-fixed": "#d4eba8",
+            "inverse-primary": "#52652f",
+            "surface-tint": "#b8cf8e",
+            "surface-container-high": "#2a2a2d",
+            "on-secondary-fixed-variant": "#544600",
+            "surface-bright": "#39393c",
+            "outline-variant": "#45483d",
+            "on-error-container": "#ffdad6",
+            "on-primary": "#253505",
+            "surface-container": "#1f1f22",
+            "on-background": "#e5e1e6",
+            "on-primary-container": "#546832",
+            "primary-container": "#cfe6a3",
+            "on-tertiary-fixed-variant": "#124e53",
+            "primary": "#f3ffd6",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "inverse-on-surface": "#303033",
+            "inverse-surface": "#e5e1e6",
+            "secondary-fixed": "#f8e28c",
+            "on-tertiary-fixed": "#002022",
+            "surface-dim": "#131316",
+            "tertiary-fixed": "#b5ecf1",
+            "on-surface-variant": "#c5c8b9",
+            "on-secondary": "#3a3000",
+            "surface-variant": "#353438",
+            "primary-fixed-dim": "#b8cf8e",
+            "outline": "#8f9284",
+            "secondary-fixed-dim": "#dbc673",
+            "on-secondary-container": "#d0bb69",
+            "error-container": "#93000a",
+            "on-error": "#690005",
+            "on-tertiary": "#00363a",
+            "on-surface": "#e5e1e6",
+            "surface-container-lowest": "#0e0e11",
+            "on-primary-fixed": "#131f00",
+            "surface-container-highest": "#353438",
+            "secondary-container": "#594b00",
+            "background": "#131316",
+            "surface": "#131316",
+            "secondary": "#dbc673"
+          },
+          borderRadius: {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          spacing: {
+            "space-lg": "1.25rem",
+            "margin": "1.25rem",
+            "gutter": "1rem",
+            "space-xs": "0.5rem",
+            "margin-mobile": "1rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.75rem",
+            "space-xl": "1.5rem",
+            "space-md": "1rem",
+            "space-3xl": "3rem",
+            "space-2xl": "2rem",
+            "space-2xs": "0.25rem"
+          },
+          fontFamily: {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "label-micro": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "code": ["Space Grotesk"]
+          },
+          fontSize: {
+            "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "0em", fontWeight: "600" }],
+            "display-hero": ["48px", { lineHeight: "52px", letterSpacing: "-0.03em", fontWeight: "400" }],
+            "label-micro": ["9px", { lineHeight: "12px", letterSpacing: "0.1em", fontWeight: "700" }],
+            "label-md": ["11px", { lineHeight: "14px", letterSpacing: "0.06em", fontWeight: "600" }],
+            "label-lg": ["13px", { lineHeight: "16px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-lg": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "600" }],
+            "stat-counter": ["38px", { lineHeight: "42px", letterSpacing: "-0.04em", fontWeight: "300" }],
+            "body-lg": ["16px", { lineHeight: "24px", letterSpacing: "-0.005em", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }],
+            "display-hero-mobile": ["36px", { lineHeight: "40px", letterSpacing: "-0.03em", fontWeight: "400" }],
+            "headline-md": ["20px", { lineHeight: "26px", letterSpacing: "-0.01em", fontWeight: "500" }],
+            "headline-lg-mobile": ["26px", { lineHeight: "32px", letterSpacing: "-0.02em", fontWeight: "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    /* Subtle custom dice animation & board styling */
+    @keyframes subtlePulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(207, 230, 163, 0.45); }
+      50% { transform: scale(1.03); box-shadow: 0 0 0 8px rgba(207, 230, 163, 0); }
+    }
+    .pulse-ring {
+      animation: subtlePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .ludo-grid {
+      display: grid;
+      grid-template-columns: repeat(15, minmax(0, 1fr));
+      grid-template-rows: repeat(15, minmax(0, 1fr));
+    }
+    /* Hairline paper inner stroke */
+    .tactile-card {
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+    .tactile-highlight {
+      box-shadow: inset 0 0 0 1px rgba(207, 230, 163, 0.45), 0 4px 16px -2px rgba(207, 230, 163, 0.15);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0C0C0F] text-on-surface antialiased min-h-screen flex flex-col items-center justify-start select-none font-body-md">
+<!-- Mobile Viewport Wrapper (390px - 430px scaled canvas feeling) -->
+<div class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#0C0C0F] px-3.5 pt-3 pb-8 relative overflow-x-hidden">
+<!-- 1. TOP APP BAR (Shared Anchor Pattern: back action, headline, meta options) -->
+<header class="flex items-center justify-between w-full py-2 mb-2 border-b border-outline-variant/30">
+<!-- Back to lobby button -->
+<a class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container-high transition-colors duration-150 border border-white/5 active:scale-95" href="#lobby">
+<span class="material-symbols-outlined text-outline text-[18px]">arrow_back</span>
+<span class="text-label-md font-label-md text-on-surface-variant">Games</span>
+</a>
+<!-- Title / Round Meta -->
+<div class="text-center">
+<h1 class="text-headline-sm font-headline-sm text-on-surface font-bold tracking-tight flex items-center justify-center gap-1.5">
+<span>Ludo</span>
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</h1>
+<p class="text-label-micro font-label-micro text-outline tracking-wider uppercase mt-0.5">Match #5A8E · Round 1 of 3</p>
+</div>
+<!-- Right: Connection pill & Haptics toggle -->
+<div class="flex items-center gap-1.5">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#16161B] border border-white/10">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+<span class="text-label-micro font-label-micro text-on-surface-variant font-medium">Sarah</span>
+</div>
+<button aria-label="Toggle sound and haptics" class="w-8 h-8 rounded-full bg-[#16161B] hover:bg-surface-container-high flex items-center justify-center border border-white/10 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-outline text-[18px]">volume_up</span>
+</button>
+</div>
+</header>
+<!-- 2. PLAYER VS PLAYER & TURN STATUS CARD -->
+<section class="bg-[#16161B] rounded-2xl p-3.5 border border-[#24242C] mb-3 tactile-card">
+<div class="flex items-center justify-between">
+<!-- Player 1: Daniel (You) -->
+<div class="flex items-center gap-2.5">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-[#11292B] border-2 border-[#2DD4BF] flex items-center justify-center font-headline-sm text-[#2DD4BF] font-bold shadow-sm">
+              D
+            </div>
+<!-- Active turn glow indicator -->
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center text-[10px] font-bold">
+              ✓
+            </div>
+</div>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="text-label-lg font-label-lg text-white font-bold">Daniel</span>
+<span class="text-[10px] font-label-micro uppercase px-1.5 py-0.2 rounded bg-[#11292B] text-[#2DD4BF] border border-[#2DD4BF]/30">You</span>
+</div>
+<p class="text-[11px] text-[#2DD4BF]/90 font-medium">1 Goal · 2 Active · 1 Yard</p>
+</div>
+</div>
+<!-- Center Match Status / VS divider -->
+<div class="flex flex-col items-center px-1">
+<span class="text-[10px] font-label-micro font-bold tracking-widest text-outline bg-surface-container-low px-2 py-0.5 rounded-full border border-white/5">VS</span>
+</div>
+<!-- Player 2: Sarah -->
+<div class="flex items-center gap-2.5 text-right flex-row-reverse">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-[#2E2305] border-2 border-[#FBBF24] flex items-center justify-center font-headline-sm text-[#FBBF24] font-bold">
+              S
+            </div>
+</div>
+<div>
+<div class="flex items-center justify-end gap-1.5">
+<span class="text-label-lg font-label-lg text-white font-bold">Sarah</span>
+</div>
+<p class="text-[11px] text-[#FBBF24]/90 font-medium">0 Goal · 2 Active · 2 Yard</p>
+</div>
+</div>
+</div>
+<!-- Active Turn Action Banner with Die 6 -->
+<div class="mt-3 bg-primary-container text-[#12200E] px-3.5 py-2.5 rounded-xl flex items-center justify-between shadow-sm relative overflow-hidden">
+<!-- Turn text & dynamic timer -->
+<div class="flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[20px] text-[#1D2915]">play_circle</span>
+<div>
+<p class="text-label-lg font-label-lg font-extrabold leading-none text-[#12200E]">Your Turn · Move Token</p>
+<p class="text-[11px] font-label-micro text-[#2b3e1c] font-semibold mt-0.5">Rolled maximum value!</p>
+</div>
+</div>
+<div class="flex items-center gap-3 z-10">
+<!-- 22s Turn Countdown -->
+<div class="flex items-center gap-1 bg-[#1D2915]/10 px-2 py-1 rounded-md text-[11px] font-bold font-code text-[#12200E]">
+<span class="material-symbols-outlined text-[14px]">timer</span>
+<span>0:22</span>
+</div>
+<!-- Tactile 3D-styled Die displaying '6' -->
+<div class="w-9 h-9 bg-white rounded-lg p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.35),inset_0_2px_2px_rgba(255,255,255,0.8),inset_0_-2px_4px_rgba(0,0,0,0.2)] border border-white/60 flex items-center justify-center transform rotate-3 active:scale-90 transition-transform">
+<!-- 6 pips arrangement -->
+<div class="grid grid-cols-2 grid-rows-3 gap-0.5 w-full h-full items-center justify-items-center">
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-[#12200E]"></div>
+</div>
+</div>
+</div>
+<!-- Subtle backdrop glow pattern inside card -->
+<div class="absolute -right-4 -bottom-6 w-24 h-24 bg-white/20 rounded-full blur-xl pointer-events-none"></div>
+</div>
+</section>
+<!-- 3. HERO BOARD: 15x15 Classic Ludo Board Anatomy -->
+<div class="w-full flex items-center justify-center my-0.5">
+<div class="w-full max-w-[348px] aspect-square rounded-2xl bg-[#121217] border-2 border-[#262630] p-1.5 shadow-2xl relative tactile-card">
+<!-- Board Container: 15x15 CSS Grid -->
+<div class="ludo-grid w-full h-full bg-[#16161B] rounded-xl overflow-hidden border border-white/10 relative">
+<!-- 4 QUADRANT YARDS (6x6 cells each) -->
+<!-- TOP-LEFT: Daniel's Cyan/Teal Yard (rows 1-6, cols 1-6) -->
+<div class="col-start-1 col-end-7 row-start-1 row-end-7 bg-[#0b2426] p-2 flex flex-col justify-between border-r border-b border-white/10 relative">
+<div class="flex items-center justify-between">
+<span class="text-[9px] font-label-micro text-[#2DD4BF] font-extrabold uppercase tracking-wider">Daniel's Yard</span>
+<span class="w-2 h-2 rounded-full bg-[#2DD4BF]"></span>
+</div>
+<!-- Yard Bases Box (White inner tactile box with 4 slots) -->
+<div class="w-full h-24 bg-[#111c1d] rounded-lg p-2 grid grid-cols-2 grid-rows-2 gap-2 border border-[#2DD4BF]/20 items-center justify-items-center">
+<!-- Slot 1: Active Token #3 (Still in Yard) -->
+<div class="w-8 h-8 rounded-full bg-[#0c2e31] border border-[#2DD4BF] flex items-center justify-center relative pulse-ring cursor-pointer">
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0d9488] to-[#2DD4BF] shadow-[0_2px_6px_rgba(45,212,191,0.6)] flex items-center justify-center text-[10px] text-black font-extrabold">3</div>
+<div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary-container rounded-full flex items-center justify-center text-[7px] text-black font-bold">6</div>
+</div>
+<!-- Slot 2: Empty base -->
+<div class="w-7 h-7 rounded-full bg-black/40 border border-dashed border-[#2DD4BF]/30 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-[#2DD4BF]/20"></div>
+</div>
+<!-- Slot 3: Empty base -->
+<div class="w-7 h-7 rounded-full bg-black/40 border border-dashed border-[#2DD4BF]/30 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-[#2DD4BF]/20"></div>
+</div>
+<!-- Slot 4: Empty base -->
+<div class="w-7 h-7 rounded-full bg-black/40 border border-dashed border-[#2DD4BF]/30 flex items-center justify-center">
+<div class="w-2 h-2 rounded-full bg-[#2DD4BF]/20"></div>
+</div>
+</div>
+</div>
+<!-- TOP-RIGHT: Sarah's Amber Yard (rows 1-6, cols 10-15) -->
+<div class="col-start-10 col-end-16 row-start-1 row-end-7 bg-[#261f0a] p-2 flex flex-col justify-between border-l border-b border-white/10 relative">
+<div class="flex items-center justify-between">
+<span class="w-2 h-2 rounded-full bg-[#FBBF24]"></span>
+<span class="text-[9px] font-label-micro text-[#FBBF24] font-extrabold uppercase tracking-wider">Sarah's Yard</span>
+</div>
+<!-- Sarah's Base Box (2 Pawns Remaining) -->
+<div class="w-full h-24 bg-[#1f190c] rounded-lg p-2 grid grid-cols-2 grid-rows-2 gap-2 border border-[#FBBF24]/20 items-center justify-items-center">
+<!-- Sarah Pawn Yard 1 -->
+<div class="w-7 h-7 rounded-full bg-[#FBBF24]/30 border border-[#FBBF24] flex items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#d97706] to-[#FBBF24] shadow-[0_2px_4px_rgba(251,191,36,0.4)] flex items-center justify-center text-[10px] text-black font-bold">S3</div>
+</div>
+<!-- Sarah Pawn Yard 2 -->
+<div class="w-7 h-7 rounded-full bg-[#FBBF24]/30 border border-[#FBBF24] flex items-center justify-center">
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#d97706] to-[#FBBF24] shadow-[0_2px_4px_rgba(251,191,36,0.4)] flex items-center justify-center text-[10px] text-black font-bold">S4</div>
+</div>
+<!-- Slot empty -->
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-[#FBBF24]/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-[#FBBF24]/30"></div>
+</div>
+</div>
+<!-- BOTTOM-LEFT: Ruby / Red Yard (rows 10-15, cols 1-6) -->
+<div class="col-start-1 col-end-7 row-start-10 row-end-16 bg-[#250d0f] p-2 flex flex-col justify-between border-r border-t border-white/10 opacity-70">
+<div class="flex items-center justify-between">
+<span class="text-[9px] font-label-micro text-rose-400 font-extrabold uppercase">Red Quadrant</span>
+<span class="w-2 h-2 rounded-full bg-rose-500"></span>
+</div>
+<div class="w-full h-24 bg-[#1c0c0e] rounded-lg p-2 grid grid-cols-2 grid-rows-2 gap-2 border border-rose-500/20 items-center justify-items-center">
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-rose-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-rose-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-rose-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-rose-500/30"></div>
+</div>
+</div>
+<!-- BOTTOM-RIGHT: Emerald Yard (rows 10-15, cols 10-15) -->
+<div class="col-start-10 col-end-16 row-start-10 row-end-16 bg-[#0f2415] p-2 flex flex-col justify-between border-l border-t border-white/10 opacity-70">
+<div class="flex items-center justify-between">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[9px] font-label-micro text-emerald-400 font-extrabold uppercase">Emerald Quadrant</span>
+</div>
+<div class="w-full h-24 bg-[#0a1b0e] rounded-lg p-2 grid grid-cols-2 grid-rows-2 gap-2 border border-emerald-500/20 items-center justify-items-center">
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-emerald-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-emerald-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-emerald-500/30"></div>
+<div class="w-6 h-6 rounded-full bg-black/40 border border-dashed border-emerald-500/30"></div>
+</div>
+</div>
+<!-- 4-WAY CENTER GOAL TRIANGLES (Cols 7,8,9; Rows 7,8,9) -->
+<div class="col-start-7 col-end-10 row-start-7 row-end-10 bg-[#16161B] relative border border-white/20">
+<!-- Center triangular goal shapes created with SVG overlay -->
+<svg class="w-full h-full absolute inset-0" preserveaspectratio="none" viewbox="0 0 100 100">
+<!-- Teal Triangle (Left / Daniel's Final Goal) -->
+<polygon fill="#0d9488" opacity="0.35" points="0,0 50,50 0,100"></polygon>
+<!-- Amber Triangle (Top / Sarah's Final Goal) -->
+<polygon fill="#d97706" opacity="0.35" points="0,0 50,50 100,0"></polygon>
+<!-- Emerald Triangle (Right) -->
+<polygon fill="#059669" opacity="0.2" points="100,0 50,50 100,100"></polygon>
+<!-- Red Triangle (Bottom) -->
+<polygon fill="#e11d48" opacity="0.2" points="0,100 50,50 100,100"></polygon>
+</svg>
+<!-- Completed Pawn Token 4 sitting in Daniel's Left Center Triangle -->
+<div class="absolute left-1 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center">
+<div class="w-5 h-5 rounded-full bg-[#2DD4BF] border border-white shadow-md flex items-center justify-center text-[9px] text-black font-extrabold">
+                ✓
+              </div>
+</div>
+<!-- Crown in Absolute Center -->
+<div class="absolute inset-0 m-auto w-4 h-4 rounded-full bg-[#16161B] border border-white/20 flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-[10px] text-primary-container fill">military_tech</span>
+</div>
+</div>
+<!-- CROSS-SHAPED RUNWAY TRACKS (Track Cells) -->
+<!-- TOP ARM (cols 7, 8, 9; rows 1 to 6) -->
+<!-- Col 7, Row 1-6 -->
+<div class="col-start-7 row-start-1 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60"></div>
+<div class="col-start-7 row-start-2 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60">
+<!-- Sarah active token 1 at Pos #8 -->
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#d97706] to-[#FBBF24] border border-white shadow flex items-center justify-center text-[9px] text-black font-extrabold">S1</div>
+</div>
+<div class="col-start-7 row-start-3 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60"></div>
+<div class="col-start-7 row-start-4 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60"></div>
+<div class="col-start-7 row-start-5 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60"></div>
+<div class="col-start-7 row-start-6 border-b border-r border-white/10 flex items-center justify-center text-[8px] text-outline/60"></div>
+<!-- Col 8 (Amber Home Row leading down to center goal) -->
+<div class="col-start-8 row-start-1 bg-amber-500/20 border-b border-r border-white/10"></div>
+<div class="col-start-8 row-start-2 bg-amber-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div></div>
+<div class="col-start-8 row-start-3 bg-amber-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div></div>
+<div class="col-start-8 row-start-4 bg-amber-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div></div>
+<div class="col-start-8 row-start-5 bg-amber-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div></div>
+<div class="col-start-8 row-start-6 bg-amber-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-amber-400"></div></div>
+<!-- Col 9, Row 1-6 (Entry Cell with Sarah Star) -->
+<div class="col-start-9 row-start-1 border-b border-white/10 flex items-center justify-center"></div>
+<div class="col-start-9 row-start-2 bg-amber-500/30 border-b border-white/10 flex items-center justify-center">
+<span class="text-[10px] text-amber-300 font-bold">★</span>
+</div>
+<div class="col-start-9 row-start-3 border-b border-white/10"></div>
+<div class="col-start-9 row-start-4 border-b border-white/10"></div>
+<div class="col-start-9 row-start-5 border-b border-white/10"></div>
+<div class="col-start-9 row-start-6 border-b border-white/10"></div>
+<!-- LEFT ARM (cols 1 to 6; rows 7, 8, 9) -->
+<!-- Daniel Entry Cell with Safe Star at Col 2, Row 7 -->
+<div class="col-start-1 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-2 row-start-7 bg-[#0d9488]/30 border-b border-r border-white/10 flex items-center justify-center">
+<span class="text-[10px] text-[#2DD4BF] font-bold">★</span>
+</div>
+<div class="col-start-3 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-4 row-start-7 border-b border-r border-white/10 flex items-center justify-center">
+<!-- Daniel active token 1 sitting at Track Pos #14 with Pulse -->
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0d9488] to-[#2DD4BF] border border-white shadow-md flex items-center justify-center text-[9px] text-black font-extrabold pulse-ring cursor-pointer">
+              1
+            </div>
+</div>
+<div class="col-start-5 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-6 row-start-7 border-b border-r border-white/10"></div>
+<!-- Row 8 (Daniel Teal Home Column leading right to center) -->
+<div class="col-start-1 row-start-8 bg-teal-500/20 border-b border-r border-white/10"></div>
+<div class="col-start-2 row-start-8 bg-teal-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]"></div></div>
+<div class="col-start-3 row-start-8 bg-teal-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]"></div></div>
+<div class="col-start-4 row-start-8 bg-teal-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]"></div></div>
+<div class="col-start-5 row-start-8 bg-teal-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]"></div></div>
+<div class="col-start-6 row-start-8 bg-teal-500/40 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-[#2DD4BF]"></div></div>
+<!-- Row 9 (Return loop) -->
+<div class="col-start-1 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-2 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-3 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-4 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-5 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-6 row-start-9 border-b border-r border-white/10"></div>
+<!-- RIGHT ARM (cols 10 to 15; rows 7, 8, 9) -->
+<div class="col-start-10 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-11 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-12 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-13 row-start-7 border-b border-r border-white/10 flex items-center justify-center">
+<!-- Sarah's second active token Pos #39 -->
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#d97706] to-[#FBBF24] border border-white shadow flex items-center justify-center text-[9px] text-black font-extrabold">S2</div>
+</div>
+<div class="col-start-14 row-start-7 border-b border-r border-white/10"></div>
+<div class="col-start-15 row-start-7 border-b border-white/10"></div>
+<!-- Row 8 (Green Home Column) -->
+<div class="col-start-10 row-start-8 bg-emerald-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div></div>
+<div class="col-start-11 row-start-8 bg-emerald-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div></div>
+<div class="col-start-12 row-start-8 bg-emerald-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div></div>
+<div class="col-start-13 row-start-8 bg-emerald-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div></div>
+<div class="col-start-14 row-start-8 bg-emerald-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div></div>
+<div class="col-start-15 row-start-8 bg-emerald-500/20 border-b border-white/10"></div>
+<!-- Row 9 (Right bottom lane) -->
+<div class="col-start-10 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-11 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-12 row-start-9 bg-emerald-500/20 border-b border-r border-white/10 flex items-center justify-center">
+<span class="text-[10px] text-emerald-300 font-bold">★</span>
+</div>
+<div class="col-start-13 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-14 row-start-9 border-b border-r border-white/10"></div>
+<div class="col-start-15 row-start-9 border-b border-white/10"></div>
+<!-- BOTTOM ARM (cols 7, 8, 9; rows 10 to 15) -->
+<!-- Col 7, Row 10-15 -->
+<div class="col-start-7 row-start-10 border-b border-r border-white/10"></div>
+<div class="col-start-7 row-start-11 border-b border-r border-white/10"></div>
+<div class="col-start-7 row-start-12 border-b border-r border-white/10"></div>
+<div class="col-start-7 row-start-13 border-b border-r border-white/10 flex items-center justify-center">
+<!-- Daniel active token 2 approaching star at Pos #28 -->
+<div class="w-5 h-5 rounded-full bg-gradient-to-tr from-[#0d9488] to-[#2DD4BF] border border-white shadow-md flex items-center justify-center text-[9px] text-black font-extrabold pulse-ring cursor-pointer">
+              2
+            </div>
+</div>
+<div class="col-start-7 row-start-14 bg-rose-500/20 border-b border-r border-white/10 flex items-center justify-center">
+<span class="text-[10px] text-rose-300 font-bold">★</span>
+</div>
+<div class="col-start-7 row-start-15 border-r border-white/10"></div>
+<!-- Col 8 (Red Home Column) -->
+<div class="col-start-8 row-start-10 bg-rose-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div></div>
+<div class="col-start-8 row-start-11 bg-rose-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div></div>
+<div class="col-start-8 row-start-12 bg-rose-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div></div>
+<div class="col-start-8 row-start-13 bg-rose-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div></div>
+<div class="col-start-8 row-start-14 bg-rose-500/30 border-b border-r border-white/10 flex items-center justify-center"><div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div></div>
+<div class="col-start-8 row-start-15 bg-rose-500/20 border-r border-white/10"></div>
+<!-- Col 9, Row 10-15 -->
+<div class="col-start-9 row-start-10 border-b border-white/10"></div>
+<div class="col-start-9 row-start-11 border-b border-white/10"></div>
+<div class="col-start-9 row-start-12 border-b border-white/10"></div>
+<div class="col-start-9 row-start-13 border-b border-white/10"></div>
+<div class="col-start-9 row-start-14 border-b border-white/10"></div>
+<div class="col-start-9 row-start-15"></div>
+</div>
+</div>
+</div>
+<!-- 4. ERGONOMIC MOBILE TOKEN CONTROLS (PRD Touchpad) -->
+<section class="bg-[#16161B] rounded-2xl p-3 border border-[#24242C] mt-2.5 tactile-card">
+<div class="flex items-center justify-between mb-2 px-1">
+<span class="text-label-micro font-label-micro text-primary-container tracking-wider uppercase font-bold flex items-center gap-1.5">
+<span class="inline-block w-1.5 h-1.5 rounded-full bg-primary-container animate-pulse"></span>
+          SELECT TOKEN TO MOVE (+6)
+        </span>
+<span class="text-[10px] text-outline font-label-micro">Tap token below to execute</span>
+</div>
+<!-- 2x2 Large Thumb-friendly Action Grid -->
+<div class="grid grid-cols-2 gap-2">
+<!-- Card: Token 1 -->
+<button class="flex flex-col text-left p-2.5 rounded-xl bg-[#1F1F26] border border-[#CFE6A3]/60 hover:bg-[#252530] active:scale-[0.98] transition-all relative overflow-hidden group">
+<div class="flex items-center justify-between w-full mb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-[#0d9488] text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">1</span>
+<span class="text-label-md font-label-md text-white font-bold">Token 1</span>
+</div>
+<span class="px-1.5 py-0.5 rounded-full bg-primary-container/20 text-primary-container text-[9px] font-extrabold uppercase">Ready</span>
+</div>
+<div class="text-[11px] text-on-surface font-semibold">Track #14 → Pos #20</div>
+<div class="text-[10px] text-outline mt-0.5">Clears opponent Sarah's range</div>
+</button>
+<!-- Card: Token 2 (Safe Star) -->
+<button class="flex flex-col text-left p-2.5 rounded-xl bg-[#1F1F26] border border-[#CFE6A3] shadow-[0_0_12px_rgba(207,230,163,0.15)] hover:bg-[#252530] active:scale-[0.98] transition-all relative overflow-hidden group">
+<div class="flex items-center justify-between w-full mb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-[#0d9488] text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">2</span>
+<span class="text-label-md font-label-md text-white font-bold">Token 2</span>
+</div>
+<span class="px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[9px] font-extrabold uppercase">Safe Star ⭐</span>
+</div>
+<div class="text-[11px] text-on-surface font-semibold">Track #28 → Star #34</div>
+<div class="text-[10px] text-primary-container mt-0.5 font-medium">Safe sanctuary cell</div>
+</button>
+<!-- Card: Token 3 (In Yard -> Unlock with 6) -->
+<button class="flex flex-col text-left p-2.5 rounded-xl bg-[#1F1F26] border border-[#CFE6A3]/60 hover:bg-[#252530] active:scale-[0.98] transition-all relative overflow-hidden group">
+<div class="flex items-center justify-between w-full mb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-[#0d9488] text-white flex items-center justify-center text-[10px] font-extrabold shadow-sm">3</span>
+<span class="text-label-md font-label-md text-white font-bold">Token 3</span>
+</div>
+<span class="px-1.5 py-0.5 rounded-full bg-primary-container/20 text-primary-container text-[9px] font-extrabold uppercase">Unlock 🚀</span>
+</div>
+<div class="text-[11px] text-on-surface font-semibold">Yard → Runway #1</div>
+<div class="text-[10px] text-outline mt-0.5">Enters active playfield</div>
+</button>
+<!-- Card: Token 4 (Finished - Disabled state) -->
+<div class="flex flex-col text-left p-2.5 rounded-xl bg-[#121216] border border-white/5 opacity-40 cursor-not-allowed">
+<div class="flex items-center justify-between w-full mb-1">
+<div class="flex items-center gap-1.5">
+<span class="w-5 h-5 rounded-full bg-[#1b2f30] text-[#2DD4BF] flex items-center justify-center text-[10px] font-bold">✓</span>
+<span class="text-label-md font-label-md text-outline font-medium">Token 4</span>
+</div>
+<span class="px-1.5 py-0.5 rounded-full bg-white/5 text-outline text-[9px] font-medium">Home ✓</span>
+</div>
+<div class="text-[11px] text-outline/80">Finished in Center Goal</div>
+<div class="text-[10px] text-outline/60 mt-0.5">Scored points</div>
+</div>
+</div>
+</section>
+<!-- 5. FOOTER STATUS & MATCH ACTIONS -->
+<footer class="mt-2.5 flex flex-col gap-2">
+<!-- Rolled bonus notice banner -->
+<div class="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#181D14] border border-[#CFE6A3]/30 text-primary-container text-[12px] font-medium">
+<span class="text-[15px]">🎲</span>
+<span class="leading-tight">Rolled a <strong>6</strong>! You earn an immediate bonus turn after moving.</span>
+</div>
+<!-- Intimate Couple Wager Reminder Pill -->
+<div class="flex items-center justify-between px-3 py-1.5 rounded-full bg-[#16161B] border border-white/5 text-on-surface-variant text-[11px]">
+<div class="flex items-center gap-1.5 truncate">
+<span>☕</span>
+<span class="truncate">Sunday iced matcha &amp; croissants on the line</span>
+</div>
+<span class="text-[10px] font-label-micro text-outline uppercase tracking-wider shrink-0 ml-2">Wager</span>
+</div>
+<!-- Secondary Match Utility Buttons (Draw / Undo / Resign) -->
+<div class="flex items-center justify-between pt-1">
+<button class="px-3 py-1.5 rounded-full bg-transparent hover:bg-surface-container-high text-outline hover:text-error text-label-md font-label-md transition-colors active:scale-95 flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">flag</span>
+<span>Resign</span>
+</button>
+<div class="flex items-center gap-1.5">
+<button class="px-3 py-1.5 rounded-full bg-[#16161B] hover:bg-surface-container-high border border-white/10 text-on-surface text-label-md font-label-md transition-colors active:scale-95">
+            Offer Draw
+          </button>
+<button class="px-3 py-1.5 rounded-full bg-[#16161B] hover:bg-surface-container-high border border-white/10 text-on-surface text-label-md font-label-md transition-colors active:scale-95 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">chat_bubble</span>
+<span>Nudge</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

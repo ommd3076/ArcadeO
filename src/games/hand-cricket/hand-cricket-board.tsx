@@ -4,7 +4,7 @@
  * Implements the complete Hand Cricket gameplay:
  * - Toss winner role selection (Bat / Bowl)
  * - Live scoreboard with innings, batter/bowler identities, runs, target, and chase status
- * - Reusable SecretHandoff integration for 1..6 secret delivery locking,
+ * - Reusable SecretHandoff integration for 1..10 (or legacy 1..6) secret delivery locking,
  *   Pass & Play privacy curtain, and synchronized reveal
  * - Real delivery resolution presentation (WICKET / runs scored)
  */
@@ -35,15 +35,6 @@ interface HandCricketBoardProps {
   onMaskChange?: (masked: boolean) => void;
 }
 
-const CRICKET_NUMBER_OPTIONS: SecretChoiceOption<number>[] = [
-  { id: 1, label: "1 Run", icon: "1" },
-  { id: 2, label: "2 Runs", icon: "2" },
-  { id: 3, label: "3 Runs", icon: "3" },
-  { id: 4, label: "4 Runs", icon: "4" },
-  { id: 5, label: "5 Runs", icon: "5" },
-  { id: 6, label: "6 Runs", icon: "6" },
-];
-
 export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
   view,
   mode,
@@ -72,8 +63,71 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
     lockedSeats,
     lastDelivery,
   } = view;
+  const playUntilBothOut =
+    view.completionRule === "both-out" || (mode === "together" && view.rulesVersion === 2);
 
-  // Toss Winner Selection Phase
+  // Unconditional Hooks: compute all derived values before ANY conditional return
+  const allowedNumbers = useMemo(() => {
+    return (
+      view.allowedNumbers ??
+      (view.rulesVersion === 1 ? [1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    );
+  }, [view.allowedNumbers, view.rulesVersion]);
+
+  const numberOptions: SecretChoiceOption<number>[] = useMemo(() => {
+    return allowedNumbers.map((num) => ({
+      id: num,
+      label: `${num} ${num === 1 ? "Run" : "Runs"}`,
+      icon: String(num),
+    }));
+  }, [allowedNumbers]);
+
+  const outcome: SecretOutcomeDisplay | null = useMemo(() => {
+    if (!lastDelivery || !roles) return null;
+
+    const batterSeat = roles.bat;
+    const bowlerSeat = roles.bowl;
+
+    const seatAChoice = batterSeat === "A" ? lastDelivery.runs.bat : lastDelivery.runs.bowl;
+    const seatBChoice = batterSeat === "B" ? lastDelivery.runs.bat : lastDelivery.runs.bowl;
+
+    const isOut = lastDelivery.outcome === "out";
+
+    return {
+      title: isOut
+        ? `WICKET! ${batterSeat === "A" ? playerAName : playerBName} is OUT on ${seatAChoice}!`
+        : `+${lastDelivery.scoredRuns} Runs Scored!`,
+      subtitle: isOut
+        ? innings === 1
+          ? `Same numbers. ${bowlerSeat === "A" ? playerAName : playerBName} bats next.`
+          : "Same numbers. Both batting turns are complete."
+        : `${batterSeat === "A" ? playerAName : playerBName} keeps batting.`,
+      winnerSeat: isOut ? bowlerSeat : "draw",
+      seatAChoiceLabel: `${roles.bat === "A" ? "Bat: " : "Bowl: "}${seatAChoice}`,
+      seatBChoiceLabel: `${roles.bat === "B" ? "Bat: " : "Bowl: "}${seatBChoice}`,
+    };
+  }, [lastDelivery, roles, innings, playerAName, playerBName]);
+
+  const firstChooserSeat: Seat = useMemo(() => {
+    if (roles) {
+      return view.rulesVersion === 1 ? (deliveryId % 2 === 1 ? "A" : "B") : roles.bat;
+    }
+    return deliveryId % 2 === 1 ? "A" : "B";
+  }, [view.rulesVersion, roles, deliveryId]);
+
+  const selectionPrompt = useMemo(() => {
+    const maxChoice = allowedNumbers[allowedNumbers.length - 1] ?? 10;
+    const isBatterChoosing =
+      mode === "together"
+        ? view.expectedRole === "bat" ||
+          (!view.expectedRole && roles && firstChooserSeat === roles.bat)
+        : roles?.bat === localSeat;
+    return isBatterChoosing
+      ? `Select runs to score (1..${maxChoice})`
+      : `Select delivery number (1..${maxChoice})`;
+  }, [allowedNumbers, mode, view.expectedRole, roles, firstChooserSeat, localSeat]);
+
+  // Conditional Rendering: Toss Winner Selection Phase (after all hooks)
   if (phase === "toss") {
     const isTossWinner = localSeat === tossWinner || mode === "together";
     const winnerName = tossWinner === "A" ? playerAName : playerBName;
@@ -158,29 +212,6 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
     );
   }
 
-  // Delivery Outcome derivation
-  const outcome: SecretOutcomeDisplay | null = useMemo(() => {
-    if (!lastDelivery || !roles) return null;
-
-    const batterSeat = roles.bat;
-    const bowlerSeat = roles.bowl;
-
-    const seatAChoice = batterSeat === "A" ? lastDelivery.runs.bat : lastDelivery.runs.bowl;
-    const seatBChoice = batterSeat === "B" ? lastDelivery.runs.bat : lastDelivery.runs.bowl;
-
-    const isOut = lastDelivery.outcome === "out";
-
-    return {
-      title: isOut
-        ? `WICKET! ${batterSeat === "A" ? playerAName : playerBName} is OUT on ${seatAChoice}!`
-        : `+${lastDelivery.scoredRuns} Runs Scored!`,
-      subtitle: `Batter played ${lastDelivery.runs.bat}, Bowler played ${lastDelivery.runs.bowl}`,
-      winnerSeat: isOut ? bowlerSeat : "draw",
-      seatAChoiceLabel: `${roles.bat === "A" ? "Bat: " : "Bowl: "}${seatAChoice}`,
-      seatBChoiceLabel: `${roles.bat === "B" ? "Bat: " : "Bowl: "}${seatBChoice}`,
-    };
-  }, [lastDelivery, roles, playerAName, playerBName]);
-
   const currentBatter = roles ? (roles.bat === "A" ? playerAName : playerBName) : "";
   const currentBowler = roles ? (roles.bowl === "A" ? playerAName : playerBName) : "";
 
@@ -225,9 +256,14 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
               color: "var(--color-primary, #38bdf8)",
             }}
           >
-            {innings === 1 ? "1st Innings" : "2nd Innings (Chase)"} • Ball #{deliveryId}
+            {playUntilBothOut
+              ? `${currentBatter} batting`
+              : innings === 1
+                ? "1st Innings"
+                : "2nd Innings (Chase)"}{" "}
+            • Ball #{deliveryId}
           </span>
-          {target !== null && (
+          {!playUntilBothOut && target !== null && (
             <span
               style={{
                 display: "inline-flex",
@@ -261,7 +297,15 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
             </div>
           </div>
 
-          {innings === 2 && target !== null && (
+          {playUntilBothOut && (
+            <div style={{ textAlign: "right", fontSize: "13px", color: "var(--color-muted-text)" }}>
+              <strong style={{ display: "block", color: "var(--color-text)" }}>
+                {currentBowler}
+              </strong>
+              {innings === 1 ? "Yet to bat" : `${firstInningsRuns} runs · Out`}
+            </div>
+          )}
+          {!playUntilBothOut && innings === 2 && target !== null && (
             <div style={{ textAlign: "right" }}>
               <div
                 style={{
@@ -280,28 +324,31 @@ export const HandCricketBoard: React.FC<HandCricketBoardProps> = ({
         </div>
       </Surface>
 
-      {/* 2. Reusable Secret Handoff for Delivery Numbers (1..6) */}
+      {/* 2. Reusable Secret Handoff for Delivery Numbers (1..10 or 1..6) */}
       <div style={{ width: "100%" }}>
         <SecretHandoff<number>
+          key={deliveryId}
           forceMasked={forceMasked}
           onMaskChange={onMaskChange}
           mode={mode}
           roundNumber={deliveryId}
+          roundLabel="Ball"
+          revealLabel="Reveal ball"
+          nextRoundLabel={
+            lastDelivery?.outcome === "out" && innings === 1 ? "Switch batting" : "Next ball"
+          }
           gameTitle="Hand Cricket"
           seatA={{ name: playerAName, accent: playerAAccent }}
           seatB={{ name: playerBName, accent: playerBAccent }}
-          firstChooserSeat={deliveryId % 2 === 1 ? "A" : "B"}
+          firstChooserSeat={firstChooserSeat}
           localSeat={localSeat}
-          options={CRICKET_NUMBER_OPTIONS}
-          selectionPrompt={
-            roles?.bat === localSeat
-              ? "Select runs to score (1..6)"
-              : "Select delivery number (1..6)"
-          }
+          options={numberOptions}
+          selectionPrompt={selectionPrompt}
           isSeatALocked={lockedSeats.includes("A")}
           isSeatBLocked={lockedSeats.includes("B")}
           isResolved={lockedSeats.length === 2 || lastDelivery !== null}
           isRevealed={view.revealed ?? (mode === "remote" && lastDelivery !== null)}
+          readiness={view.readiness}
           outcome={outcome}
           onLockChoice={(choice, seat) => onLockNumber(choice, seat)}
           onReveal={onReveal}

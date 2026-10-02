@@ -3,6 +3,7 @@ import { GameId, PlayMode, AccountId, AccentFamily } from "../../shared/protocol
 import { getCsrfSecret } from "../config";
 import { getGameEngine } from "../../shared/games/registry";
 import { extractSessionToken, validateCsrfToken, validateSession } from "../auth/session";
+import { isValidUuid } from "../../shared/utils/uuid";
 
 export interface MatchApiEnv {
   DB: D1Database;
@@ -167,12 +168,34 @@ export async function handleMatchesRequest(
         );
       }
     }
-    if (!creationId || typeof creationId !== "string") {
-      return jsonResponse({ error: "creationId is required", code: ErrorCode.INVALID_ACTION }, 400);
+    if (!creationId || typeof creationId !== "string" || !isValidUuid(creationId)) {
+      return jsonResponse(
+        { error: "creationId must be a valid UUID", code: ErrorCode.INVALID_ACTION },
+        400,
+      );
     }
     if (!gameId || !getGameEngine(gameId)) {
       return jsonResponse(
         { error: `Unsupported or unknown gameId: ${gameId}`, code: ErrorCode.UNSUPPORTED_RULES },
+        400,
+      );
+    }
+    if (
+      gameOptions?.rulesVersion !== undefined &&
+      !getGameEngine(gameId, Number(gameOptions.rulesVersion))
+    ) {
+      return jsonResponse(
+        { error: `Unsupported rules version for ${gameId}`, code: ErrorCode.UNSUPPORTED_RULES },
+        400,
+      );
+    }
+    if (
+      gameId === "snakes-and-ladders" &&
+      gameOptions?.boardVersion !== undefined &&
+      ![1, 2].includes(gameOptions.boardVersion as number)
+    ) {
+      return jsonResponse(
+        { error: "Choose board version 1 or 2", code: ErrorCode.INVALID_ACTION },
         400,
       );
     }
@@ -301,7 +324,7 @@ export async function handleMatchesRequest(
 
       if (
         regRow &&
-        ["completed", "resigned", "abandoned", "cancelled"].includes(regRow.lifecycle)
+        ["completed", "resigned", "abandoned", "cancelled", "expired"].includes(regRow.lifecycle)
       ) {
         await env.DB.prepare("DELETE FROM active_slots WHERE slotKey = ? AND matchId = ?")
           .bind(slotKey, activeSlot.matchId)
@@ -314,7 +337,9 @@ export async function handleMatchesRequest(
         );
         if (current.ok) {
           const view = (await current.json()) as { lifecycle: string };
-          if (["completed", "resigned", "abandoned", "cancelled"].includes(view.lifecycle))
+          if (
+            ["completed", "resigned", "abandoned", "cancelled", "expired"].includes(view.lifecycle)
+          )
             await env.DB.prepare("DELETE FROM active_slots WHERE slotKey = ? AND matchId = ?")
               .bind(slotKey, activeSlot.matchId)
               .run();

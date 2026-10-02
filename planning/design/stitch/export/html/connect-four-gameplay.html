@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Private Arcade - Connect Four</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-variant": "#353438",
+            "outline-variant": "#45483d",
+            "on-surface": "#e5e1e6",
+            "surface-container-lowest": "#0e0e11",
+            "secondary-fixed": "#f8e28c",
+            "secondary": "#dbc673",
+            "surface": "#131316",
+            "on-primary": "#253505",
+            "secondary-fixed-dim": "#dbc673",
+            "inverse-on-surface": "#303033",
+            "primary": "#f3ffd6",
+            "on-background": "#e5e1e6",
+            "primary-fixed-dim": "#b8cf8e",
+            "inverse-surface": "#e5e1e6",
+            "surface-bright": "#39393c",
+            "surface-container-low": "#1b1b1e",
+            "tertiary": "#ebfdff",
+            "on-secondary-fixed-variant": "#544600",
+            "tertiary-fixed": "#b5ecf1",
+            "error": "#ffb4ab",
+            "surface-container-high": "#2a2a2d",
+            "on-secondary-fixed": "#221b00",
+            "primary-fixed": "#d4eba8",
+            "on-tertiary-fixed": "#002022",
+            "outline": "#8f9284",
+            "on-error-container": "#ffdad6",
+            "on-error": "#690005",
+            "secondary-container": "#594b00",
+            "on-tertiary-fixed-variant": "#124e53",
+            "surface-tint": "#b8cf8e",
+            "surface-container-highest": "#353438",
+            "primary-container": "#cfe6a3",
+            "surface-dim": "#131316",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "surface-container": "#1f1f22",
+            "on-tertiary-container": "#33696e",
+            "on-secondary-container": "#d0bb69",
+            "background": "#0C0C0F",
+            "inverse-primary": "#52652f",
+            "tertiary-fixed-dim": "#99d0d5",
+            "tertiary-container": "#b0e7ec",
+            "on-primary-container": "#1D2915",
+            "on-secondary": "#3a3000",
+            "on-tertiary": "#00363a",
+            "on-primary-fixed": "#131f00",
+            "error-container": "#93000a",
+            "on-surface-variant": "#c5c8b9"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-2xs": "0.25rem",
+            "space-xl": "1.5rem",
+            "margin-mobile": "1rem",
+            "space-3xl": "3rem",
+            "space-xs": "0.5rem",
+            "space-md": "1rem",
+            "gutter-sm": "0.75rem",
+            "space-sm": "0.75rem",
+            "space-2xl": "2rem",
+            "margin": "1.25rem",
+            "gutter": "1rem",
+            "space-lg": "1.25rem"
+          },
+          "fontFamily": {
+            "label-micro": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined[data-weight="fill"] {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(207, 230, 163, 0.45); }
+      70% { box-shadow: 0 0 0 7px rgba(207, 230, 163, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(207, 230, 163, 0); }
+    }
+    .active-turn-pulse {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    .disc-yellow {
+      background: radial-gradient(circle at 35% 30%, #fde047 0%, #eab308 65%, #ca8a04 100%);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.45);
+    }
+    .disc-red {
+      background: radial-gradient(circle at 35% 30%, #fb7185 0%, #f43f5e 60%, #be123c 100%);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    .slot-empty {
+      background-color: #0b0c10;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.85), inset 0 -1px 1px rgba(255, 255, 255, 0.05);
+    }
+    .board-frame {
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 28px rgba(0, 0, 0, 0.7);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex justify-center selection:bg-primary-container selection:text-on-primary-container">
+<!-- Mobile Viewport Shell (Max 430px) -->
+<main class="w-full max-w-[430px] min-h-screen bg-background flex flex-col justify-between px-space-md py-space-sm relative border-x border-white/5">
+<!-- 1. TOP NAVIGATION BAR (Shared Components JSON Anchor & Contextual Adaptation) -->
+<header class="flex justify-between items-center w-full pt-1 pb-2">
+<!-- Back to Games -->
+<button aria-label="Back to games" class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container border border-white/10 hover:bg-surface-container-high active:scale-95 transition-all text-on-surface" type="button">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span class="font-label-lg text-label-lg">Games</span>
+</button>
+<!-- Center Title and Series Context -->
+<div class="text-center">
+<h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight">Connect Four</h1>
+<p class="font-label-micro text-label-micro text-outline tracking-wider">Round 3 of 5 · Best of 5</p>
+</div>
+<!-- Right: Online Badge & Quick Audio Toggle -->
+<div class="flex items-center gap-1.5">
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container border border-white/10">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></span>
+<span class="font-label-micro text-label-micro text-on-surface/90">Sarah</span>
+</div>
+<button aria-label="Toggle sound and haptics" class="w-8 h-8 rounded-full bg-surface-container border border-white/10 flex items-center justify-center text-outline hover:text-on-surface active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[18px]">volume_up</span>
+</button>
+</div>
+</header>
+<!-- 2. PLAYER & TURN BAR HUD -->
+<section class="space-y-2 mt-1">
+<!-- Dual Player Head-to-Head Card -->
+<div class="bg-surface-container-low border border-white/10 rounded-2xl p-3">
+<div class="grid grid-cols-2 gap-2 relative">
+<!-- Daniel (Left Player - Active Turn) -->
+<div class="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container border border-primary-container/40 active-turn-pulse transition-all">
+<div class="relative">
+<div class="w-9 h-9 rounded-full bg-amber-400/20 border border-amber-400 flex items-center justify-center font-headline-sm text-amber-300">
+                D
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full disc-yellow border border-surface-container-low"></span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1">
+<span class="font-label-lg text-label-lg text-on-surface truncate">Daniel</span>
+<span class="font-label-micro text-label-micro text-primary-container bg-primary-container/10 px-1 py-0.5 rounded">You</span>
+</div>
+<p class="font-headline-sm text-headline-sm text-secondary leading-none mt-0.5">2 wins</p>
+</div>
+</div>
+<!-- Vertical Divider Ring -->
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-surface-container-low border border-white/10 flex items-center justify-center z-10">
+<span class="font-label-micro text-label-micro text-outline">VS</span>
+</div>
+<!-- Sarah (Right Player - Resting Turn) -->
+<div class="flex items-center justify-end gap-2.5 p-2 rounded-xl bg-surface-container/50 border border-white/5 opacity-85">
+<div class="text-right min-w-0">
+<p class="font-label-lg text-label-lg text-on-surface truncate">Sarah</p>
+<p class="font-headline-sm text-headline-sm text-rose-400 leading-none mt-0.5">1 win</p>
+</div>
+<div class="relative">
+<div class="w-9 h-9 rounded-full bg-rose-500/20 border border-rose-400/60 flex items-center justify-center font-headline-sm text-rose-300">
+                S
+              </div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full disc-red border border-surface-container-low"></span>
+</div>
+</div>
+</div>
+</div>
+<!-- Turn Announcement Banner (Pastel Accent Card: Mint Deck) -->
+<div class="bg-primary-container text-on-primary-container rounded-2xl px-3.5 py-2.5 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px] text-on-primary-container animate-bounce">arrow_downward</span>
+<div>
+<p class="font-label-lg text-label-lg font-bold tracking-tight text-on-primary-container leading-tight">Your Turn</p>
+<p class="font-label-micro text-label-micro text-on-primary-container/85 tracking-normal">Drop a disc in any open column</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 bg-[#1D2915] text-primary-container px-2.5 py-1 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-[14px]">hourglass_top</span>
+<span class="font-label-lg text-label-lg font-bold tabular-nums">0:24</span>
+</div>
+</div>
+</section>
+<!-- 3. HERO GAME BOARD (7 COLUMNS × 6 ROWS) -->
+<section class="my-auto py-2">
+<div class="bg-[#151720] border border-white/15 rounded-[24px] p-3 board-frame relative overflow-hidden">
+<!-- Ambient Subtle Drop Glow Indicator for Column 4 -->
+<div class="absolute top-0 left-[43.5%] w-[13%] h-full bg-rose-500/10 pointer-events-none rounded-lg blur-[2px] border-x border-rose-500/20"></div>
+<!-- 7x6 Slots Grid (Rows numbered top-to-bottom: R5 down to R0) -->
+<div class="grid grid-cols-7 gap-1.5 sm:gap-2 justify-items-center">
+<!-- ROW 5 (TOP ROW) -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 4 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty border border-dashed border-rose-400/40"></div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- ROW 4 -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 4 (Latest move: Sarah) -->
+<div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red ring-2 ring-rose-400 ring-offset-2 ring-offset-[#151720] relative">
+<span class="absolute inset-0 m-auto w-2 h-2 rounded-full bg-white/70 animate-ping"></span>
+</div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- ROW 3 -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 4 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- ROW 2 -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 4 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- ROW 1 -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 4 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full slot-empty"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- ROW 0 (BOTTOM ROW) -->
+<!-- Col 1 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 2 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 3 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 4 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 5 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+<!-- Col 6 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-red"></div>
+<!-- Col 7 --> <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full disc-yellow"></div>
+</div>
+</div>
+</section>
+<!-- 4. COLUMN DROP BUTTON CONTROLS -->
+<section class="w-full">
+<div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+<!-- Col 1 Drop -->
+<button aria-label="Drop disc in Column 1" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-white/10 hover:border-primary-container hover:bg-surface-container-high active:scale-95 transition-all group" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary-container group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-on-surface">C1</span>
+</button>
+<!-- Col 2 Drop -->
+<button aria-label="Drop disc in Column 2" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-white/10 hover:border-primary-container hover:bg-surface-container-high active:scale-95 transition-all group" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary-container group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-on-surface">C2</span>
+</button>
+<!-- Col 3 Drop -->
+<button aria-label="Drop disc in Column 3" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-white/10 hover:border-primary-container hover:bg-surface-container-high active:scale-95 transition-all group" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary-container group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-on-surface">C3</span>
+</button>
+<!-- Col 4 Drop (Critical: 1 slot left) -->
+<button aria-label="Drop disc in Column 4 (1 left)" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-amber-400/50 hover:bg-surface-container-high active:scale-95 transition-all relative group" type="button">
+<span class="material-symbols-outlined text-[16px] text-amber-300 group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-amber-300">C4</span>
+<span class="absolute -top-2 px-1 py-0.2 rounded bg-amber-400 text-[#221b00] font-label-micro text-[8px] font-bold leading-tight">1 left</span>
+</button>
+<!-- Col 5 Drop -->
+<button aria-label="Drop disc in Column 5" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-white/10 hover:border-primary-container hover:bg-surface-container-high active:scale-95 transition-all group" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary-container group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-on-surface">C5</span>
+</button>
+<!-- Col 6 Drop -->
+<button aria-label="Drop disc in Column 6" class="h-12 flex flex-col items-center justify-center rounded-xl bg-surface-container border border-white/10 hover:border-primary-container hover:bg-surface-container-high active:scale-95 transition-all group" type="button">
+<span class="material-symbols-outlined text-[16px] text-primary-container group-hover:translate-y-0.5 transition-transform">arrow_downward</span>
+<span class="font-label-micro text-label-micro text-on-surface">C6</span>
+</button>
+<!-- Col 7 Drop (Disabled: FULL) -->
+<button aria-label="Column 7 is Full" class="h-12 flex flex-col items-center justify-center rounded-xl bg-[#17171d] border border-white/5 text-outline/40 cursor-not-allowed opacity-60" disabled="" type="button">
+<span class="material-symbols-outlined text-[14px]">block</span>
+<span class="font-label-micro text-label-micro line-through">FULL</span>
+</button>
+</div>
+</section>
+<!-- 5. TELEMETRY & MATCH UTILITIES -->
+<footer class="space-y-2.5 pt-3 pb-1">
+<!-- Telemetry Strip -->
+<div class="flex items-center justify-center gap-1.5 text-center px-3 py-1.5 rounded-full bg-surface-container-low border border-white/5">
+<span class="w-2.5 h-2.5 rounded-full disc-red shrink-0"></span>
+<p class="font-label-md text-label-md text-on-surface-variant truncate">
+          Last move: <span class="text-on-surface font-semibold">Sarah</span> dropped in Col 4 (2s ago)
+        </p>
+</div>
+<!-- Secret Wager Pill Card (Yellow Deck Inspiration) -->
+<div class="flex items-center justify-between px-3 py-2 rounded-xl bg-secondary-fixed/15 border border-secondary/30 text-secondary">
+<div class="flex items-center gap-2 min-w-0">
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0" data-weight="fill">token</span>
+<span class="font-label-md text-label-md truncate">Secret Wager: Sunday iced matcha &amp; breakfast in bed 🥞</span>
+</div>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-secondary/80 shrink-0 ml-1">STAKES</span>
+</div>
+<!-- Bottom Secondary Action Pair -->
+<div class="grid grid-cols-2 gap-2">
+<button class="w-full py-2.5 rounded-full bg-surface-container border border-white/10 hover:border-white/20 active:scale-98 transition-all text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">flag</span>
+<span>Resign Match</span>
+</button>
+<button class="w-full py-2.5 rounded-full bg-surface-container border border-white/10 hover:border-white/20 active:scale-98 transition-all text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">handshake</span>
+<span>Offer Draw</span>
+</button>
+</div>
+</footer>
+</main>
+<script>
+    // Lightweight tactile sound/haptic simulation
+    document.querySelectorAll('button:not([disabled])').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if ('vibrate' in navigator) {
+          navigator.vibrate(15);
+        }
+      });
+    });
+  </script>
+</body></html>

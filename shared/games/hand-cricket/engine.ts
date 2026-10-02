@@ -3,32 +3,14 @@
  *
  * Server-authoritative, deterministic pure reducer for Hand Cricket.
  *
- * Rules Summary (GAME-RULES.md & planning/tasks/game-engines.md):
- * - Numbers 1..6, one wicket each, two innings, no ball limit.
- * - Server coin toss (startFacts.startingSeat) chooses toss winner.
- * - Phase 'toss': Toss winner calls 'cricket.choose-role' with { role: 'bat' | 'bowl' }.
- * - Phase 'first_innings':
- *   - Both seats secretly lock numbers 1..6 via 'secret.lock'.
- *   - When both locked:
- *     - If equal numbers: Batter is OUT (dismissal). First innings ends.
- *       Target is firstInningsRuns + 1 (special case: 0 runs -> target 1).
- *       Phase stays 'first_innings' with pending readiness to swap, or waits for 'secret.next'.
- *       When both confirm 'secret.next': swap roles, set innings = 2, phase -> 'second_innings'.
- *     - If different numbers: Batter scores their played number.
- *       Both seats must confirm 'secret.next' before the next delivery can be locked.
- * - Phase 'second_innings':
- *   - Both seats secretly lock numbers 1..6 via 'secret.lock'.
- *   - When both locked:
- *     - If different numbers: Batter scores their played number.
- *       - If secondInningsRuns >= target: chasing batter wins immediately ('rules_win', phase -> 'terminal').
- *       - Otherwise: delivery resolved, waits for 'secret.next' confirmation from both seats to advance to next delivery.
- *     - If equal numbers: Batter is OUT (dismissal). Second innings ends. Match is terminal immediately:
- *       - If secondInningsRuns === firstInningsRuns: DRAW ('rules_draw', winner: null).
- *       - If secondInningsRuns < firstInningsRuns: 1st batting team wins ('rules_win').
- * - Terminal phase: match concluded with terminalResult.
- * - Privacy: Secret delivery numbers are NEVER exposed in toPublicView until delivery is resolved.
- * - Emits effects: 'toss-resolved', 'role-chosen', 'delivery-locked', 'delivery-resolved',
- *                  'wicket-fallen', 'innings-swapped', 'game-won', 'game-drawn'.
+ * - Current choices 1..10; legacy version 1 uses 1..6. No ball limit.
+ * - Saved toss winner chooses Bat or Bowl. Different numbers add the batter's
+ *   number; matching numbers score zero and dismiss the batter.
+ * - Together version 2: both players bat until OUT, then compare totals.
+ * - Remote/legacy games: the second batter can also win by reaching first total + 1.
+ * - Together locks remain covered until explicit Reveal, including terminal balls.
+ * - Next clears the current ball. Roles swap only after the first dismissal.
+ * - The stored first_innings/second_innings fields retain saved-state compatibility.
  */
 
 import {
@@ -49,8 +31,11 @@ import { CricketDeliveryResult, CricketEffect, CricketState, CricketView } from 
  */
 export function createInitialState(startFacts: SuppliedStartFacts): CricketState {
   const tossWinner = startFacts.startingSeat;
+  const rulesVersion =
+    typeof startFacts.config?.rulesVersion === "number" ? startFacts.config.rulesVersion : 1;
 
   return {
+    rulesVersion,
     mode: startFacts.config?.mode === "together" ? "together" : "remote",
     revealed: false,
     phase: "toss",
@@ -76,6 +61,19 @@ export function validateAndReduce(
   action: { action: ActionType; payload: unknown },
   acceptedFacts: AcceptedFacts,
 ): ReductionResult<CricketState, CricketEffect> {
+  // Owner's Together rules: each person bats until dismissed, then compare both totals.
+  // Legacy 1..6 games and remote games retain their saved chase rules.
+  const playUntilBothOut = state.mode === "together" && state.rulesVersion === 2;
+  // A chase win that was still covered was not a completed match. Keep its accepted
+  // runs, but let that batter continue under the owner's corrected Together rules.
+  if (
+    playUntilBothOut &&
+    state.phase === "terminal" &&
+    state.lastDelivery?.outcome === "runs" &&
+    !state.revealed
+  ) {
+    state = { ...state, phase: "second_innings", terminalResult: undefined, target: null };
+  }
   if (
     action.action === "secret.reveal" &&
     state.mode === "together" &&
@@ -199,14 +197,16 @@ export function validateAndReduce(
       };
     }
 
+    const rulesVersion = state.rulesVersion ?? 1;
+    const maxVal = rulesVersion === 2 ? 10 : 6;
     const payload = action.payload as SecretLockPayload | undefined;
     const value = payload?.value;
-    if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > 6) {
+    if (typeof value !== "number" || !Number.isInteger(value) || value < 1 || value > maxVal) {
       return {
         success: false,
         error: createError(
           ErrorCode.INVALID_ACTION,
-          "Delivery number must be an integer between 1 and 6",
+          `Delivery number must be an integer between 1 and ${maxVal}`,
         ),
       };
     }
@@ -261,7 +261,7 @@ export function validateAndReduce(
     if (state.innings === 1) {
       if (isWicket) {
         // First innings dismissal
-        const target = state.firstInningsRuns + 1; // Special case 0 runs -> target 1 handled naturally
+        const target = playUntilBothOut ? null : state.firstInningsRuns + 1;
         const lastDelivery: CricketDeliveryResult = {
           innings: 1,
           deliveryId: state.deliveryId,
@@ -403,6 +403,7 @@ export function validateAndReduce(
           const newState: CricketState = {
             ...state,
             phase: "terminal",
+            target: playUntilBothOut ? null : state.target,
             secretDeliveries: newSecretDeliveries,
             lockedSeats: newLockedSeats,
             lastDelivery,
@@ -442,9 +443,10 @@ export function validateAndReduce(
             terminalResult: state.mode === "together" ? undefined : terminalResult,
           };
         } else {
-          // secondInningsRuns < firstInningsRuns: First batter (now bowler) defends and wins!
+          const winner =
+            state.secondInningsRuns > state.firstInningsRuns ? secondBatter : firstBatter;
           const terminalResult: TerminalResult = {
-            winner: firstBatter,
+            winner,
             reason: "rules_win",
             scores,
             finishedAt: serverTime,
@@ -457,6 +459,7 @@ export function validateAndReduce(
           const newState: CricketState = {
             ...state,
             phase: "terminal",
+            target: playUntilBothOut ? null : state.target,
             secretDeliveries: newSecretDeliveries,
             lockedSeats: newLockedSeats,
             lastDelivery,
@@ -484,9 +487,11 @@ export function validateAndReduce(
             },
             {
               type: "game-won",
-              winner: firstBatter,
+              winner,
               scores,
-              reason: `Seat ${firstBatter} defended ${state.firstInningsRuns} runs`,
+              reason: playUntilBothOut
+                ? `Seat ${winner} finished with the higher batting total`
+                : `Seat ${firstBatter} defended ${state.firstInningsRuns} runs`,
             },
           ];
 
@@ -520,7 +525,7 @@ export function validateAndReduce(
         } as Record<Seat, number>;
 
         // Check if chasing batter reached target immediately!
-        if (newSecondInningsRuns >= target) {
+        if (!playUntilBothOut && newSecondInningsRuns >= target) {
           const terminalResult: TerminalResult = {
             winner: secondBatter,
             reason: "rules_win",
@@ -677,7 +682,7 @@ export function validateAndReduce(
 
       const newBatter: Seat = state.roles.bowl;
       const newBowler: Seat = state.roles.bat;
-      const target = state.target ?? state.firstInningsRuns + 1;
+      const target = playUntilBothOut ? null : (state.target ?? state.firstInningsRuns + 1);
 
       const newState: CricketState = {
         ...state,
@@ -687,6 +692,7 @@ export function validateAndReduce(
           bat: newBatter,
           bowl: newBowler,
         },
+        target,
         deliveryId: state.deliveryId + 1,
         secretDeliveries: {},
         lockedSeats: [],
@@ -715,10 +721,12 @@ export function validateAndReduce(
     // Normal delivery advancement within innings 1 or 2
     const newState: CricketState = {
       ...state,
+      target: playUntilBothOut ? null : state.target,
       deliveryId: state.deliveryId + 1,
       secretDeliveries: {},
       lockedSeats: [],
       lastDelivery: null,
+      revealed: false,
       readiness: { A: false, B: false },
     };
 
@@ -783,10 +791,57 @@ export function legalActions(
  * Guarantees secret delivery numbers are NEVER exposed in any way until resolved in lastDelivery.
  */
 export function toPublicView(state: CricketState, _viewer?: ViewerContext): CricketView {
+  const rulesVersion = state.rulesVersion ?? 1;
+  const maxNumber = rulesVersion === 2 ? 10 : 6;
+  const allowedNumbers = Array.from({ length: maxNumber }, (_, i) => i + 1);
+
+  let expectedChooser: Seat | undefined = undefined;
+  let expectedRole: "bat" | "bowl" | undefined = undefined;
+
+  if (
+    state.roles &&
+    (state.phase === "first_innings" || state.phase === "second_innings") &&
+    state.lastDelivery === null
+  ) {
+    if (rulesVersion === 2) {
+      // Version 2: Batter chooses first, bowler second
+      if (!state.lockedSeats.includes(state.roles.bat)) {
+        expectedChooser = state.roles.bat;
+        expectedRole = "bat";
+      } else if (!state.lockedSeats.includes(state.roles.bowl)) {
+        expectedChooser = state.roles.bowl;
+        expectedRole = "bowl";
+      }
+    } else {
+      // Version 1 legacy: deliveryId % 2 === 1 ? "A" : "B"
+      const first: Seat = state.deliveryId % 2 === 1 ? "A" : "B";
+      const second: Seat = first === "A" ? "B" : "A";
+      if (!state.lockedSeats.includes(first)) {
+        expectedChooser = first;
+        expectedRole = state.roles.bat === first ? "bat" : "bowl";
+      } else if (!state.lockedSeats.includes(second)) {
+        expectedChooser = second;
+        expectedRole = state.roles.bat === second ? "bat" : "bowl";
+      }
+    }
+  }
+
   const hidden = state.mode === "together" && Boolean(state.lastDelivery) && !state.revealed;
+  const publicPhase = hidden
+    ? state.innings === 1
+      ? "first_innings"
+      : "second_innings"
+    : state.phase;
+
   return {
-    revealed: Boolean(state.revealed),
-    phase: state.phase,
+    rulesVersion,
+    completionRule: state.mode === "together" && rulesVersion === 2 ? "both-out" : "chase",
+    allowedNumbers,
+    expectedChooser,
+    expectedRole,
+    // Old saved games may have kept the previous ball's reveal flag after Next.
+    revealed: Boolean(state.lastDelivery && state.revealed),
+    phase: publicPhase,
     innings: state.innings,
     tossWinner: state.tossWinner,
     roles: state.roles ? { ...state.roles } : null,
@@ -796,7 +851,10 @@ export function toPublicView(state: CricketState, _viewer?: ViewerContext): Cric
       state.secondInningsRuns -
       (hidden && state.innings === 2 ? state.lastDelivery!.scoredRuns : 0),
     target:
-      hidden && state.innings === 1 && state.lastDelivery?.outcome === "out" ? null : state.target,
+      (state.mode === "together" && rulesVersion === 2) ||
+      (hidden && state.innings === 1 && state.lastDelivery?.outcome === "out")
+        ? null
+        : state.target,
     deliveryId: state.deliveryId,
     lockedSeats: [...state.lockedSeats],
     lastDelivery: !hidden && state.lastDelivery ? { ...state.lastDelivery } : null,

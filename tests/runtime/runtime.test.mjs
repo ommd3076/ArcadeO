@@ -13,7 +13,28 @@ async function check(name, fn) {
 }
 function saveReport(failed) {
   fs.mkdirSync("planning/review/evidence", { recursive: true });
-  fs.writeFileSync("planning/review/evidence/runtime-results.json", JSON.stringify({ runtime: "Wrangler/workerd, SQLite Durable Objects and D1, real HTTP", passed: report, count: report.length, complete: !failed, failed: failed ?? null, verifiedAt: new Date().toISOString() }, null, 2));
+  const content = JSON.stringify(
+    {
+      runtime: "Wrangler/workerd, SQLite Durable Objects and D1, real HTTP",
+      passed: report,
+      count: report.length,
+      complete: !failed,
+      failed: failed ?? null,
+      verifiedAt: new Date().toISOString(),
+    },
+    null,
+    2,
+  );
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      fs.writeFileSync("planning/review/evidence/runtime-results.json", content);
+      break;
+    } catch (err) {
+      if (attempt === 4) throw err;
+      const end = Date.now() + 50;
+      while (Date.now() < end) {}
+    }
+  }
 }
 async function request(person, url, options = {}) {
   const response = await fetch(origin + url, { ...options, headers: { Origin: origin, "Content-Type": "application/json", ...(person ? { Cookie: people[person].cookie, "X-CSRF-Token": people[person].csrf } : {}), ...options.headers } });

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Private Arcade V1 — Snakes & Ladders Game Types
  *
  * Server-authoritative, deterministic pure types for Snakes & Ladders.
@@ -67,9 +67,13 @@ export const REFERENCE_SNAKES: Readonly<Record<number, number>> = {
 };
 
 export function boardMapFor(version?: SnakesBoardVersion) {
-  return version === REFERENCE_BOARD_VERSION
-    ? { ladders: REFERENCE_LADDERS, snakes: REFERENCE_SNAKES }
-    : { ladders: LADDERS, snakes: SNAKES };
+  if (version === undefined || version === null || version === 1) {
+    return { ladders: LADDERS, snakes: SNAKES };
+  }
+  if (version === REFERENCE_BOARD_VERSION) {
+    return { ladders: REFERENCE_LADDERS, snakes: REFERENCE_SNAKES };
+  }
+  throw new Error(`Invalid Snakes & Ladders board version: ${String(version)}. Expected 1 or 2.`);
 }
 
 export interface SnakesAndLaddersState {

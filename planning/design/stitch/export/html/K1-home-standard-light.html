@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Private Arcade - Home</title>
+  <!-- Google Fonts: Antonio (condensed grotesque), Plus Jakarta Sans (body sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antonio:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            condensed: ['Antonio', 'Barlow Condensed', 'DIN Condensed', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            porcelain: '#F7F7F9',
+            'porcelain-card': '#FFFFFF',
+            'acid-lime': '#D4FE00',
+            'citrus-orange': '#FF5500',
+            'citrus-orange-light': '#FFF0E6',
+            'arcade-ink': '#0F1015',
+            'arcade-muted': '#727682',
+            'arcade-border': '#EAEBF0',
+          },
+          boxShadow: {
+            'squircle-soft': '0 8px 30px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)',
+            'squircle-elevated': '0 20px 48px -12px rgba(15, 16, 21, 0.08), 0 4px 16px rgba(0, 0, 0, 0.03)',
+            'bubble-pop': '0 10px 24px -4px rgba(212, 254, 0, 0.4), 0 2px 6px rgba(0,0,0,0.04)',
+            'dock': '0 16px 36px -8px rgba(15, 16, 21, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Continuous iOS Squircle look & smooth layout */
+    body {
+      background-color: #F7F7F9;
+      color: #0F1015;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+    
+    .font-condensed {
+      font-family: 'Antonio', sans-serif;
+      letter-spacing: 0.06em;
+    }
+    
+    /* Speech bubble tail styling */
+    .bubble-tail::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 28px;
+      width: 16px;
+      height: 16px;
+      background-color: #D4FE00;
+      clip-path: polygon(0 0, 100% 0, 0 100%);
+      transform: rotate(-10deg);
+    }
+
+    /* Scalloped / starburst wager badge */
+    .scalloped-badge {
+      background: #FF5500;
+      border-radius: 9999px;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(255, 85, 0, 0.35);
+    }
+
+    /* Micro 3D dice styling */
+    .dice-cube {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(145deg, #FFFFFF, #E4E5EB);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9), inset 0 -2px 0 rgba(0,0,0,0.12);
+      border: 1px solid #D6D8E1;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    /* Subtle carousel peek effects */
+    .carousel-container {
+      perspective: 1000px;
+    }
+    .peek-card-left {
+      width: 28px;
+      border-top-right-radius: 28px;
+      border-bottom-right-radius: 28px;
+    }
+    .peek-card-right {
+      width: 28px;
+      border-top-left-radius: 28px;
+      border-bottom-left-radius: 28px;
+    }
+  </style>
+</head>
+<body class="bg-porcelain flex justify-center items-start min-h-screen antialiased select-none p-0 m-0">
+
+  <!-- Mobile Screen Container (390 x 844 frame layout) -->
+  <div class="w-full max-w-[390px] min-h-[844px] bg-porcelain flex flex-col justify-between relative pb-28 pt-2 px-0 overflow-hidden">
+
+    <!-- Top Status Bar & App Bar -->
+    <header class="w-full px-5 pt-3 pb-2 flex flex-col gap-2 z-20">
+      <!-- iOS Status Header time & icons -->
+      <div class="flex justify-between items-center text-[13px] font-semibold tracking-tight text-arcade-ink/80 px-1 mb-1">
+        <span>9:41</span>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.28 19.64 10.58 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4zm0 3.5c3.55 0 6.78 1.34 9.24 3.53L12 19.33 2.76 11.03C5.22 8.84 8.45 7.5 12 7.5z"/></svg>
+          <div class="w-5 h-2.5 border border-arcade-ink/80 rounded-sm p-0.5 flex items-center">
+            <div class="w-full h-full bg-arcade-ink/80 rounded-[1px]"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Bar Navigation -->
+      <div class="flex justify-between items-center mt-1">
+        <!-- Main Brand Title in THE EVOLUTION Condensed Grotesque -->
+        <div class="flex items-center gap-2">
+          <h1 class="font-condensed text-[26px] font-bold text-arcade-ink tracking-wider uppercase leading-none">
+            PRIVATE ARCADE
+          </h1>
+          <!-- Tactile Arcade Sparkle -->
+          <span class="inline-block w-2.5 h-2.5 bg-arcade-ink rotate-45 transform scale-90"></span>
+        </div>
+
+        <!-- Frosted Partner Status Capsule -->
+        <div class="flex items-center gap-2 bg-white/80 backdrop-blur-md border border-arcade-border px-3 py-1.5 rounded-full shadow-sm">
+          <span class="font-condensed text-[12px] font-bold text-arcade-ink tracking-wider uppercase flex items-center gap-1.5">
+            SARAH 
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-arcade-muted font-medium text-[11px] tracking-normal font-sans">24MS</span>
+          </span>
+          <!-- Sarah Mini Avatar -->
+          <div class="w-5 h-5 rounded-full bg-amber-200 text-amber-900 border border-amber-300 flex items-center justify-center font-bold text-[10px]">
+            S
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Subtitle Greeting & Quick Status -->
+    <div class="px-5 pt-1 pb-1">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="text-xs text-arcade-muted font-medium">Synced with Daniel</span>
+          <span class="text-[10px] text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold border border-emerald-200">PAIR LIVE</span>
+        </div>
+        <span class="font-condensed text-[11px] font-bold text-arcade-muted uppercase tracking-widest">
+          TURN 14 OF 30
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Content Area: Horizontal Card Carousel -->
+    <main class="w-full flex flex-col gap-4 mt-1">
+      
+      <!-- Carousel Track -->
+      <div class="w-full relative flex items-center justify-center">
+        <!-- Left Peeking Card -->
+        <div class="peek-card-left absolute left-0 top-6 bottom-6 bg-porcelain-card/60 border border-arcade-border/80 shadow-sm z-0"></div>
+
+        <!-- Hero Card (Ludo Duel) -->
+        <div class="w-[350px] bg-porcelain-card rounded-[32px] p-6 border border-arcade-border shadow-squircle-elevated z-10 relative flex flex-col justify-between overflow-hidden">
+          
+          <!-- Subtle Card Watermark / Grid Lines -->
+          <div class="absolute -right-12 -top-12 w-44 h-44 bg-gradient-to-br from-amber-50/60 to-emerald-50/40 rounded-full blur-2xl pointer-events-none"></div>
+
+          <!-- Top Row inside Card: Tag & Scalloped Starburst Wager Badge -->
+          <div class="flex justify-between items-start mb-3 relative z-10">
+            <!-- Functional Control Tag in Condensed All-Caps -->
+            <div class="inline-flex items-center gap-1.5 bg-porcelain border border-arcade-border px-3 py-1 rounded-full">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              <span class="font-condensed text-[11px] font-bold text-arcade-ink uppercase tracking-wider">
+                CLASSIC DUEL · LIVE
+              </span>
+            </div>
+
+            <!-- Citrus Orange Playful Scalloped Wager Badge -->
+            <div class="scalloped-badge px-3 py-1 flex items-center gap-1.5 transform hover:scale-105 transition-transform cursor-pointer">
+              <!-- Coffee / Iced Matcha Icon -->
+              <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 8h1a4 4 0 1 1 0 8h-1"></path>
+                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path>
+                <line x1="6" y1="2" x2="6" y2="4"></line>
+                <line x1="10" y1="2" x2="10" y2="4"></line>
+                <line x1="14" y1="2" x2="14" y2="4"></line>
+              </svg>
+              <span class="font-condensed text-[11px] font-bold text-white uppercase tracking-wider">
+                ICED MATCHA WAGER
+              </span>
+            </div>
+          </div>
+
+          <!-- Hero Heading: LUDO DUEL in Condensed Grotesque -->
+          <div class="mb-3 relative z-10 flex items-baseline justify-between">
+            <div>
+              <h2 class="font-condensed text-[38px] font-bold text-arcade-ink uppercase leading-none tracking-tight">
+                LUDO DUEL
+              </h2>
+              <p class="text-xs text-arcade-muted font-medium mt-1">Round 2 of 3 · Golden Yard Pursuit</p>
+            </div>
+            <!-- Live Round Timer Capsule -->
+            <div class="flex items-center gap-1 bg-porcelain px-2.5 py-1 rounded-full border border-arcade-border text-arcade-muted font-condensed text-xs font-semibold">
+              <svg class="w-3 h-3 text-arcade-ink" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>04:18</span>
+            </div>
+          </div>
+
+          <!-- Vibrant Acid-Lime Playful Speech Bubble (Conversational Update) -->
+          <div class="relative bg-acid-lime text-arcade-ink rounded-[22px] p-3.5 mb-4 bubble-tail shadow-bubble-pop border border-lime-300/60 z-10">
+            <div class="flex items-start gap-2.5">
+              <!-- Chat / Alert icon -->
+              <div class="w-6 h-6 rounded-full bg-arcade-ink text-acid-lime flex items-center justify-center shrink-0 mt-0.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                </svg>
+              </div>
+              <div class="flex-1">
+                <div class="flex justify-between items-center mb-0.5">
+                  <span class="font-condensed text-[11px] font-bold text-arcade-ink uppercase tracking-wider">SARAH JUST MOVED</span>
+                  <span class="text-[10px] text-arcade-ink/70 font-semibold">1m ago</span>
+                </div>
+                <!-- 60% Modern Geometric Sans Body -->
+                <p class="text-[13px] font-medium leading-snug text-arcade-ink">
+                  Sarah just rolled a <span class="font-bold underline decoration-arcade-ink">5</span> and entered your home stretch! 🎲
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Board Teaser / Game State Micro Visualization -->
+          <div class="bg-porcelain rounded-2xl p-3 border border-arcade-border mb-4 flex items-center justify-between z-10">
+            <!-- Daniel Token -->
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-emerald-500 text-white font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm font-condensed">
+                D
+              </div>
+              <div>
+                <span class="block text-[11px] text-arcade-muted font-medium">YOUR TOKEN</span>
+                <span class="font-condensed text-xs font-bold text-arcade-ink tracking-wider">#30 IN PURSUIT</span>
+              </div>
+            </div>
+
+            <!-- Tactile 3D Mini Dice Widget -->
+            <div class="flex items-center gap-2 px-2 py-1 bg-white rounded-xl border border-arcade-border shadow-xs">
+              <div class="dice-cube">
+                <!-- 5 dots pattern -->
+                <div class="w-full h-full p-1.5 flex flex-col justify-between">
+                  <div class="flex justify-between"><span class="w-1.5 h-1.5 rounded-full bg-arcade-ink"></span><span class="w-1.5 h-1.5 rounded-full bg-arcade-ink"></span></div>
+                  <div class="flex justify-center"><span class="w-1.5 h-1.5 rounded-full bg-arcade-ink"></span></div>
+                  <div class="flex justify-between"><span class="w-1.5 h-1.5 rounded-full bg-arcade-ink"></span></div>
+                </div>
+              </div>
+              <div class="pr-1">
+                <span class="block font-condensed text-[10px] font-bold text-arcade-muted uppercase">ROLLED</span>
+                <span class="font-condensed text-sm font-bold text-arcade-ink">+5 STEP</span>
+              </div>
+            </div>
+
+            <!-- Sarah Token -->
+            <div class="flex items-center gap-2">
+              <div class="text-right">
+                <span class="block text-[11px] text-arcade-muted font-medium">SARAH</span>
+                <span class="font-condensed text-xs font-bold text-arcade-ink tracking-wider">#34 (GOAL)</span>
+              </div>
+              <div class="w-8 h-8 rounded-full bg-amber-400 text-arcade-ink font-bold text-xs flex items-center justify-center border-2 border-white shadow-sm font-condensed">
+                S
+              </div>
+            </div>
+          </div>
+
+          <!-- Dominant 52px Solid Black Pill CTA in Condensed All-Caps -->
+          <button class="w-full h-[52px] bg-arcade-ink text-white rounded-full flex items-center justify-center gap-2 hover:bg-neutral-800 active:scale-[0.98] transition-all shadow-md group z-10">
+            <span class="font-condensed text-[15px] font-bold uppercase tracking-wider text-white">
+              JUMP IN · RESUME
+            </span>
+            <svg class="w-4 h-4 text-white transform group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Right Peeking Card (Connect Four / Sudoku) -->
+        <div class="peek-card-right absolute right-0 top-6 bottom-6 bg-porcelain-card/60 border border-arcade-border/80 shadow-sm z-0"></div>
+      </div>
+
+      <!-- Carousel Pagination Indicator -->
+      <div class="flex justify-center items-center gap-1.5 my-0.5">
+        <span class="w-5 h-1.5 rounded-full bg-arcade-ink"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-arcade-border"></span>
+        <span class="w-1.5 h-1.5 rounded-full bg-arcade-border"></span>
+      </div>
+
+      <!-- Duo Momentum Squircle Card -->
+      <div class="px-5">
+        <div class="w-full bg-porcelain-card rounded-[32px] p-5 border border-arcade-border shadow-squircle-soft relative overflow-hidden">
+          
+          <div class="flex justify-between items-start mb-2">
+            <!-- Label in Condensed All-Caps -->
+            <div class="flex items-center gap-2">
+              <span class="text-orange-500">🔥</span>
+              <span class="font-condensed text-[12px] font-bold text-arcade-ink uppercase tracking-wider">
+                DUO STREAK RECORD
+              </span>
+            </div>
+
+            <!-- Mini Gold Trophy Accent & Percentile -->
+            <div class="inline-flex items-center gap-1 bg-amber-50 border border-amber-200/80 px-2.5 py-0.5 rounded-full">
+              <!-- Trophy Icon -->
+              <svg class="w-3.5 h-3.5 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0 0 11 15.9V19H7v2h10v-2h-4v-3.1c1.86-.48 3.27-2.03 3.61-3.96C19.08 11.63 21 9.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+              </svg>
+              <span class="font-condensed text-[11px] font-bold text-amber-800 uppercase tracking-wider">TOP 2%</span>
+            </div>
+          </div>
+
+          <!-- Streak Numbers & Synergy Stat -->
+          <div class="flex items-baseline justify-between mb-3">
+            <div class="flex items-baseline gap-2">
+              <!-- Huge 14 DAYS Numeral in Condensed Grotesque -->
+              <span class="font-condensed text-[44px] font-bold text-arcade-ink tracking-tight leading-none">
+                14
+              </span>
+              <span class="font-condensed text-[18px] font-bold text-arcade-ink uppercase tracking-wider">
+                DAYS
+              </span>
+            </div>
+
+            <!-- Synchronized Tag -->
+            <div class="text-right">
+              <span class="font-condensed text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 uppercase tracking-wider">
+                84% SYNC RATE
+              </span>
+              <p class="text-[11px] text-arcade-muted font-medium mt-0.5">Highest in 3 months</p>
+            </div>
+          </div>
+
+          <!-- Week Checkmark Circles (Tactile status) -->
+          <div class="grid grid-cols-7 gap-1.5 pt-1 border-t border-arcade-border/60">
+            <!-- Mon -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">M</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Tue -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">T</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Wed -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">W</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Thu -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">T</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Fri -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">F</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Sat -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-semibold text-arcade-muted uppercase">S</span>
+              <div class="w-8 h-8 rounded-full bg-porcelain border border-emerald-300 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                ✓
+              </div>
+            </div>
+            <!-- Sun (Today / Active) -->
+            <div class="flex flex-col items-center gap-1">
+              <span class="font-condensed text-[10px] font-bold text-arcade-ink uppercase">S</span>
+              <div class="w-8 h-8 rounded-full bg-arcade-ink text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                ✓
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Centered Floating Bottom Pill Dock with Solid Black Active HOME Capsule -->
+    <nav class="fixed bottom-5 left-0 right-0 max-w-[390px] mx-auto px-5 z-40">
+      <div class="w-full bg-white/90 backdrop-blur-xl border border-arcade-border rounded-full p-1.5 shadow-dock flex items-center justify-between">
+        
+        <!-- Active Tab: HOME (Solid Black Capsule with Condensed All-Caps) -->
+        <a href="#home" class="flex-1 flex items-center justify-center gap-2 bg-arcade-ink text-white py-2.5 px-4 rounded-full shadow-sm transition-transform active:scale-95">
+          <!-- Cottage / Home Icon -->
+          <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          <span class="font-condensed text-[12px] font-bold uppercase tracking-widest text-white leading-none">
+            HOME
+          </span>
+        </a>
+
+        <!-- Inactive Tab: GAMES -->
+        <a href="#games" class="flex-1 flex items-center justify-center gap-2 text-arcade-muted hover:text-arcade-ink py-2.5 px-3 rounded-full transition-colors active:scale-95">
+          <!-- Controller Icon -->
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="4"></rect>
+            <path d="M6 12h4"></path>
+            <path d="M8 10v4"></path>
+            <circle cx="17" cy="10" r=".5" fill="currentColor"></circle>
+            <circle cx="15" cy="13" r=".5" fill="currentColor"></circle>
+          </svg>
+          <span class="font-condensed text-[12px] font-bold uppercase tracking-widest leading-none">
+            GAMES
+          </span>
+        </a>
+
+        <!-- Inactive Tab: US -->
+        <a href="#us" class="flex-1 flex items-center justify-center gap-2 text-arcade-muted hover:text-arcade-ink py-2.5 px-3 rounded-full transition-colors active:scale-95">
+          <!-- Heart Icon -->
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path>
+          </svg>
+          <span class="font-condensed text-[12px] font-bold uppercase tracking-widest leading-none">
+            US
+          </span>
+        </a>
+
+      </div>
+    </nav>
+
+  </div>
+
+</body>
+</html>

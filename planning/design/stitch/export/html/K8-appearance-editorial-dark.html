@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Arcade - Appearance & Settings</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Barlow Condensed & Space Grotesk / Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            condensed: ['"Barlow Condensed"', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            grotesk: ['"Space Grotesk"', 'sans-serif'],
+          },
+          colors: {
+            'canvas-black': '#0C0C0F',
+            'canvas-charcoal': '#16161B',
+            'card-charcoal': '#1F1F27',
+            'acid-lime': '#D4FE00',
+            'mint-card': '#CFE6A3',
+            'mint-ink': '#182412',
+            'butter-card': '#F4DE88',
+            'butter-ink': '#2C2204',
+            'citrus-orange': '#FF6B00',
+          },
+          borderRadius: {
+            '32px': '32px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #0C0C0F;
+    }
+    .font-grotesque-condensed {
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 0.03em;
+    }
+    /* Squircle smooth radius */
+    .squircle-card {
+      border-radius: 32px;
+    }
+    /* Scalloped badge simulation */
+    .scalloped-badge {
+      box-shadow: 0 2px 8px rgba(255, 107, 0, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-[#0C0C0F] text-slate-100 min-h-screen flex justify-center items-start antialiased selection:bg-lime-400 selection:text-black">
+
+  <!-- iPhone 15/16 Pro Mobile Shell Container (390px fixed preview width) -->
+  <div class="w-full max-w-[390px] min-h-screen bg-[#0C0C0F] relative flex flex-col pb-28 border-x border-white/5 shadow-[0_0_80px_rgba(0,0,0,0.9)] overflow-hidden">
+
+    <!-- Top Ambient Dynamic Notch & Status Bar -->
+    <header class="sticky top-0 z-40 bg-[#0C0C0F]/90 backdrop-blur-xl px-5 pt-3 pb-3 border-b border-white/[0.04]">
+      <!-- iOS Status Bar Clock & Icons -->
+      <div class="flex justify-between items-center text-xs font-semibold text-white/70 px-1 mb-2">
+        <span class="tracking-tight text-[13px] text-white font-medium">9:41</span>
+        <!-- Dynamic Island Pill -->
+        <div class="w-[100px] h-5 bg-black rounded-full border border-white/10 flex items-center justify-center gap-1.5 shadow-inner">
+          <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span class="text-[9px] text-white/70 font-mono tracking-widest uppercase">SYNCED</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-white/80">
+          <i data-lucide="signal" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          <i data-lucide="wifi" class="w-3.5 h-3.5 stroke-[2.2]"></i>
+          <div class="w-5 h-2.5 rounded-sm border border-white/80 p-0.5 flex items-center">
+            <div class="h-full w-3/4 bg-white rounded-2xs"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Header Navigation Bar -->
+      <div class="flex items-center justify-between pt-1">
+        <!-- Tactile circular frosted back button [ ← US ] -->
+        <button class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.07] hover:bg-white/[0.12] active:scale-95 transition-all border border-white/10 text-white/90">
+          <i data-lucide="arrow-left" class="w-4 h-4 stroke-[2.5]"></i>
+          <span class="font-grotesque-condensed font-bold text-xs uppercase tracking-wider text-white">US</span>
+        </button>
+
+        <!-- Center brand subtle eyebrow -->
+        <div class="flex items-center gap-1.5 opacity-80">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-lime-400"></i>
+          <span class="font-grotesque-condensed font-black text-xs uppercase tracking-[0.18em] text-white/90">PRIVATE ARCADE</span>
+        </div>
+
+        <!-- High-contrast pill status [ SAVED ✓ ] -->
+        <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+          <span class="font-grotesque-condensed font-black text-[11px] uppercase tracking-wider">SAVED</span>
+          <i data-lucide="check" class="w-3 h-3 stroke-[3]"></i>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Stack with Deliberately Varied Proportions -->
+    <main class="flex-1 px-4 pt-4 flex flex-col gap-4">
+
+      <!-- ========================================================================= -->
+      <!-- CARD 1: HERO DISPLAY MODE CARD (Crisp Porcelain White Surface) -->
+      <!-- ========================================================================= -->
+      <section class="bg-[#F8F8F6] text-[#0E0E12] squircle-card p-6 shadow-[0_12px_36px_rgba(0,0,0,0.5)] border border-white/40 relative overflow-hidden flex flex-col justify-between">
+        
+        <!-- Subtle Top Metadata & Eyebrow -->
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-black"></span>
+            <span class="font-grotesque-condensed font-extrabold text-[12px] uppercase tracking-[0.2em] text-[#0E0E12]/70">
+              DISPLAY &amp; ILLUMINATION
+            </span>
+          </div>
+          <span class="font-mono text-[10px] bg-black/5 px-2 py-0.5 rounded-md font-semibold text-black/60">SYS // 01</span>
+        </div>
+
+        <!-- Hero Headline in condensed grotesque all-caps -->
+        <h1 class="font-grotesque-condensed font-black text-[38px] leading-[0.92] uppercase tracking-[-0.01em] text-black mt-1 mb-2">
+          APPEARANCE &amp; SHELL
+        </h1>
+
+        <!-- Conversational Sub-copy in clean modern sans -->
+        <p class="text-[13px] leading-relaxed text-[#2D2D35] font-medium max-w-[92%] mb-5">
+          Customize your tandem tactile experience across light, dark and ambient rooms.
+        </p>
+
+        <!-- Segmented 3-Way Mode Capsule with Dark Pill Indicator -->
+        <div class="bg-[#E7E7E2] p-1.5 rounded-2xl flex items-center justify-between gap-1 border border-black/5 mb-4">
+          <!-- Light Mode Option -->
+          <button class="flex-1 py-2 px-1 rounded-xl flex items-center justify-center gap-1.5 text-black/60 hover:text-black font-semibold text-xs transition-colors">
+            <span class="text-sm">☀️</span>
+            <span class="font-grotesque-condensed font-bold text-[12px] uppercase tracking-wider">LIGHT</span>
+          </button>
+
+          <!-- Dark Mode Option (ACTIVE DARK PILL) -->
+          <button class="flex-1 py-2 px-1 rounded-xl bg-[#0E0E12] text-white flex items-center justify-center gap-1.5 shadow-md shadow-black/25">
+            <span class="text-sm">🌙</span>
+            <span class="font-grotesque-condensed font-bold text-[12px] uppercase tracking-wider text-white">DARK</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-[#D4FE00]"></span>
+          </button>
+
+          <!-- System Option -->
+          <button class="flex-1 py-2 px-1 rounded-xl flex items-center justify-center gap-1.5 text-black/60 hover:text-black font-semibold text-xs transition-colors">
+            <span class="text-sm">⚙️</span>
+            <span class="font-grotesque-condensed font-bold text-[12px] uppercase tracking-wider">SYSTEM</span>
+          </button>
+        </div>
+
+        <!-- Playful Accent Element: Acid-Lime Conversational Banter Bubble with Directional Pointer Tail -->
+        <div class="relative mt-1">
+          <div class="bg-[#D4FE00] text-black font-semibold text-xs px-4 py-2.5 rounded-2xl rounded-bl-sm border-2 border-black flex items-center gap-2 shadow-[3px_3px_0px_#000]">
+            <span class="w-2 h-2 rounded-full bg-black shrink-0"></span>
+            <span class="text-[12px] leading-tight font-medium">
+              <strong class="font-bold font-grotesque-condensed uppercase tracking-wide text-[13px]">Sarah:</strong> Dark mode looks gorgeous tonight 🖤
+            </span>
+          </div>
+          <!-- Tiny speech notch indicator dot -->
+          <div class="w-2.5 h-2.5 bg-[#D4FE00] border-l-2 border-b-2 border-black rotate-45 -mt-1 ml-4"></div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- CARD 2: THEME FAMILY SELECTION CARD (Luminous Mint/Lime Surface #CFE6A3) -->
+      <!-- ========================================================================= -->
+      <section class="bg-[#CFE6A3] text-[#182412] squircle-card p-5 shadow-[0_10px_28px_rgba(207,230,163,0.15)] border border-[#CFE6A3]/60 relative flex flex-col justify-between">
+        
+        <!-- Header & Info Button -->
+        <div class="flex items-center justify-between mb-1">
+          <div class="flex items-center gap-2">
+            <i data-lucide="palette" class="w-4 h-4 text-[#182412] stroke-[2.5]"></i>
+            <h2 class="font-grotesque-condensed font-black text-[22px] uppercase tracking-wide text-[#182412]">
+              THEME FAMILIES
+            </h2>
+          </div>
+          <button class="w-6 h-6 rounded-full bg-black/10 hover:bg-black/15 flex items-center justify-center text-[#182412] transition-colors">
+            <i data-lucide="info" class="w-3.5 h-3.5 stroke-[2.5]"></i>
+          </button>
+        </div>
+
+        <!-- Subtext -->
+        <p class="text-[12px] font-medium text-[#293B20] mb-3.5">
+          Choose your duo atmosphere.
+        </p>
+
+        <!-- Side-by-Side Squircle Mini-Decks -->
+        <div class="grid grid-cols-2 gap-3">
+          
+          <!-- Deck A: STANDARD DUO (ACTIVE) -->
+          <div class="bg-white/80 backdrop-blur-sm rounded-[24px] p-3.5 border-2 border-[#182412] shadow-[0_4px_16px_rgba(24,36,18,0.1)] flex flex-col justify-between relative">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-grotesque-condensed font-extrabold text-[14px] uppercase tracking-wider text-[#182412]">STANDARD DUO</span>
+            </div>
+            
+            <!-- Active Checkmark Pill -->
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#182412] text-white self-start mb-3">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#D4FE00]"></span>
+              <span class="font-grotesque-condensed font-black text-[10px] uppercase tracking-wider">ACTIVE ●</span>
+            </div>
+
+            <!-- Mini Color Swatch Bar -->
+            <div class="mt-auto">
+              <div class="text-[9px] uppercase font-bold tracking-wider text-black/60 mb-1 font-grotesque-condensed">PALETTE DNA</div>
+              <div class="flex items-center h-3.5 rounded-full overflow-hidden border border-black/15 gap-0.5 p-0.5 bg-black/5">
+                <span class="h-full flex-1 rounded-full bg-[#CFE6A3]" title="Mint"></span>
+                <span class="h-full flex-1 rounded-full bg-[#38BDF8]" title="Cyan"></span>
+                <span class="h-full flex-1 rounded-full bg-[#FACC15]" title="Yellow"></span>
+                <span class="h-full flex-1 rounded-full bg-[#16161B]" title="Charcoal"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deck B: ROMANTIC VELVET (PREVIEW) -->
+          <div class="bg-white/40 hover:bg-white/60 transition-all backdrop-blur-sm rounded-[24px] p-3.5 border border-[#182412]/20 flex flex-col justify-between relative opacity-90">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-grotesque-condensed font-extrabold text-[14px] uppercase tracking-wider text-[#182412]">ROMANTIC VELVET</span>
+            </div>
+
+            <!-- Preview Pill -->
+            <div class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/10 text-[#182412] self-start mb-3">
+              <span class="font-grotesque-condensed font-bold text-[10px] uppercase tracking-wider">PREVIEW</span>
+            </div>
+
+            <!-- Mini Color Swatch Bar -->
+            <div class="mt-auto">
+              <div class="text-[9px] uppercase font-bold tracking-wider text-black/60 mb-1 font-grotesque-condensed">PALETTE DNA</div>
+              <div class="flex items-center h-3.5 rounded-full overflow-hidden border border-black/15 gap-0.5 p-0.5 bg-black/5">
+                <span class="h-full flex-1 rounded-full bg-[#4A154B]" title="Aubergine"></span>
+                <span class="h-full flex-1 rounded-full bg-[#A855F7]" title="Lilac"></span>
+                <span class="h-full flex-1 rounded-full bg-[#F472B6]" title="Blush Rose"></span>
+                <span class="h-full flex-1 rounded-full bg-[#FDE2EC]" title="Porcelain Rose"></span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- CARD 3: PLAYER TOKEN CUSTOMIZATION CARD (Warm Butter Yellow Surface #F4DE88) -->
+      <!-- ========================================================================= -->
+      <section class="bg-[#F4DE88] text-[#2C2204] squircle-card p-5 shadow-[0_10px_28px_rgba(244,222,136,0.15)] border border-[#F4DE88]/60 relative flex flex-col justify-between">
+        
+        <!-- Header & Top Badge -->
+        <div class="flex items-start justify-between mb-1">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="disc" class="w-4 h-4 text-[#2C2204] stroke-[2.5]"></i>
+              <h2 class="font-grotesque-condensed font-black text-[22px] uppercase tracking-wide text-[#2C2204]">
+                PLAYER GAME PIECES
+              </h2>
+            </div>
+            <p class="text-[12px] font-medium text-[#46380A] leading-snug mt-0.5">
+              Player colors remain distinct from app themes. Daniel (P1) vs Sarah (P2).
+            </p>
+          </div>
+        </div>
+
+        <!-- Daniel's Swatch Selector Row -->
+        <div class="bg-black/[0.06] rounded-[22px] p-3 border border-black/10 my-3">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-black text-[#F4DE88] font-bold text-[10px] flex items-center justify-center font-mono">D</span>
+              <span class="font-grotesque-condensed font-black text-[13px] uppercase tracking-wider text-[#2C2204]">DANIEL'S DISC (P1)</span>
+            </div>
+            <span class="text-[10px] font-mono font-bold text-emerald-800 uppercase tracking-wide">EMERALD ACTIVE</span>
+          </div>
+
+          <!-- Swatches (Emerald, Electric Cyan, Coral Red, Radiant Amber) -->
+          <div class="grid grid-cols-4 gap-2.5 pt-0.5">
+            
+            <!-- Emerald Green (SELECTED) -->
+            <button class="flex flex-col items-center gap-1 group">
+              <div class="w-11 h-11 rounded-full bg-[#10B981] flex items-center justify-center shadow-md ring-4 ring-[#2C2204] relative">
+                <i data-lucide="check" class="w-5 h-5 text-white stroke-[3]"></i>
+                <span class="absolute -top-1 -right-1 w-3.5 h-3.5 bg-black rounded-full flex items-center justify-center text-[8px] text-white font-mono font-bold">1</span>
+              </div>
+              <span class="font-grotesque-condensed font-bold text-[10px] uppercase tracking-wider text-[#2C2204]">EMERALD</span>
+            </button>
+
+            <!-- Electric Cyan -->
+            <button class="flex flex-col items-center gap-1 group opacity-80 hover:opacity-100 transition-opacity">
+              <div class="w-11 h-11 rounded-full bg-[#06B6D4] flex items-center justify-center shadow border-2 border-black/20 group-active:scale-95 transition-transform"></div>
+              <span class="font-grotesque-condensed font-bold text-[10px] uppercase tracking-wider text-[#2C2204]/70">CYAN</span>
+            </button>
+
+            <!-- Coral Red -->
+            <button class="flex flex-col items-center gap-1 group opacity-80 hover:opacity-100 transition-opacity">
+              <div class="w-11 h-11 rounded-full bg-[#F43F5E] flex items-center justify-center shadow border-2 border-black/20 group-active:scale-95 transition-transform"></div>
+              <span class="font-grotesque-condensed font-bold text-[10px] uppercase tracking-wider text-[#2C2204]/70">CORAL</span>
+            </button>
+
+            <!-- Radiant Amber -->
+            <button class="flex flex-col items-center gap-1 group opacity-80 hover:opacity-100 transition-opacity">
+              <div class="w-11 h-11 rounded-full bg-[#F59E0B] flex items-center justify-center shadow border-2 border-black/20 group-active:scale-95 transition-transform"></div>
+              <span class="font-grotesque-condensed font-bold text-[10px] uppercase tracking-wider text-[#2C2204]/70">AMBER</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Tandem Preview Chip & Sync Badge -->
+        <div class="flex items-center justify-between gap-2 pt-1">
+          <!-- Mini Connect-4 / Ludo dual token badge -->
+          <div class="flex items-center gap-2 bg-white/70 backdrop-blur-sm px-3 py-1.5 rounded-full border border-black/10">
+            <span class="text-[10px] font-bold font-grotesque-condensed uppercase tracking-wider text-black/80">VERSUS:</span>
+            <!-- Token pair representation -->
+            <div class="flex items-center -space-x-1.5">
+              <div class="w-5 h-5 rounded-full bg-[#10B981] border-2 border-white flex items-center justify-center text-[9px] font-black text-white font-mono shadow-sm">D</div>
+              <div class="w-5 h-5 rounded-full bg-[#A855F7] border-2 border-white flex items-center justify-center text-[9px] font-black text-white font-mono shadow-sm">S</div>
+            </div>
+            <span class="text-[10px] font-semibold text-black/70">Connect-4 Grid</span>
+          </div>
+
+          <!-- Wager / sync badge: Citrus-orange scalloped starburst pill [ REAL-TIME PEER SYNCED ] -->
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FF6B00] text-white shadow-md scalloped-badge border border-white/30">
+            <i data-lucide="radio" class="w-3.5 h-3.5 stroke-[2.5] animate-pulse"></i>
+            <span class="font-grotesque-condensed font-black text-[10px] uppercase tracking-wider whitespace-nowrap">PEER SYNCED</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- CARD 4: SENSORY EXPERIENCE CARD (Elevated Charcoal Surface #1F1F26) -->
+      <!-- ========================================================================= -->
+      <section class="bg-[#1F1F27] text-white squircle-card p-5 shadow-[0_12px_32px_rgba(0,0,0,0.6)] border border-white/[0.08] flex flex-col justify-between">
+        
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sliders-horizontal" class="w-4 h-4 text-lime-400 stroke-[2.5]"></i>
+            <h2 class="font-grotesque-condensed font-black text-[22px] uppercase tracking-wide text-white">
+              TACTILE &amp; SENSORY
+            </h2>
+          </div>
+          <span class="font-grotesque-condensed text-[11px] font-extrabold uppercase tracking-widest text-lime-400 bg-lime-400/10 px-2 py-0.5 rounded-full border border-lime-400/20">
+            HAPTIC ENGINE
+          </span>
+        </div>
+
+        <div class="flex flex-col gap-2.5">
+          
+          <!-- Row 1: Tactile Haptic Feedback -->
+          <div class="flex items-center justify-between bg-black/30 rounded-[20px] p-3.5 border border-white/5">
+            <div class="flex items-center gap-3 pr-2">
+              <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lime-400 shrink-0">
+                <i data-lucide="zap" class="w-4 h-4 stroke-[2.5]"></i>
+              </div>
+              <div>
+                <h3 class="font-grotesque-condensed font-bold text-[15px] uppercase tracking-wide text-white">
+                  TACTILE HAPTIC FEEDBACK
+                </h3>
+                <p class="text-[11px] text-white/50 leading-tight">
+                  Subtle vibration on turn timer, dice roll &amp; disc drops.
+                </p>
+              </div>
+            </div>
+
+            <!-- iOS Switch ON (Mint/Lime active switch) -->
+            <button class="w-12 h-7 bg-[#CFE6A3] rounded-full p-1 transition-colors relative shrink-0 shadow-inner">
+              <div class="w-5 h-5 bg-[#182412] rounded-full shadow-md transform translate-x-5 transition-transform flex items-center justify-center">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#D4FE00]"></div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Row 2: 8-Bit Duo Chimes -->
+          <div class="flex items-center justify-between bg-black/30 rounded-[20px] p-3.5 border border-white/5">
+            <div class="flex items-center gap-3 pr-2">
+              <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-lime-400 shrink-0">
+                <i data-lucide="volume-2" class="w-4 h-4 stroke-[2.5]"></i>
+              </div>
+              <div>
+                <h3 class="font-grotesque-condensed font-bold text-[15px] uppercase tracking-wide text-white">
+                  8-BIT DUO CHIMES
+                </h3>
+                <p class="text-[11px] text-white/50 leading-tight">
+                  Whimsical acoustic chimes for moves and milestones.
+                </p>
+              </div>
+            </div>
+
+            <!-- iOS Switch ON -->
+            <button class="w-12 h-7 bg-[#CFE6A3] rounded-full p-1 transition-colors relative shrink-0 shadow-inner">
+              <div class="w-5 h-5 bg-[#182412] rounded-full shadow-md transform translate-x-5 transition-transform flex items-center justify-center">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#D4FE00]"></div>
+              </div>
+            </button>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- Bottom Spacer for Floating Dock clearance -->
+      <div class="h-6"></div>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- 6. FLOATING DOCK (Navigation Capsule) -->
+    <!-- ========================================================================= -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 flex flex-col items-center pointer-events-none pb-2">
+      <!-- Floating Dock Capsule -->
+      <nav class="pointer-events-auto bg-[#1A1A22]/90 backdrop-blur-2xl px-3 py-2 rounded-full border border-white/15 shadow-[0_16px_36px_rgba(0,0,0,0.8)] flex items-center gap-2 max-w-[280px] w-full justify-between">
+        
+        <!-- Tab 1: Home -->
+        <button class="flex items-center justify-center w-11 h-11 rounded-full text-white/50 hover:text-white transition-colors active:scale-90" aria-label="Home">
+          <i data-lucide="home" class="w-5 h-5 stroke-[2]"></i>
+        </button>
+
+        <!-- Tab 2: Games -->
+        <button class="flex items-center justify-center w-11 h-11 rounded-full text-white/50 hover:text-white transition-colors active:scale-90" aria-label="Games">
+          <i data-lucide="gamepad-2" class="w-5 h-5 stroke-[2]"></i>
+        </button>
+
+        <!-- Tab 3: Us (ACTIVELY HIGHLIGHTED IN SOFT MINT PILL) -->
+        <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#CFE6A3] text-[#182412] font-semibold active:scale-95 transition-transform shadow-[0_2px_12px_rgba(207,230,163,0.3)]">
+          <i data-lucide="heart-handshake" class="w-5 h-5 stroke-[2.5]"></i>
+          <span class="font-grotesque-condensed font-black text-xs uppercase tracking-wider">US</span>
+        </button>
+
+      </nav>
+
+      <!-- iOS Home Indicator bar -->
+      <div class="w-32 h-1 bg-white/30 rounded-full mt-2"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

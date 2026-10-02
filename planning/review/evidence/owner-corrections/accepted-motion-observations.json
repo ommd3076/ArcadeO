@@ -5,7 +5,7 @@
     "targets": [
       "div"
     ],
-    "savedVersion": 7,
+    "savedVersion": 4,
     "refreshRunning": 0
   },
   {
@@ -15,7 +15,7 @@
       "span",
       "snl-token-A"
     ],
-    "savedVersion": 15,
+    "savedVersion": 43,
     "refreshRunning": 0
   },
   {
@@ -38,7 +38,7 @@
   },
   {
     "game": "sos",
-    "animationSamples": 12,
+    "animationSamples": 13,
     "targets": [
       "span"
     ],

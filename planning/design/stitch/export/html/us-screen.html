@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>Private Arcade   Us — Private Arcade</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "error": "#ffb4ab",
+            "on-tertiary-container": "#33696e",
+            "tertiary-fixed-dim": "#99d0d5",
+            "surface": "#131316",
+            "secondary-fixed": "#f8e28c",
+            "inverse-surface": "#e5e1e6",
+            "surface-container-high": "#2a2a2d",
+            "surface-variant": "#353438",
+            "tertiary-container": "#b0e7ec",
+            "background": "#131316",
+            "on-error": "#690005",
+            "on-primary-fixed": "#131f00",
+            "primary-fixed": "#d4eba8",
+            "secondary": "#dbc673",
+            "on-error-container": "#ffdad6",
+            "primary-container": "#cfe6a3",
+            "secondary-container": "#594b00",
+            "surface-container-low": "#1b1b1e",
+            "on-primary-fixed-variant": "#3b4d1a",
+            "on-primary": "#253505",
+            "on-secondary-fixed": "#221b00",
+            "inverse-primary": "#52652f",
+            "outline-variant": "#45483d",
+            "on-tertiary": "#00363a",
+            "primary": "#f3ffd6",
+            "on-tertiary-fixed": "#002022",
+            "surface-container-lowest": "#0e0e11",
+            "surface-bright": "#39393c",
+            "inverse-on-surface": "#303033",
+            "surface-container": "#1f1f22",
+            "primary-fixed-dim": "#b8cf8e",
+            "on-primary-container": "#546832",
+            "on-secondary": "#3a3000",
+            "on-secondary-container": "#d0bb69",
+            "surface-container-highest": "#353438",
+            "on-surface-variant": "#c5c8b9",
+            "on-tertiary-fixed-variant": "#124e53",
+            "tertiary": "#ebfdff",
+            "on-surface": "#e5e1e6",
+            "on-background": "#e5e1e6",
+            "outline": "#8f9284",
+            "secondary-fixed-dim": "#dbc673",
+            "on-secondary-fixed-variant": "#544600",
+            "tertiary-fixed": "#b5ecf1",
+            "error-container": "#93000a",
+            "surface-tint": "#b8cf8e",
+            "surface-dim": "#131316"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-xs": "0.5rem",
+            "space-sm": "0.75rem",
+            "space-2xs": "0.25rem",
+            "gutter-sm": "0.75rem",
+            "gutter": "1rem",
+            "margin-mobile": "1rem",
+            "margin": "1.25rem",
+            "space-2xl": "2rem",
+            "space-3xl": "3rem",
+            "space-lg": "1.25rem",
+            "space-md": "1rem",
+            "space-xl": "1.5rem"
+          },
+          "fontFamily": {
+            "label-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "display-hero-mobile": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-micro": ["Plus Jakarta Sans"],
+            "display-hero": ["Plus Jakarta Sans"],
+            "stat-counter": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-lg": ["13px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "headline-lg": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "display-hero-mobile": ["36px", { "lineHeight": "40px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "headline-sm": ["16px", { "lineHeight": "22px", "letterSpacing": "0em", "fontWeight": "600" }],
+            "headline-md": ["20px", { "lineHeight": "26px", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "400" }],
+            "label-md": ["11px", { "lineHeight": "14px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "label-micro": ["9px", { "lineHeight": "12px", "letterSpacing": "0.1em", "fontWeight": "700" }],
+            "display-hero": ["48px", { "lineHeight": "52px", "letterSpacing": "-0.03em", "fontWeight": "400" }],
+            "stat-counter": ["38px", { "lineHeight": "42px", "letterSpacing": "-0.04em", "fontWeight": "300" }],
+            "headline-lg-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      word-wrap: normal;
+      white-space: nowrap;
+      direction: ltr;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+<meta content="mobile_tab" name="shell-type"/><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#0C0C0F] text-on-surface antialiased selection:bg-primary-container selection:text-on-primary font-body-md text-body-md min-h-screen flex flex-col">
+<!-- Fixed Header (~64px height) -->
+<header class="fixed top-0 left-0 right-0 w-full z-50 bg-[#0C0C0F]/85 backdrop-blur-xl shadow-lg shadow-black/40">
+<div class="h-16 max-w-md mx-auto px-margin-mobile flex items-center justify-between">
+<!-- Leading: Daniel & Sarah Duo Avatar Profile with Status -->
+<div class="flex items-center gap-space-sm">
+<div class="relative flex items-center -space-x-2.5">
+<!-- Daniel Avatar -->
+<div class="relative w-9 h-9 rounded-full ring-2 ring-[#0C0C0F] bg-surface-container-low overflow-hidden shadow-sm shadow-black">
+<img class="w-full h-full object-cover" data-alt="Editorial portrait of Daniel looking calm with subtle cyan tone ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-2RgedSXcANgdlLFf2NUIZC30-YovNGPjT1qKqyT81r9GOxxi0f5QuSDN61YFtjzVkleW6aG-2V75KEz-5Y1qz4eXNZy_jfptmIdKH6uwDmLMlIArkjzzQR-qQIYGh3u0nEKZU-epgbRyd9hp3J70mtgffNubg-4HaDpxu16J_TtjYlCMphc2o5CT0HDmjDMBZYPzPyuTI6-JqEzH75gYBWrmuAjW2YAlMtAl4jlxYhpX2MZK-ZubDJbfAqG3-mQcPMo95vVJf-g"/>
+</div>
+<!-- Sarah Avatar with Online Indicator -->
+<div class="relative w-9 h-9 rounded-full ring-2 ring-[#0C0C0F] bg-surface-container-low overflow-hidden shadow-sm shadow-black">
+<img class="w-full h-full object-cover" data-alt="Intimate portrait of Sarah bathed in warm amber tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiZZ-W8r7jKLUYMbzkW9nGsfQK2mQI1G8ARXxTGRH06hzd7-f01O61wJqIc5FhM99_jSv7KULSyRODwWTQaToyU4vH60-i0dyYs6sga5Wyp0lR_vXniC7awtRHs0GhmHZsDzGve7vN0QZ7EQv9ooU7F-6bCGr77OmLewqQJIZ9ROi_uJ8UtxI5zgvuf1z-13CeZLLy-IgdkDMOoBvHJT01PEzTBaJAdZ8weoT8Hf6jShv1v9YV3WWImZVFoVSaeq3PrqYK-3ofi04"/>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary-container rounded-full ring-2 ring-[#0C0C0F] animate-pulse" title="Sarah is online"></span>
+</div>
+</div>
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Daniel &amp; Sarah</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-outline">Sarah active now</span>
+</div>
+</div>
+</div>
+<!-- Trailing: Sleek Notification Bell -->
+<div class="flex items-center">
+<button aria-label="Notifications" class="relative w-11 h-11 rounded-full flex items-center justify-center bg-surface-container-low text-on-surface hover:bg-surface-container hover:text-primary transition-all duration-200 active:scale-95 shadow-sm shadow-black">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary-fixed ring-2 ring-[#0C0C0F]"></span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas (Exact Header pt-16 offset, Bottom safe spacing) -->
+<main class="flex-1 pt-16 pb-28 max-w-md w-full mx-auto px-margin-mobile flex flex-col">
+<div class="flex flex-col w-full space-y-space-lg pb-space-2xl">
+<!-- 1. Couple Status & Shared Streak Hero Card -->
+<section class="flex flex-col space-y-space-sm">
+<!-- Intimate Pulse Header Badge -->
+<div class="flex items-center justify-between px-space-xs">
+<div class="inline-flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1.5 rounded-full shadow-sm">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary-container"></span>
+</span>
+<span class="font-label-md text-label-md text-on-surface uppercase tracking-wider">Synced &amp; Connected</span>
+<span class="material-symbols-outlined text-[14px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="flex items-center gap-1.5 bg-surface-container-low px-space-sm py-1.5 rounded-full">
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-widest">Co-op Level</span>
+<span class="font-label-lg text-label-lg text-primary-container font-bold">14</span>
+</div>
+</div>
+<!-- Main Streak Deck Card (Mint Highlight Bento) -->
+<div class="bg-primary-container text-on-primary-container rounded-2xl p-space-lg shadow-xl relative overflow-hidden">
+<!-- Decorative ambient corner glow -->
+<div class="absolute -right-8 -top-8 w-32 h-32 bg-primary rounded-full opacity-40 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col space-y-space-md">
+<!-- Top Row: Streak Counter & XP Badge -->
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-1.5">
+<span class="font-label-micro text-label-micro uppercase tracking-widest text-on-primary-fixed-variant font-bold">Shared Ritual</span>
+<span class="text-sm">🔥</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-on-primary-fixed mt-0.5">
+              42 Day Duel Streak
+            </h1>
+</div>
+<span class="inline-flex items-center gap-1 bg-on-primary-fixed/10 px-space-sm py-1 rounded-full font-label-md text-label-md font-semibold text-on-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">bolt</span>
+            +150 XP Today
+          </span>
+</div>
+<!-- Weekly Streak Calendar Bubbles (Mon - Sun) -->
+<div class="flex items-center justify-between pt-1">
+<!-- Mon -->
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">M</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed text-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+</div>
+<!-- Tue -->
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">T</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed text-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+</div>
+<!-- Wed -->
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">W</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed text-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+</div>
+<!-- Thu -->
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">T</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed text-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[16px] font-bold">check</span>
+</div>
+</div>
+<!-- Fri (Today) -->
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed font-extrabold">F</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed text-secondary-fixed flex items-center justify-center ring-2 ring-on-primary-fixed shadow-md animate-pulse">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<!-- Sat -->
+<div class="flex flex-col items-center gap-1 opacity-60">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">S</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed/20 text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+</div>
+<!-- Sun -->
+<div class="flex flex-col items-center gap-1 opacity-60">
+<span class="font-label-micro text-label-micro uppercase text-on-primary-fixed-variant">S</span>
+<div class="w-8 h-8 rounded-full bg-on-primary-fixed/20 text-on-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+</div>
+</div>
+</div>
+<!-- Meta Footer: Milestone info -->
+<div class="flex items-center justify-between pt-1 border-t border-on-primary-container/15 text-on-primary-fixed font-label-md text-label-md">
+<span class="flex items-center gap-1 opacity-90">
+<span class="material-symbols-outlined text-[15px]">trophy</span>
+            Record: 58 Days
+          </span>
+<span class="opacity-90 font-medium">Next Milestone in 8 days (Day 50)</span>
+</div>
+</div>
+</div>
+<!-- Pair Synergy Card -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-md flex flex-col space-y-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary-fixed text-[18px]">neurology</span>
+<span class="font-headline-sm text-headline-sm text-on-surface">Couple Synergy Index</span>
+</div>
+<span class="font-headline-sm text-headline-sm text-tertiary-fixed font-bold">92%</span>
+</div>
+<!-- Segmented Bar -->
+<div class="w-full bg-surface-container rounded-full h-2.5 overflow-hidden flex">
+<div class="bg-tertiary-container h-full rounded-l-full" style="width: 92%"></div>
+<div class="bg-surface-container-high h-full" style="width: 8%"></div>
+</div>
+<div class="flex items-center justify-between text-outline font-label-md text-label-md pt-0.5">
+<span class="truncate pr-2">“Soulmates in Connect Four, ruthless rivals in Ludo”</span>
+<span class="text-on-surface font-semibold shrink-0">Flawless</span>
+</div>
+</div>
+</section>
+<!-- 2. Cute Bets & Wagers (Couple Stakes) -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">redeem</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Cute Bets &amp; Stakes</h2>
+</div>
+<button class="inline-flex items-center gap-1 bg-surface-container hover:bg-surface-container-high text-primary-container px-space-sm py-1.5 rounded-full font-label-md text-label-md transition-all active:scale-95 shadow-sm" type="button">
+<span class="material-symbols-outlined text-[15px]">add</span>
+        Propose Bet
+      </button>
+</div>
+<!-- Active Bet Card 1: Connect Four (High Stakes) -->
+<div class="bg-surface-container-low rounded-2xl p-space-lg shadow-md flex flex-col space-y-space-md">
+<div class="flex items-start justify-between gap-space-xs">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-xl bg-tertiary-container text-on-tertiary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">grid_4x4</span>
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold">Connect Four · Best of 5</h3>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Sarah's wager · 2h ago</span>
+</div>
+</div>
+<span class="inline-flex items-center px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-micro text-label-micro font-bold uppercase tracking-wider">
+          Decider Next
+        </span>
+</div>
+<!-- Stake Callout Box -->
+<div class="bg-surface-container rounded-xl p-space-sm flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5 shrink-0" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-outline">The Stake</span>
+<p class="font-body-md text-body-md text-on-surface leading-snug mt-0.5">
+            Loser makes iced vanilla matcha &amp; breakfast in bed on Sunday morning 🥞☕
+          </p>
+</div>
+</div>
+<!-- Duel Progress Bar & Turn Indicator -->
+<div class="flex flex-col space-y-1.5">
+<div class="flex items-center justify-between font-label-md text-label-md">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="text-on-surface font-medium">Daniel: 2</span>
+</div>
+<span class="text-outline uppercase font-label-micro text-label-micro">Match Point</span>
+<div class="flex items-center gap-1.5">
+<span class="text-on-surface font-medium">Sarah: 1</span>
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+</div>
+<div class="w-full bg-surface-container h-2 rounded-full overflow-hidden flex">
+<div class="bg-primary-container h-full" style="width: 50%"></div>
+<div class="bg-surface-container-high h-full" style="width: 25%"></div>
+<div class="bg-secondary h-full" style="width: 25%"></div>
+</div>
+</div>
+<!-- Quick Action -->
+<button class="w-full bg-primary-container text-on-primary-container hover:opacity-95 font-label-lg text-label-lg py-2.5 rounded-full font-semibold transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+        Play Deciding Game 4
+      </button>
+</div>
+<!-- Active Bet Card 2: Sudoku Speed Duel -->
+<div class="bg-surface-container-low rounded-2xl p-space-lg shadow-md flex flex-col space-y-space-sm">
+<div class="flex items-start justify-between gap-space-xs">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-xl bg-surface-container text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">timer</span>
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface font-semibold">Sudoku Speed Duel</h3>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Daniel's wager · Today</span>
+</div>
+</div>
+<span class="inline-flex items-center px-space-xs py-0.5 rounded-full bg-surface-container text-outline font-label-micro text-label-micro font-bold uppercase tracking-wider">
+          Stakes Locked
+        </span>
+</div>
+<div class="bg-surface-container rounded-xl p-space-sm flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5 shrink-0" style="font-variation-settings: 'FILL' 1;">spa</span>
+<div class="flex flex-col">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-outline">The Stake</span>
+<p class="font-body-md text-body-md text-on-surface leading-snug mt-0.5">
+            Loser gives a 20-min shoulder massage + picks the Netflix movie tonight 🎬🍿
+          </p>
+</div>
+</div>
+</div>
+<!-- Settled / Vaulted Bets Strip -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-inner flex flex-col space-y-space-xs">
+<div class="flex items-center justify-between pb-1">
+<span class="font-label-micro text-label-micro uppercase tracking-wider text-outline">Recently Honored Debts</span>
+<span class="material-symbols-outlined text-outline text-[16px]">history</span>
+</div>
+<!-- Mini Settled Item 1 -->
+<div class="flex items-center justify-between py-1 border-b border-surface-container">
+<div class="flex items-center gap-2 min-w-0 pr-2">
+<span class="material-symbols-outlined text-primary-container text-[16px] shrink-0">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface truncate">Sarah won: Daniel washed dishes for a week 🧼</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline shrink-0">Yesterday</span>
+</div>
+<!-- Mini Settled Item 2 -->
+<div class="flex items-center justify-between py-1">
+<div class="flex items-center gap-2 min-w-0 pr-2">
+<span class="material-symbols-outlined text-secondary text-[16px] shrink-0" style="font-variation-settings: 'FILL' 1;">loyalty</span>
+<span class="font-body-md text-body-md text-on-surface truncate">Daniel won: 10 kiss coupons 💋 (Redeemed)</span>
+</div>
+<span class="font-label-micro text-label-micro text-outline shrink-0">3d ago</span>
+</div>
+</div>
+</section>
+<!-- 3. Head-to-Head Lifetime Rivalry -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-container text-[20px]">swords</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Lifetime Rivalry</h2>
+</div>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">94 Total Duels</span>
+</div>
+<!-- Win Rate Split Card -->
+<div class="bg-surface-container-low rounded-2xl p-space-lg shadow-md flex flex-col space-y-space-md">
+<!-- Avatars & Win Count Header -->
+<div class="flex items-center justify-between">
+<!-- Daniel -->
+<div class="flex items-center gap-2.5">
+<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary-container font-headline-sm text-headline-sm font-bold shadow-sm">
+            D
+          </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Daniel</span>
+<span class="font-stat-counter text-stat-counter leading-none text-primary-container font-light">49</span>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Victories</span>
+</div>
+</div>
+<div class="flex flex-col items-center">
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-widest font-bold">VS</span>
+<div class="h-8 w-px bg-surface-container-high my-1"></div>
+<span class="font-label-micro text-label-micro text-secondary font-semibold">Tension 9.8</span>
+</div>
+<!-- Sarah -->
+<div class="flex items-center gap-2.5 flex-row-reverse text-right">
+<div class="w-10 h-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary font-headline-sm text-headline-sm font-bold shadow-sm">
+            S
+          </div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">Sarah</span>
+<span class="font-stat-counter text-stat-counter leading-none text-secondary font-light">45</span>
+<span class="font-label-micro text-label-micro text-outline uppercase tracking-wider">Victories</span>
+</div>
+</div>
+</div>
+<!-- Split Ratio Bar -->
+<div class="flex flex-col space-y-1">
+<div class="w-full bg-surface-container h-3 rounded-full overflow-hidden flex">
+<div class="bg-primary-container h-full rounded-l-full transition-all duration-500" style="width: 52.1%"></div>
+<div class="bg-secondary h-full rounded-r-full transition-all duration-500" style="width: 47.9%"></div>
+</div>
+<div class="flex items-center justify-between font-label-micro text-label-micro text-outline px-1">
+<span class="text-primary-container font-semibold">52.1% Win Rate</span>
+<span class="text-secondary font-semibold">47.9% Win Rate</span>
+</div>
+</div>
+<!-- Rivalry by Game Mini Badges Grid -->
+<div class="grid grid-cols-2 gap-space-xs pt-1">
+<!-- Connect Four -->
+<div class="bg-surface-container rounded-xl p-space-sm flex flex-col space-y-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">Connect Four</span>
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">18 - 14</span>
+<span class="font-label-micro text-label-micro text-primary-container font-medium">Daniel +4</span>
+</div>
+</div>
+<!-- Ludo Duel -->
+<div class="bg-surface-container rounded-xl p-space-sm flex flex-col space-y-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">Ludo Duel</span>
+<span class="text-xs">👑</span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">16 - 12</span>
+<span class="font-label-micro text-label-micro text-secondary font-medium">Sarah Dominant</span>
+</div>
+</div>
+<!-- Dots & Boxes -->
+<div class="bg-surface-container rounded-xl p-space-sm flex flex-col space-y-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">Dots &amp; Boxes</span>
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">9 - 9</span>
+<span class="font-label-micro text-label-micro text-tertiary font-medium">Dead Heat 🔥</span>
+</div>
+</div>
+<!-- RPS Quick Duel -->
+<div class="bg-surface-container rounded-xl p-space-sm flex flex-col space-y-1 shadow-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-micro text-label-micro text-outline uppercase">RPS Speed</span>
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+</div>
+<div class="flex items-baseline justify-between">
+<span class="font-label-lg text-label-lg text-on-surface font-bold">10 - 10</span>
+<span class="font-label-micro text-label-micro text-outline font-medium">Balanced</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Recent Match History (Detailed Log) -->
+<section class="flex flex-col space-y-space-sm">
+<div class="flex items-center justify-between px-space-xs">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-[20px]">history_edu</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface font-bold">Match Chronicle</h2>
+</div>
+<span class="font-label-micro text-label-micro text-outline">Synced Live</span>
+</div>
+<!-- Filter Pill Tags (Scrollable/Wrap) -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+<button class="bg-primary-container text-on-primary-container font-label-md text-label-md px-space-sm py-1 rounded-full font-semibold shadow-sm shrink-0" type="button">
+        All Duels
+      </button>
+<button class="bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md px-space-sm py-1 rounded-full shrink-0 transition-colors" type="button">
+        Connect Four
+      </button>
+<button class="bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md px-space-sm py-1 rounded-full shrink-0 transition-colors" type="button">
+        Ludo
+      </button>
+<button class="bg-surface-container text-on-surface-variant hover:text-on-surface font-label-md text-label-md px-space-sm py-1 rounded-full shrink-0 transition-colors" type="button">
+        Sudoku
+      </button>
+</div>
+<!-- Match History Item 1 -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm flex flex-col space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">
+            D
+          </div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold">Connect Four · Round 2</h4>
+<span class="font-label-micro text-label-micro text-primary-container font-semibold">Won by Daniel (+25 XP)</span>
+</div>
+</div>
+<span class="font-label-micro text-label-micro text-outline">45m ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant bg-surface-container px-space-sm py-1.5 rounded-xl">
+        “Clutched on Turn 18 with vertical sneaky trap 🧠”
+      </p>
+<div class="flex items-center justify-between text-outline font-label-micro text-label-micro pt-0.5">
+<span class="flex items-center gap-1 text-secondary">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">redeem</span>
+          Tied to: Matcha &amp; Breakfast Wager
+        </span>
+<span>Duration: 4m 12s</span>
+</div>
+</div>
+<!-- Match History Item 2 -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm flex flex-col space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs">
+            S
+          </div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold">Ludo Duel · 4-Token Blitz</h4>
+<span class="font-label-micro text-label-micro text-secondary font-semibold">Won by Sarah 👑 (+30 XP)</span>
+</div>
+</div>
+<span class="font-label-micro text-label-micro text-outline">Yesterday 11:20 PM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant bg-surface-container px-space-sm py-1.5 rounded-xl">
+        “Sarah knocked out Daniel's final golden pawn right at home gate!”
+      </p>
+</div>
+<!-- Match History Item 3 -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm flex flex-col space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-lg bg-secondary text-on-secondary flex items-center justify-center font-bold text-xs">
+            S
+          </div>
+<div>
+<h4 class="font-label-lg text-label-lg text-on-surface font-semibold">RPS Quick Duel · Best of 3</h4>
+<span class="font-label-micro text-label-micro text-secondary font-semibold">Won by Sarah (+10 XP)</span>
+</div>
+</div>
+<span class="font-label-micro text-label-micro text-outline">Yesterday 4:15 PM</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant bg-surface-container px-space-sm py-1.5 rounded-xl">
+        “Rock vs Scissors lightning decider ⚡”
+      </p>
+</div>
+<!-- Match History Item 4 -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm flex items-center justify-between py-space-sm px-space-md">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-md bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">
+          D
+        </div>
+<div>
+<span class="font-label-lg text-label-lg text-on-surface">Dots &amp; Boxes · 5x5 Grid</span>
+<span class="block font-label-micro text-label-micro text-outline">Won by Daniel (+25 XP)</span>
+</div>
+</div>
+<span class="font-label-micro text-label-micro text-outline">2 days ago</span>
+</div>
+</section>
+<!-- 5. Bottom Secret Capsule / Romantic Vault Unlock -->
+<section class="bg-surface-container-low rounded-2xl p-space-lg shadow-lg flex flex-col space-y-space-xs relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 bg-secondary-container rounded-full opacity-30 blur-xl pointer-events-none"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]" style="font-variation-settings: 'FILL' 1;">lock</span>
+<span class="font-headline-sm text-headline-sm text-on-surface font-semibold">Vault Secret Note</span>
+</div>
+<span class="font-label-micro text-label-micro px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold uppercase">
+        Locked · Day 50
+      </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant pt-1 leading-relaxed">
+      “Next mystery wager unlocks automatically when your shared streak hits 50 days: <span class="text-secondary font-medium">Weekend mountain cabin getaway wager 🌲✨</span>”
+    </p>
+<!-- Micro progress bar to next milestone -->
+<div class="pt-2 flex items-center gap-2">
+<div class="flex-1 bg-surface-container h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full" style="width: 84%"></div>
+</div>
+<span class="font-label-micro text-label-micro text-secondary font-semibold shrink-0">42 / 50 Days</span>
+</div>
+</section>
+</div>
+</main>
+<!-- Fixed Floating Bottom Pill Navigation Bar -->
+<div class="fixed bottom-0 left-0 right-0 w-full z-50 pb-safe pointer-events-none flex justify-center">
+<nav aria-label="Bottom Navigation" class="pointer-events-auto mb-space-lg mx-auto flex items-center justify-between px-3 w-[270px] h-[60px] bg-surface-container/90 backdrop-blur-xl rounded-full shadow-2xl shadow-black/80" data-active-classes="bg-on-surface text-surface-container-lowest shadow-md scale-105">
+<!-- Home Tab (Inactive) -->
+<a aria-label="Home" class="flex items-center justify-center w-11 h-11 rounded-full text-outline hover:text-on-surface transition-all duration-200 active:scale-95" data-path="private-arcade---home" href="#home">
+<span class="material-symbols-outlined text-[22px]" data-icon="home">home</span>
+</a>
+<!-- Games Tab (Inactive) -->
+<a aria-label="Games" class="flex items-center justify-center w-11 h-11 rounded-full text-outline hover:text-on-surface transition-all duration-200 active:scale-95" data-path="private-arcade---games" href="#games">
+<span class="material-symbols-outlined text-[22px]" data-icon="sports_esports">sports_esports</span>
+</a>
+<!-- Us Tab (Active) -->
+<a aria-current="page" aria-label="Us" class="flex items-center justify-center w-11 h-11 rounded-full transition-all duration-200 bg-on-surface text-surface-container-lowest shadow-md scale-105" data-path="private-arcade---us" href="#us">
+<span class="material-symbols-outlined text-[22px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</a>
+</nav>
+</div>
+</body></html>
