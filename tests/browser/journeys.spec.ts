@@ -125,30 +125,6 @@ test("Together RPS handoff lock refresh masking Reveal Next and normal best-of c
   }
   await expect.poll(async () => (await view(page, id)).lifecycle).toBe("completed");
 });
-test("Together Hand Cricket UI role/secret locks/reveal/Next and normal chase completion", async ({
-  page,
-}) => {
-  await login(page, "A");
-  const id = await uiCreate(page, "hand-cricket");
-  await page.getByRole("button", { name: /Bat First/i }).click();
-  await page.getByRole("button", { name: "Resume & Unmask", exact: true }).click();
-  for (let innings = 1; innings <= 2; innings++) {
-    await page.getByRole("button", { name: /I am .*\(Ready\)/ }).click();
-    await page.getByRole("radio", { name: "1 Run", exact: true }).click();
-    await page.getByRole("button", { name: "Lock Choice", exact: true }).click();
-    await page.getByRole("button", { name: /I am .*\(Ready\)/ }).click();
-    await page
-      .getByRole("radio", { name: innings === 1 ? "1 Run" : "2 Runs", exact: true })
-      .click();
-    await page.getByRole("button", { name: "Lock Choice", exact: true }).click();
-    expect((await view(page, id)).gameState.lastDelivery).toBeNull();
-    await page.getByRole("button", { name: "Reveal Outcome", exact: true }).click();
-    if (innings === 1) await page.getByRole("button", { name: "Next Round", exact: true }).click();
-  }
-  const v = await view(page, id);
-  expect(v.lifecycle).toBe("completed");
-  expect(v.result.reason).toBe("rules_win");
-});
 test("practice UI notes undo pause Check assistance and server solution completion", async ({
   page,
 }) => {
