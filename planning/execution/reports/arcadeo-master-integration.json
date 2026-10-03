@@ -1,0 +1,11 @@
+{
+  "target": "origin/master",
+  "remoteBaseline": "origin/main",
+  "conflicts": 385,
+  "remoteEqualsBaseline": 382,
+  "semanticResolutions": {
+    "scripts/preview.mjs": "Exact configured development Origin retains upstream removal of wildcard preview",
+    "worker/config.ts": "Current exact HTTPS production Origin validation retains remote strict requirement; wildcard limited to development",
+    "worker/matches/match-do.ts": "Explicit follow-up: central Origin validator to preserve remote strict socket rule even inside DO"
+  }
+}
