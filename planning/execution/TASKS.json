@@ -1,8 +1,10 @@
 {
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
-  "executionStatus": "OVERNIGHT_FINISH_RUNNING",
+  "executionStatus": "V1_LOCAL_CLOSED_WITH_DEFERRED_AND_EXTERNAL_GATES",
   "currentExecutor": "Codex native GPT-6.1 Sol High lead with twelve bounded GPT-6 Luna High submissions, at most three active specialists",
+  "currentHandoff": "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md",
+  "currentValidation": "planning/review/evidence/v1-closeout-validation.json",
   "currentExecutionQueue": "planning/execution/OVERNIGHT-TASKS-2026-10-03.json",
   "currentAcceptanceLedger": "planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json",
   "currentHandCricketRepair": {
@@ -31,7 +33,7 @@
   "requestedModel": "GPT-6.1 Sol (owner-selected specialists)",
   "maxActiveSpecialists": 3,
   "statuses": ["PENDING", "RUNNING", "READY_FOR_REVIEW", "VERIFIED", "BLOCKED"],
-  "statusMeaning": "Earlier task/checkpoint results and prior planning-only follow-ups are historical. The owner-authorized Overnight Finish implementation is running in the linked 2026-10-03 queue; current readiness comes from that queue and fresh integrated evidence. Deployment and physical-phone certification remain separate gates.",
+  "statusMeaning": "Historical tasks below retain their original results. The 2026-10-03 queue and final handoff close local V1 with explicit previous-candidate, owner-deferred and external limits. Further polish/animation is V2; deployment and physical phones remain separately gated. Execution stops after handoff.",
   "externalReleaseTasks": ["D01", "D02"],
   "sharedWriter": "arcade-orchestrator",
   "tasks": [

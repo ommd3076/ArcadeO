@@ -1796,5 +1796,11 @@
     }
   ],
   "findings": [],
-  "reviewedImageCount": 256
+  "reviewedImageCount": 256,
+  "finalCandidateAssessment": {
+    "applicationCommit": "7f82b2a",
+    "publicCacheRevision": "78decb9c6adb25d0",
+    "captureProvenance": "planning/review/evidence/overnight-acceptance/candidate-equivalence.json",
+    "policy": "The aggregate review covers captures from several recorded builds. Original inspection times and image hashes are preserved; the final candidate fields describe the scoped code-impact assessment, not a claim that every image was regenerated on that candidate."
+  }
 }

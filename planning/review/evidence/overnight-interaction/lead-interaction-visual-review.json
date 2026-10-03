@@ -1,0 +1,24 @@
+{
+  "reviewedAt": "2026-10-03T03:52:49.836317+00:00",
+  "sourceCommit": "7f82b2a",
+  "publicCacheRevision": "78decb9c6adb25d0",
+  "browserExecution": "A11 confirmed all five current interaction cases PASS. Geometry JSON explicitly differentiates compact glyphFitsfalse from Zoom glyphFitstrue.",
+  "hardwareCertification": false,
+  "records": [
+    {
+      "file": "dots-boxes-landscape-text200.png",
+      "sha256": "cdea90b80353fc081618878585750107318c359f7dd5f8456c18f59c9e825cde",
+      "observation": "Lead actually viewed fresh original844px full-page image. Complete9x9 dot grid, accepted bottom-right mint edge, next-playerB status, reachable Zoom and coordinate alternative; enlarged text wraps safely. Capture simulates viewport844x390 and safe insets20/34."
+    },
+    {
+      "file": "sos-landscape-text200.png",
+      "sha256": "539a9361e23ca1dd1385da35a37f139c59ba229060e4da10f4c361fc5c788fef",
+      "observation": "Lead actually viewed fresh original844px full-page image. Complete equal-square9x9 compact grid, next-playerB status, reachable Zoom and coordinate alternative. At200percent text the48pxS does not fit compact cell; this limitation is exposed rather than approved as fitting."
+    },
+    {
+      "file": "sos-landscape-text200-zoom.png",
+      "sha256": "c315f45e442e6c7b6126a952d6ab5eb571bdbfc3aaaa57b9a62e1062720ebd93",
+      "observation": "Lead actually viewed fresh original844px full-page zoom image. All9rows and9columns remain square and visible; accepted bottom-right48pxS fully fits; top header unobscured after screenshot scroll reset. Reset zoom and coordinate alternative reachable."
+    }
+  ]
+}

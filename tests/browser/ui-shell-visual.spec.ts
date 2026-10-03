@@ -139,7 +139,7 @@ test("Home renders accurate empty and multi-match states in all four appearances
       await expect(
         page.getByRole("link", { name: /Resume Connect Four|Resume Ludo/ }).first(),
       ).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Active matches" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "More matches to resume" })).toBeVisible();
       const layout = await page.evaluate(() => ({
         width: window.innerWidth,
         scrollWidth: document.documentElement.scrollWidth,

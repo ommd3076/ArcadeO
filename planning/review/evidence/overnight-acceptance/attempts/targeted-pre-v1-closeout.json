@@ -1,0 +1,142 @@
+{
+  "status": "IN_PROGRESS",
+  "redaction": "Synthetic local accounts only. No cookies, credentials, choices, match IDs, raw traces, or screenshots embedded.",
+  "sourceBuild": {
+    "command": "npm run build",
+    "result": "PASS",
+    "publicCacheRevision": "f06fa1cd747193b0",
+    "publicAssetCount": 50
+  },
+  "runs": [
+    {
+      "command": "npx playwright test tests/browser/overnight-targeted.spec.ts tests/browser/overnight-interaction.spec.ts",
+      "result": "11 passed, 2 failed",
+      "failedCases": [
+        "REC-06",
+        "REC-07"
+      ],
+      "failureDisposition": {
+        "REC-06": "Test reached the resumed-poll checkpoint; assertion incorrectly expected A to regain the turn after A's accepted Connect Four move. Updated to assert B is enabled and A is disabled.",
+        "REC-07": "Fixture creation collided with an old synthetic A Sudoku Practice slot from a prior local run; a scoped synthetic-slot cleanup was added. Follow-up found that a saved view hides paused cell contents and filledCount includes givens; assertions now verify hidden saved cells, relative filledCount, then restored UI cell after resume."
+      },
+      "passedAssertions": [
+        {
+          "id": "SEC-01",
+          "test": "Independent browser contexts have distinct cookies and B cannot read A's private Sudoku match.",
+          "result": "PASS"
+        },
+        {
+          "id": "SEC-08",
+          "test": "Stale same-account preference write shows visible conflict and keeps the persisted Romantic family.",
+          "result": "PASS"
+        },
+        {
+          "id": "REC-03",
+          "test": "A-session takeover disables old A input while B remains able to make an independent correct Sudoku edit.",
+          "direction": "A takeover",
+          "result": "PASS"
+        },
+        {
+          "id": "REC-03",
+          "test": "B-session takeover disables old B input while A remains able to make an independent correct Sudoku edit.",
+          "direction": "B takeover",
+          "result": "PASS"
+        },
+        {
+          "id": "REC-11",
+          "test": "Saved Remote RPS phase survives reload; both UI acknowledgments are required and the opponent's locked choice stays hidden.",
+          "result": "PASS"
+        },
+        {
+          "id": "REC-12",
+          "test": "Saved Together RPS restores its outstanding secret handoff and keeps the locked choice masked.",
+          "result": "PASS"
+        },
+        {
+          "id": "UI-02",
+          "test": "Fresh-document deep link uses the app's Games fallback instead of external browser history.",
+          "result": "PASS"
+        },
+        {
+          "id": "UI-10",
+          "test": "Live reduced-motion toggle during accepted Connect Four travel settles without another action.",
+          "result": "PASS"
+        },
+        {
+          "id": "UI-11",
+          "test": "Dots and SOS 9x9 boards remain keyboard reachable in landscape with simulated safe insets and 200% text.",
+          "result": "PASS"
+        },
+        {
+          "id": "UI-12",
+          "test": "Sheet focus survives an accepted peer update and terminal result/rematch is emitted once.",
+          "result": "PASS"
+        }
+      ]
+    },
+    {
+      "command": "npx playwright test tests/browser/overnight-targeted.spec.ts -g \"REC06|REC07\"",
+      "result": "1 passed, 1 failed",
+      "passedAssertions": [
+        {
+          "id": "REC-06",
+          "test": "Remote A uses bounded HTTP fallback under injected socket failure while B remains on WebSocket; accepted UI move reaches both; A hidden polling stops and resumes with B as next actor.",
+          "result": "PASS"
+        }
+      ],
+      "failedCases": [
+        "REC-07"
+      ],
+      "failureDisposition": {
+        "REC-07": "Saved paused Sudoku intentionally omits private cell contents; the test initially assumed cells stayed in the saved public view. Changed to assert the saved filled count and hidden cells, then visible restored digit after UI resume."
+      }
+    },
+    {
+      "command": "npx playwright test tests/browser/overnight-targeted.spec.ts -g \"REC07\"",
+      "result": "1 passed",
+      "passedAssertions": [
+        {
+          "id": "REC-07",
+          "test": "Sudoku Practice A UI-enters a correct digit, saves/reloads, verifies saved private cells remain hidden, resumes through UI and sees the digit restored.",
+          "result": "PASS"
+        }
+      ]
+    },
+    {
+      "command": "npx playwright test tests/browser/overnight-interaction.spec.ts -g \"UI11\"",
+      "result": "2 passed",
+      "passedAssertions": [
+        {
+          "id": "UI-11",
+          "test": "Dots & Boxes and SOS 9x9 grids retain equal cell geometry, keyboard reachability and enlarged glyph fit in simulated landscape/safe inset/200% text.",
+          "result": "PASS",
+          "limits": "Browser simulation only; no physical-device claim."
+        }
+      ]
+    }
+  ],
+  "visualMatrix": {
+    "command": "VIS_RESUME_FROM=1..256 npx playwright test tests/browser/overnight-acceptance.spec.ts (continuation checkpoints: 1-96 preserved, 97-160 resumed, 161-162 bounded smoke, 163-256 resumed)",
+    "status": "RUN_COMPLETE",
+    "expectedCells": 256,
+    "passedCellRecords": 256,
+    "failures": 0,
+    "perGame": {
+      "connectFour": 32,
+      "sudoku": 32,
+      "handCricket": 32,
+      "rockPaperScissors": 32,
+      "ludo": 32,
+      "dotsBoxes": 32,
+      "snakesAndLadders": 32,
+      "sos": 32
+    },
+    "assertionEvidence": "planning/review/evidence/overnight-acceptance/VIS-001-256-assertions.json",
+    "pngCount": 256,
+    "matrixBuildRevision": "f06fa1cd747193b0",
+    "visualApproval": "PENDING_PARENT_IMAGE_REVIEW",
+    "limitations": "Synthetic local Worker/SQLite; API fixture setup and cleanup, UI accepted actions; motion reduced simulated in Playwright; no physical phone or deployment certification."
+  },
+  "visualApproval": "PENDING_PARENT_IMAGE_REVIEW",
+  "ledgerMutation": "NONE"
+}

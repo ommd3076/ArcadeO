@@ -1,0 +1,805 @@
+{
+  "recordedAtUtc": "2026-10-03 04:33:28 UTC",
+  "status": "V1_LOCAL_VALIDATION_COMPLETE_WITH_EXPLICIT_LIMITS",
+  "applicationCommit": "7f82b2a",
+  "publicCacheRevision": "78decb9c6adb25d0",
+  "ownerCloseout": "Finish current validation, repair only release-blocking failures, save handoff and stop. No additional broad audit, visual/performance or optimization cycle.",
+  "checks": [
+    {
+      "command": "npm run build",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "category": "frontend/service-worker/Worker local dry-run build",
+      "publicInventoryPaths": 50,
+      "publicFiles": 59,
+      "note": "Final application build retained. Later Git application contents remain unchanged; line-ending-only tooling and test fixture corrections do not change served artifacts."
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "executionOwner": "lead",
+      "note": "Repeated only after final TypeScript test fixture changes."
+    },
+    {
+      "command": "npm run lint",
+      "status": "PASS",
+      "executionOwner": "A11 and lead",
+      "note": "Global passed; changed fixture paths individually checked after edits."
+    },
+    {
+      "command": "npm run format:check",
+      "status": "PASS",
+      "executionOwner": "lead",
+      "note": "Global passed after CRLF normalization. All subsequently changed test paths passed scoped Prettier checks."
+    },
+    {
+      "command": "npm run test",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "category": "pure/unit",
+      "files": 23,
+      "tests": 305
+    },
+    {
+      "command": "npm run test:contracts",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "category": "source/mocked SQLite/D1 contracts",
+      "files": 13,
+      "tests": 78
+    },
+    {
+      "command": "npm run test:components",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "category": "server-rendered components",
+      "files": 12,
+      "tests": 62
+    },
+    {
+      "command": "npm run test:integration",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "category": "actual workerd/SQLite DO/D1",
+      "workerFiles": 3,
+      "workerTests": 11,
+      "httpCases": 26,
+      "apiAssistedNormalJourneys": 17,
+      "evidence": "planning/review/evidence/runtime-results.json"
+    },
+    {
+      "command": "npm run content:verify",
+      "status": "PASS",
+      "executionOwner": "A11",
+      "puzzles": 1000,
+      "perDifficulty": 250
+    },
+    {
+      "command": "full Playwright selection excluding standalone VIS matrix and performance benchmark",
+      "status": "PASS_ACROSS_BOUNDED_CONTINUATIONS",
+      "executionOwner": "lead",
+      "uniqueCases": 123,
+      "batches": [
+        {
+          "selected": 123,
+          "passed": 79,
+          "failed": 1,
+          "notRun": 43
+        },
+        {
+          "selected": 44,
+          "passed": 23,
+          "failed": 1,
+          "notRun": 20
+        },
+        {
+          "selected": 21,
+          "passed": 14,
+          "failed": 1,
+          "notRun": 6
+        },
+        {
+          "selected": 7,
+          "passed": 6,
+          "failed": 1,
+          "notRun": 0
+        },
+        {
+          "selected": 1,
+          "passed": 1,
+          "failed": 0,
+          "notRun": 0
+        }
+      ],
+      "note": "Only failed or unrun cases continued. Previously passed cases were preserved. This is not one uninterrupted 123-pass run.",
+      "cases": [
+        {
+          "case": "tests/browser/environment.spec.ts:21:1 › four saved theme families/modes, portrait/laptop layout, keyboard focus and reduced motion screenshots",
+          "seconds": 2.8,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/environment.spec.ts:86:1 › actual service worker registration caches only public assets; API and private pages absent",
+          "seconds": 1.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/environment.spec.ts:114:1 › offline board input disabled then recovered; second device takeover disables previous controller",
+          "seconds": 3.7,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/environment.spec.ts:149:1 › native authenticated browser WebSocket sends real authoritative snapshot",
+          "seconds": 1.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/environment.spec.ts:178:1 › same-account independent sessions require explicit Together takeover",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/hand-cricket.spec.ts:14:3 › Together Hand Cricket keeps A batting until out and swaps once",
+          "seconds": 8.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/hand-cricket.spec.ts:14:3 › Together Hand Cricket keeps B batting until out and swaps once",
+          "seconds": 6.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:4:1 › two independent UI logins, remote invitation/readiness, normal Connect Four win, refresh and rematch",
+          "seconds": 7.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:53:3 › connect-four Together UI creation and normal rule completion (API actions)",
+          "seconds": 2.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:53:3 › dots-boxes Together UI creation and normal rule completion (API actions)",
+          "seconds": 4.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:53:3 › sos Together UI creation and normal rule completion (API actions)",
+          "seconds": 3.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:53:3 › snakes-and-ladders Together UI creation and normal rule completion (API actions)",
+          "seconds": 7.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:53:3 › ludo Together UI creation and normal rule completion (API actions)",
+          "seconds": 23.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:97:1 › Together RPS handoff lock refresh masking Reveal Next and normal best-of completion",
+          "seconds": 4.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:128:1 › practice UI notes undo pause Check assistance and server solution completion",
+          "seconds": 6.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › dots-boxes remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 10.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › sos remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 8,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › snakes-and-ladders remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 11.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › ludo remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 51.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › rock-paper-scissors remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 6.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:189:3 › hand-cricket remote UI invitation both Ready first action and Rematch; API normal completion",
+          "seconds": 6.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:318:1 › Sudoku duel prestart private board common timer independent revisions and normal finish (API setup/actions)",
+          "seconds": 12.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/journeys.spec.ts:357:1 › async sender normal completion UI Publish receiver invitation acceptance and normal finish",
+          "seconds": 15.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/lifecycle-ui.spec.ts:4:1 › Back preserves an active match, saved setup resumes it, and intentional abandon is confirmed",
+          "seconds": 3.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-auth-race.spec.ts:5:1 › late unauthenticated bootstrap cannot replace the newer UI sign-in session",
+          "seconds": 1.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-auth-race.spec.ts:50:1 › a successful sign-out clears the same session after a preference refresh",
+          "seconds": 1.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-interaction.spec.ts:40:1 › UI02: a fresh document deep link uses Games instead of external browser history",
+          "seconds": 2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-interaction.spec.ts:62:1 › UI10: changing reduced motion during accepted disc travel settles without another action",
+          "seconds": 1.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-interaction.spec.ts:140:3 › UI11: dots-boxes largest grid remains keyboard reachable in landscape with simulated safe insets and 200% text",
+          "seconds": 2.8,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-interaction.spec.ts:140:3 › UI11: sos largest grid remains keyboard reachable in landscape with simulated safe insets and 200% text",
+          "seconds": 3.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-interaction.spec.ts:248:1 › UI12: an accepted update preserves sheet focus and one result/rematch",
+          "seconds": 3.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-motion.spec.ts:14:1 › accepted disc travel has sampled movement and a settled laptop frame",
+          "seconds": 3.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-motion.spec.ts:81:1 › Connect Four accepted motion runs once, stays under 600ms and settles offline",
+          "seconds": 2.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-motion.spec.ts:215:1 › match option sheet consumes browser Back before leaving the match and restores focus",
+          "seconds": 1.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-motion.spec.ts:234:1 › options-to-confirmation sheet replacement preserves Back and accepted match state",
+          "seconds": 4.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-motion.spec.ts:286:1 › Ludo accepted roll and board fit a narrow phone viewport",
+          "seconds": 2.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-pwa.spec.ts:4:1 › precaches only the public shell graph and recovers cold offline routes",
+          "seconds": 1.7,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:10:1 › UI01: named pawn swatches explain conflicts and persist real setup colors",
+          "seconds": 2.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup 403 failure ends pending state and allows a successful explicit retry",
+          "seconds": 2.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup 404 failure ends pending state and allows a successful explicit retry",
+          "seconds": 2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup 409 failure ends pending state and allows a successful explicit retry",
+          "seconds": 2.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup 429 failure ends pending state and allows a successful explicit retry",
+          "seconds": 1.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup 503 failure ends pending state and allows a successful explicit retry",
+          "seconds": 2.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 › PERF06: setup invalid-json failure ends pending state and allows a successful explicit retry",
+          "seconds": 2.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:134:1 › PERF06: a protected 401 returns to sign in and unknown game/match routes expose safe navigation",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:163:1 › REC15: an accepted creation with a lost response retries its identity and opens one saved match",
+          "seconds": 2.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery-ui.spec.ts:218:1 › PERF08: an actual waiting service worker update preserves the active match and document",
+          "seconds": 3.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-recovery.spec.ts:4:1 › an unloaded route opened offline enables Retry when the connection returns",
+          "seconds": 1.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › connect-four: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › connect-four: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › dots-boxes: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › dots-boxes: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › sos: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › sos: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › snakes-and-ladders: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › snakes-and-ladders: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › ludo: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › ludo: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › rock-paper-scissors: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › rock-paper-scissors: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › hand-cricket: creator A accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote-games.spec.ts:77:5 › hand-cricket: creator B accepts and delivers the first Remote action through UI without reload",
+          "seconds": 4.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-remote.spec.ts:4:1 › different accounts finish Remote Connect Four using live UI without reload",
+          "seconds": 5.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:121:1 › REC-05 Together control transfers explicitly and leaves exactly one device active",
+          "seconds": 4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:162:3 › UI-06 rock-paper-scissors masks locked, refreshed, and blurred secret choices in pixels and accessibility",
+          "seconds": 3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:162:3 › UI-06 hand-cricket masks locked, refreshed, and blurred secret choices in pixels and accessibility",
+          "seconds": 2.9,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:237:1 › UI-07 Remote RPS advances during a paused outcome exit without stranding Round 1",
+          "seconds": 4.8,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:354:1 › UI-09 Ludo accepted pawn travel settles to the accepted token coordinate after offline",
+          "seconds": 3.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 › UI-09 snakes-and-ladders accepted presentation settles to its accepted target after background",
+          "seconds": 2.3,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 › UI-09 connect-four accepted presentation settles to its accepted target after navigation",
+          "seconds": 2.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 › UI-09 dots-boxes accepted presentation settles to its accepted target after offline",
+          "seconds": 2.2,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 › UI-09 sos accepted presentation settles to its accepted target after blur",
+          "seconds": 2.4,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-startup.spec.ts:3:1 › stalled session bootstrap shows loading and Retry states, then recovers",
+          "seconds": 12.8,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-sudoku-recovery.spec.ts:128:1 › REC08: unpublished Async sender saves, reloads, and resumes alone through the UI",
+          "seconds": 5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-sudoku-recovery.spec.ts:175:1 › REC07B/UI05: B's Practice saves through Home and resumes with its own digit",
+          "seconds": 3.6,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-sudoku-recovery.spec.ts:221:1 › REC09: accepted Async receiver resumes alone while the completed sender stays in history",
+          "seconds": 13,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-sudoku-recovery.spec.ts:297:1 › REC04/REC10: simultaneous private Duel edits, two UI resume acknowledgments, and history-only completion",
+          "seconds": 16.1,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:46:1 › SEC01: independent accounts receive distinct browser session cookies and cannot read a private match",
+          "seconds": 2.5,
+          "observedIn": "browserUnionChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:78:1 › SEC08: stale account preference write is rejected in the UI without replacing the saved family",
+          "seconds": 3.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:127:1 › REC03: Sudoku Duel A takeover preserves B control while the old A session loses edits",
+          "seconds": 21,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:225:1 › REC03: Sudoku Duel B takeover leaves A editable and revokes the prior B session",
+          "seconds": 8,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:284:1 › REC07: Sudoku Practice A keeps a UI-entered digit through save, reload, and resume",
+          "seconds": 3.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:332:1 › REC12: a Together secret handoff survives save and resume without exposing the locked choice",
+          "seconds": 3.5,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:377:1 › REC11: saved Remote secret round resumes only after both participants acknowledge, without revealing the locked choice",
+          "seconds": 4.8,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/overnight-targeted.spec.ts:446:1 › REC06: forced socket outage falls back to HTTP, submits through UI, and stops hidden polling",
+          "seconds": 10.7,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:33:1 › remote Ludo colour changes belong to the authenticated seat and reject stale writes",
+          "seconds": 2.9,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:120:3 › dots-boxes rejects an action that attempts to change the saved grid size",
+          "seconds": 2.7,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:120:3 › sos rejects an action that attempts to change the saved grid size",
+          "seconds": 2.7,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › dots-boxes creation rejects unsupported grid size 3",
+          "seconds": 1.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › sos creation rejects unsupported grid size 3",
+          "seconds": 1.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › dots-boxes creation rejects unsupported grid size 11",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › sos creation rejects unsupported grid size 11",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › dots-boxes creation rejects unsupported grid size 99",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:168:5 › sos creation rejects unsupported grid size 99",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:186:3 › Ludo creation rejects near-identical colours blue/cyan",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:186:3 › Ludo creation rejects near-identical colours red/pink",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-authority.spec.ts:186:3 › Ludo creation rejects near-identical colours yellow/orange",
+          "seconds": 1.2,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:6:5 › dots-boxes 7 setup saves an outer playable grid",
+          "seconds": 2.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:6:5 › dots-boxes 9 setup saves an outer playable grid",
+          "seconds": 2.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:6:5 › sos 7 setup saves an outer playable grid",
+          "seconds": 2.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:6:5 › sos 9 setup saves an outer playable grid",
+          "seconds": 2.1,
+          "observedIn": "browserContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:77:1 › personal pins stay isolated, shared queue rejects stale writes, and name save retains account",
+          "seconds": 3.1,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › ludo: four appearances at phone and laptop widths",
+          "seconds": 5.4,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › snakes-and-ladders: four appearances at phone and laptop widths",
+          "seconds": 5.6,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › dots-boxes: four appearances at phone and laptop widths",
+          "seconds": 6,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › sos: four appearances at phone and laptop widths",
+          "seconds": 5.3,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › connect-four: four appearances at phone and laptop widths",
+          "seconds": 5.2,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › rock-paper-scissors: four appearances at phone and laptop widths",
+          "seconds": 6.3,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › hand-cricket: four appearances at phone and laptop widths",
+          "seconds": 5.1,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › sudoku: four appearances at phone and laptop widths",
+          "seconds": 5.6,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › dots-boxes-7: four appearances at phone and laptop widths",
+          "seconds": 5.9,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › dots-boxes-9: four appearances at phone and laptop widths",
+          "seconds": 5.9,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › sos-7: four appearances at phone and laptop widths",
+          "seconds": 5.6,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:98:5 › owner visual matrix on real Worker › sos-9: four appearances at phone and laptop widths",
+          "seconds": 5.6,
+          "observedIn": "browserFinalContinuationChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:105:5 › owner visual matrix on real Worker › hand-cricket-play: four appearances at phone and laptop widths",
+          "seconds": 5.3,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/owner-visual.spec.ts:201:1 › accepted action motion video and live Animation observations",
+          "seconds": 48.9,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/owner-zoom.spec.ts:7:3 › dots-boxes: zoom pans to the outer column and accepts an outer action at 320px",
+          "seconds": 2.3,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/owner-zoom.spec.ts:7:3 › sos: zoom pans to the outer column and accepts an outer action at 320px",
+          "seconds": 2.6,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/owner-zoom.spec.ts:43:1 › shared recap projects a real scored result and excludes an abandoned match",
+          "seconds": 2,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/ui-shell-visual.spec.ts:20:1 › Home, Games and Us render across all appearances and responsive widths",
+          "seconds": 20.4,
+          "observedIn": "browserLastChunks"
+        },
+        {
+          "case": "tests/browser/environment.spec.ts:3:1 › deep-link authentication guard, client session deadline and UI logout",
+          "seconds": 2,
+          "observedIn": "initial exec output"
+        },
+        {
+          "case": "tests/browser/owner-corrections.spec.ts:34:1 › Ludo pending pawn selection survives refresh and a colour update",
+          "seconds": 1.6,
+          "observedIn": "initial final-continuation exec output"
+        },
+        {
+          "case": "tests/browser/ui-shell-visual.spec.ts:120:1 › Home renders accurate empty and multi-match states in all four appearances",
+          "seconds": 3,
+          "observedIn": "final affected-case exec output"
+        }
+      ]
+    },
+    {
+      "command": "standalone VIS-001..256 matrix",
+      "status": "PASS_WITH_RECORDED_BUILD_PROVENANCE",
+      "executionOwner": "A11; lead image inspection",
+      "assertionRecords": 256,
+      "inspectedOriginalImages": 256,
+      "evidence": "planning/review/evidence/overnight-acceptance/candidate-equivalence.json",
+      "note": "No new matrix rerun after owner closeout; original hashes/times and scoped source equivalence retained."
+    },
+    {
+      "command": "fresh final-candidate loading/input/resource performance benchmark",
+      "status": "DEFERRED_OWNER",
+      "note": "No new benchmark/optimization cycle. Earlier pre-audit measurements retain their actual script identities and conditions, not final-candidate certification.",
+      "evidence": "planning/review/evidence/owner-corrections/performance-overnight-final-pre-audit.json"
+    },
+    {
+      "command": "final public entry gzip budget read",
+      "status": "PASS",
+      "executionOwner": "lead",
+      "path": "dist/client/assets/index-Dwz2urzg.js",
+      "rawBytes": 451168,
+      "gzipBytes": 148695,
+      "sha256": "844af6a33b95c9dd90a761d3198029ce3566021cd4cac6d816852d49b3d71d5b",
+      "note": "Bounded read of existing built artifact, no benchmark/build cycle."
+    }
+  ],
+  "failureHistory": [
+    {
+      "case": "lifecycle-ui Back",
+      "kind": "stale test copy",
+      "correction": "Match remains active after Back; expect current ready-to-resume text while preserving lifecycle assertions.",
+      "owner": "A11"
+    },
+    {
+      "case": "UI-06 secret games",
+      "kind": "hardcoded default participant name",
+      "correction": "Exact Ready labels derive from accepted participant names; all pixel/accessibility masking assertions retained.",
+      "owner": "lead"
+    },
+    {
+      "case": "SEC-08",
+      "kind": "assumed initial Standard family",
+      "correction": "Reproduce Romantic starting state, derive opposite target, retain conflict/independent persisted preference/old-client rollback checks.",
+      "owner": "lead"
+    },
+    {
+      "case": "Ludo pending selection",
+      "kind": "obsolete generic colour accessible name",
+      "correction": "Use exact named pawn swatch; retain accepted pending roll, tokens and legal move checks.",
+      "owner": "lead"
+    },
+    {
+      "case": "Cricket playable visual fixture",
+      "kind": "obsolete innings label",
+      "correction": "Assert accepted first-innings phase, actual batter name and delivery number.",
+      "owner": "lead"
+    },
+    {
+      "case": "Home multi-match fixture",
+      "kind": "obsolete heading",
+      "correction": "Expect More matches to resume; retain Resume links and overflow checks.",
+      "owner": "lead"
+    }
+  ],
+  "limitations": [
+    "Physical phone and installed-device certification not executed.",
+    "No account-specific production dry run/deploy, production URL/KDF qualification or owner database mutation.",
+    "Platform eviction while a future Duel start alarm is pending remains unverified; persisted reconstruction and general eviction tests are separate.",
+    "Compact SOS 200-percent glyphs require tested Zoom; crowded Ludo uses count summaries and large token controls.",
+    "Additional polish/animations and fresh performance/optimization cycle deferred to V2.",
+    "A12's completed source/artifact/provenance reviews remain valid within their recorded scopes; no new post-closeout broad audit or final post-QA independent verdict was run."
+  ]
+}

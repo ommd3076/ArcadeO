@@ -1,0 +1,23 @@
+{
+  "viewport": {
+    "width": 844,
+    "height": 390
+  },
+  "textScalePercent": 200,
+  "simulatedInsets": {
+    "top": 20,
+    "bottom": 34
+  },
+  "hardwareCertification": false,
+  "geometry": {
+    "left": 281.828125,
+    "right": 312.375,
+    "top": 181.296875,
+    "bottom": 209.296875,
+    "width": 844,
+    "height": 390,
+    "hit": true
+  },
+  "acceptedVersion": 2,
+  "documentWidth": 844
+}

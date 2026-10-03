@@ -1,0 +1,7 @@
+{
+  "injectedNetworkResponse": 429,
+  "boundedVisibleFailure": true,
+  "pendingCleared": true,
+  "explicitRetryAcceptedByRealWorker": true,
+  "sameCreationId": true
+}

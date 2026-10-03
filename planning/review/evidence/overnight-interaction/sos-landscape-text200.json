@@ -1,0 +1,37 @@
+{
+  "viewport": {
+    "width": 844,
+    "height": 390
+  },
+  "textScalePercent": 200,
+  "simulatedInsets": {
+    "top": 20,
+    "bottom": 34
+  },
+  "hardwareCertification": false,
+  "geometry": {
+    "left": 298.125,
+    "right": 324.390625,
+    "top": 182.03125,
+    "bottom": 208.296875,
+    "width": 844,
+    "height": 390,
+    "hit": true
+  },
+  "sosGeometry": {
+    "compact": {
+      "widthSpread": 0,
+      "heightSpread": 0,
+      "squareDifference": 0,
+      "glyphFits": false
+    },
+    "zoomed": {
+      "widthSpread": 0.015625,
+      "heightSpread": 0.015625,
+      "squareDifference": 0,
+      "glyphFits": true
+    }
+  },
+  "acceptedVersion": 2,
+  "documentWidth": 844
+}

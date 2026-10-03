@@ -50,11 +50,68 @@
     "recordedAtUtc": "2026-10-02T22:29:19Z",
     "branch": "codex/v1-finish",
     "head": "204b204",
-    "actualNativePacketsLaunched": ["A01", "A02", "A03", "A04", "A05", "A06", "A07", "A08", "A09", "A10", "A11", "A12"],
-    "activeSpecialists": ["A05 remediation", "A11 QA", "A12 independent audit"],
+    "actualNativePacketsLaunched": [
+      "A01",
+      "A02",
+      "A03",
+      "A04",
+      "A05",
+      "A06",
+      "A07",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A12"
+    ],
+    "activeSpecialists": [
+      "A05 remediation",
+      "A11 QA",
+      "A12 independent audit"
+    ],
     "completedClaimed": false,
     "acceptanceStatus": "IN_PROGRESS; all 300 individual dispositions pending final QA and inspection",
     "provisionalVisualInspection": "30 actual original-size Ludo images inspected; contrast and screenshot-framing findings recorded, no pass inferred",
     "next": "Review scheduled Duel start refinement, rebuild and run targeted browser/256 matrix/full validation, inspect exact captures, then final independent audit."
+  },
+  "childFinal": {
+    "recordedAtUtc": "2026-10-03T04:57:34.156160+00:00",
+    "status": "V1_LOCAL_CLOSED_WITH_DEFERRED_AND_EXTERNAL_GATES",
+    "branch": "codex/v1-finish",
+    "headBeforeCloseout": "4b2ea47",
+    "applicationCommit": "7f82b2a",
+    "publicCacheRevision": "78decb9c6adb25d0",
+    "actualNativeSubmissions": 12,
+    "activeSpecialists": [],
+    "finalQaExecutor": "lead; native A11 checks separately attributed",
+    "browserUniquePassed": 123,
+    "browserPassingBatches": [
+      79,
+      23,
+      14,
+      6,
+      1
+    ],
+    "acceptance": {
+      "PASS": 297,
+      "VERIFIED_PREVIOUS_CANDIDATE": 1,
+      "DEFERRED_OWNER": 1,
+      "PARTIAL_EXTERNAL": 1
+    },
+    "taskSummary": {
+      "VERIFIED": 55,
+      "VERIFIED_PREVIOUS_CANDIDATE": 2,
+      "VERIFIED_WITH_LIMITS": 1,
+      "DEFERRED_OWNER": 1,
+      "PARTIAL_DEFERRED_EXTERNAL": 1
+    },
+    "independentPostQaVerdict": "DEFERRED_OWNER; original A12 review preserved",
+    "external": [
+      "production authorization/account/D1/Origin/secrets/dry run/deployed KDF",
+      "physical phone/PC certification"
+    ],
+    "handoff": "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md",
+    "validation": "planning/review/evidence/v1-closeout-validation.json",
+    "next": "Stop after saved handoff; defer further polish/animation to V2."
   }
 }

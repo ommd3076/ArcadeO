@@ -55,7 +55,12 @@ test("Ludo pending pawn selection survives refresh and a colour update", async (
   });
   expect((await view(page, id)).gameState.pendingRoll).toBe(pending);
   await page.getByText("Pawn colours", { exact: true }).click();
-  await page.getByRole("button", { name: "purple", exact: true }).click();
+  await page
+    .getByRole("button", {
+      name: `${saved.participants.A.displayName} pawn colour: Purple`,
+      exact: true,
+    })
+    .click();
   await expect.poll(async () => (await view(page, id)).gameState.colours.A).toBe("purple");
   const changed = await view(page, id);
   expect(changed.gameState.pendingRoll).toBe(pending);

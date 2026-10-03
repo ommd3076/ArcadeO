@@ -41,3 +41,22 @@ The Worker regression proves both A and B receive a pre-start view with hidden g
 - `evictDurableObject()` did not complete within the 30-second Worker test timeout while this DO held a future scheduled-start alarm, even with no WebSockets or pending outbox rows. The fixture therefore verifies reconstruction from persisted DO SQLite state with a new instance, while platform eviction with a future alarm remains unverified here. Existing Worker durability tests separately cover eviction and hibernating WebSockets without a future scheduled-start alarm.
 
 The A11 full runtime, browser, and matrix gates remain outside this assignment.
+
+## Follow-up — UI recovery navigation coverage
+
+**Outcome:** READY_FOR_REVIEW (browser execution pending A11's shared runtime window)
+**Additional owned path:** `tests/browser/overnight-sudoku-recovery.spec.ts`.
+
+The new REC08–REC10 browser spec covers an unpublished Async sender and an accepted Async receiver through real UI save/reload/resume actions. REC04 is folded into the Duel journey: both seats become Ready in the UI, submit the same correct editable cell concurrently from independent browser contexts, and each filtered view retains only that seat's board. The recovery routes now exercise the Home → Games → Sudoku mode selector and its paused-attempt Resume for Challenge/Duel, plus Vault's saved Sudoku row and mode label for Challenge/Duel. Duel recovery checks that the first Resume acknowledgment leaves the match saved and the second activates it; post-resume completion uses the API solver as a clearly identified fixture action, then checks history-only UI and actual records API eligibility.
+
+`npm run typecheck`, scoped ESLint, Prettier, and `git diff --check` pass for the new spec. The spec has not been run in a browser or Worker runtime; A11's active VIS/matrix run owns the shared browser window. REC07 remains covered by A11's separate passing UI test. These authored REC04/08/09/10 journeys are therefore pending actual browser evidence and are not claimed as passing.
+
+## Follow-up — B Practice and Home Resume
+
+Added a B-account REC07B Practice journey. It clears only B's synthetic Practice slot, enters a correct digit in the UI, saves, reloads, uses the actual Home saved-match card (`Saved match`, Sudoku/Practice, `Resume Sudoku`), then resumes through the Practice-specific button and verifies the digit remains visible. This provides the missing independent-account counterpart to A11's REC07 A case and exercises Home Resume itself. Browser execution remains pending A11's shared window.
+
+Prettier, scoped ESLint, and `git diff --check` pass for this test file. An initial repository-wide typecheck reported an unrelated TS6133 unused `request` import in `tests/browser/overnight-recovery-ui.spec.ts`, outside A05 ownership. Root resolved that import and confirmed the integrated `npx tsc -b` passes; A05 made no edit to that file.
+
+## Lead final-candidate browser integration
+
+The pending browser statements above describe the original handoff. A11 subsequently executed `overnight-sudoku-recovery.spec.ts` against application `7f82b2a`, public revision `78decb9c6adb25d0`: **4/4 pass**, including B Practice, unpublished sender, published receiver and deliberately interrupted Duel. Receiver publishing initially exposed a real disabled completed-sender capability; the lead repaired it narrowly in `7f82b2a`, added meaningful completed/assisted/controller/published contract regressions, and the actual receiver journey then passed. The published source uses explicitly API-assisted completion; save, navigation, receiver edit and sole Resume use UI controls. Full integrated QA and the independent verdict are recorded separately in A11/A12 reports.

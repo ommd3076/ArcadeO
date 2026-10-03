@@ -1,0 +1,65 @@
+{
+  "reviewedAt": "2026-10-03T02:40:28.650546+00:00",
+  "sourceCommit": "8a7db13",
+  "publicCacheRevision": "cd79381c103ceb57",
+  "browserExecution": "A11 confirmed both isolated UI-06 rechecks PASS; original fixture skipped required privacy/Ready transition and was repaired without weakening concealment assertions.",
+  "simulation": "Local bundled Worker, synthetic accounts, viewport390x844. Lock/reload via browser, blur event dispatched explicitly; accessibility assertions and first-animation-frame concealment are in the executed spec.",
+  "hardwareCertification": false,
+  "records": [
+    {
+      "game": "rock-paper-scissors",
+      "state": "locked",
+      "file": "rock-paper-scissors-locked.png",
+      "sha256": "bc42559b9e4f43ab0c47ecfd44d3fafd35ca5014f0fab32d267420b201518fef",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    },
+    {
+      "game": "rock-paper-scissors",
+      "state": "refreshed-curtain",
+      "file": "rock-paper-scissors-refreshed-curtain.png",
+      "sha256": "fad5565b103367636bbedba0e928ad4f9737df47d9ba39243fe12f485748eab9",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    },
+    {
+      "game": "rock-paper-scissors",
+      "state": "blurred",
+      "file": "rock-paper-scissors-blurred.png",
+      "sha256": "b7bd574b8035759ea246b8118fc2137f05d2e379456ecb989ee361f150f1a67a",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    },
+    {
+      "game": "hand-cricket",
+      "state": "locked",
+      "file": "hand-cricket-locked.png",
+      "sha256": "279d972f0c12d50b9d3a6561d6aa658c1273d7fe16bf45e5f70bf713fbdaa9f3",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    },
+    {
+      "game": "hand-cricket",
+      "state": "refreshed-curtain",
+      "file": "hand-cricket-refreshed-curtain.png",
+      "sha256": "9f98982872ef49d50a7da5b32abcdeffe0cf2030f492381ee9ea5b4f624dacee",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    },
+    {
+      "game": "hand-cricket",
+      "state": "blurred",
+      "file": "hand-cricket-blurred.png",
+      "sha256": "0abd399b27b8e055157375978eca9a91d7919c9b13f6bcb76214e07f1031b45c",
+      "visualVerdict": "PASS",
+      "observation": "Lead actually viewed original390px PNG: no selected secret value, radio choices or Lock Choice appears. Named next-player Ready remains reachable after lock/reload; blur requires explicit Resume & Unmask."
+    }
+  ],
+  "finalCandidateAssessment": {
+    "applicationCommit": "7f82b2a",
+    "publicCacheRevision": "78decb9c6adb25d0",
+    "preservedCaptureSource": "8a7db13 / cd79381c103ceb57",
+    "equivalence": "The six preserved UI-06 masked captures and original review hashes remain from the recorded earlier build. The subsequent SecretHandoff change is below the unchanged early isMasked curtain return and only mounts already-public outcomes; the RPS motion change gates resolved Remote public results. Completed Challenge publication is outside both secret-game paths. A11 separately executed all nine secret-motion cases on the final bundle, including both UI-06 cases. Fresh RPS/Cricket public-outcome matrix captures are identified in candidate-equivalence.json.",
+    "notRecaptured": true
+  }
+}

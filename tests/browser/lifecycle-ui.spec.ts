@@ -22,7 +22,7 @@ test("Back preserves an active match, saved setup resumes it, and intentional ab
     expect((await view(page, matchId)).lifecycle).toBe("active");
 
     await page.getByRole("button", { name: /^Together/ }).click();
-    await expect(page.getByText("A saved together match is in progress")).toBeVisible();
+    await expect(page.getByText("A together match is ready to resume")).toBeVisible();
     await page.getByRole("button", { name: "Resume Match", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/matches/${matchId}$`));
     expect((await view(page, matchId)).lifecycle).toBe("active");

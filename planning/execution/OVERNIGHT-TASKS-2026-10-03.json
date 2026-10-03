@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "date": "2026-10-03",
   "scope": "Complete existing Private Arcade V1 finishing; direct owner authorizes new-chat execution.",
-  "executionStatus": "RUNNING",
+  "executionStatus": "V1_LOCAL_CLOSED_WITH_DEFERRED_AND_EXTERNAL_GATES",
   "leadModel": "gpt-6.1-sol",
   "leadReasoning": "high",
   "executorModel": "gpt-6-luna",
@@ -65,7 +65,7 @@
         "tests/integration/matches/authority-regressions.test.ts",
         "tests/unit/sync/sync.test.ts"
       ],
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "agentHandle": "/root/a02",
       "taskIds": [
         "A02-T1",
@@ -74,7 +74,8 @@
         "A02-T4",
         "A02-T5"
       ],
-      "report": "planning/execution/reports/overnight-A02.md"
+      "report": "planning/execution/reports/overnight-A02.md",
+      "lease": "Released same-version Duel ordering source and eight focused regressions in 555e4c5; 34 sync tests pass. Final integrated QA pending."
     },
     {
       "id": "A03",
@@ -95,7 +96,7 @@
         "tests/e2e/qa-journeys/journeys.test.tsx",
         "planning/execution/reports/overnight-A03.md"
       ],
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "agentHandle": "/root/a03",
       "taskIds": [
         "A03-T1",
@@ -146,10 +147,11 @@
         "planning/execution/reports/overnight-A05.md",
         "worker/matches/types.ts",
         "tests/workers/durability.test.mjs",
-        "tests/workers/overnight-duel-start.test.mjs"
+        "tests/workers/overnight-duel-start.test.mjs",
+        "tests/browser/overnight-sudoku-recovery.spec.ts"
       ],
-      "lease": "Same-packet remediation: exact MatchDO scheduled Duel start alarm and authorized filtered snapshot delivery, plus NEW tests/workers/overnight-duel-start.test.mjs and own report. A11 owns other QA files/browser port; root owns schema/protocol. No expiry/forfeit changes or fake acceptance event.",
-      "status": "RUNNING",
+      "lease": "Supplemental Sudoku browser spec released to A11: B Practice/Home Resume, unpublished sender, accepted Async receiver, simultaneous private Duel edits/two resume acknowledgments/history-only. Static checks pass; browser execution pending.",
+      "status": "VERIFIED",
       "agentHandle": "/root/a05",
       "taskIds": [
         "A05-T1",
@@ -180,7 +182,7 @@
         "tests/unit/auth-api-fetch.test.ts",
         "src/app/auth.css"
       ],
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "agentHandle": "/root/a06",
       "taskIds": [
         "A06-T1",
@@ -214,7 +216,7 @@
         "src/screens/sudoku-list.tsx (identity controls only)",
         "tests/e2e/qa-journeys/journeys.test.tsx"
       ],
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "agentHandle": "/root/a07",
       "taskIds": [
         "A07-T1",
@@ -255,8 +257,8 @@
         "src/games/ludo/ludo-board.tsx",
         "tests/e2e/ludo/ludo-screen.test.ts"
       ],
-      "lease": "Initial motion slice integrated in 48b5d09. Current remediation owns src/components/sheet.tsx, tests/browser/overnight-motion.spec.ts, report and exact MatchScreen Confirm leave-and-save handler/helper import only. A10 owns disjoint MatchScreen lazy loading and SSR harness changes.",
-      "status": "READY_FOR_REVIEW",
+      "lease": "Released nine supplemental controller/privacy/interrupted-motion browser cases and own report. Typecheck/lint/format pass; execution now owned by A11.",
+      "status": "VERIFIED",
       "agentHandle": "/root/a08",
       "taskIds": [
         "A08-T1",
@@ -284,7 +286,7 @@
         "planning/execution/reports/overnight-A09.md"
       ],
       "lease": "Reference checkout is unshipped; root manages notices/inventory. No shared hook/geometry changes without lead interface agreement.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "agentHandle": "/root/a09",
       "taskIds": [
         "A09-T1",
@@ -327,7 +329,7 @@
         "tests/e2e/qa-journeys/journeys.test.tsx"
       ],
       "lease": "Released after f85f905 integration and focused PWA/startup/auth/performance, 17 sync and 56 streaming SSR passes. No active source or browser lease; final full-stack and matrix verification belong to A11, independent audit to A12.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED_WITH_LIMITS",
       "agentHandle": "/root/a10",
       "taskIds": [
         "A10-T1",
@@ -359,8 +361,8 @@
         "scripts/verify-dev.mjs",
         "planning/execution/reports/overnight-A11.md"
       ],
-      "lease": "Full QA released after A08/A10 source and port handoff. Owns tests/browser, tests/runtime, tests/workers, tests/integration/qa-adversarial, scripts/test-runtime.mjs, scripts/browser-server.mjs, scripts/verify-dev.mjs, report and redacted evidence. Root retains shared configuration, application source, queue and acceptance ledger. Fresh build precedes captures; performance uses overnight-final label.",
-      "status": "RUNNING",
+      "lease": "Final bundled source 8a7db13/current revision cd79381c103ceb57. 256 distinct VIS assertions complete and root independently inspected/hash-approved all256. Full current validation, targeted44 and standalone final performance remain in progress. Own released supplemental specs during test-only remediation; preserve all256 PNGs.",
+      "status": "LOCAL_CLOSED_WITH_LIMITS",
       "agentHandle": "/root/a11",
       "taskIds": [
         "A11-T1",
@@ -381,8 +383,8 @@
       "owns": [
         "planning/execution/reports/overnight-A12.md"
       ],
-      "lease": "Read-only source, current built public artifact, privacy/license and evidence audit; owns only own report. Avoid A11 browser/runtime/performance conflicts. Final verdict depends on A11 integrated evidence, all matrix inspections and final source freeze.",
-      "status": "RUNNING",
+      "lease": "Same restored native packet, report-only independent final audit preparation. Current final public artifact privacy/license scan passes; verdict waits A11 fullQA/targeted44/performance and final ledger reconciliation.",
+      "status": "CLOSED_WITH_OWNER_DEFERRAL",
       "agentHandle": "/root/a12",
       "taskIds": [
         "A12-T1",
@@ -401,9 +403,11 @@
       "description": "Reconcile current source and three owner policy corrections with authored contracts.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A01.md"
+        "planning/execution/reports/overnight-A01.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+      "notes": "Authored requirements and owner corrections reviewed; no-loss/no-expiry/history-only policies implemented and exercised separately."
     },
     {
       "id": "A01-T2",
@@ -411,9 +415,11 @@
       "description": "Specify viewer/session control and accepted readiness invariants for all actual modes.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A01.md"
+        "planning/execution/reports/overnight-A01.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+      "notes": "Per-account controller and accepted readiness invariants used in HTTP/WS and browser cases; both takeover directions verified locally."
     },
     {
       "id": "A01-T3",
@@ -421,9 +427,11 @@
       "description": "Review typed motion cancellation, transport-error and interrupted-record interfaces.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A01.md"
+        "planning/execution/reports/overnight-A01.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+      "notes": "Accepted-motion cancellation, bounded transport errors and monotonic interruption interfaces reviewed and integrated."
     },
     {
       "id": "A01-T4",
@@ -431,9 +439,11 @@
       "description": "Identify exact root/schema/protocol leases and blocking migration compatibility requirements.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A01.md"
+        "planning/execution/reports/overnight-A01.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+      "notes": "Lead retained protocol/schema/config ownership; migration 0004 additive compatibility checked without owner database mutation."
     },
     {
       "id": "A01-T5",
@@ -441,109 +451,131 @@
       "description": "Return a bounded requirements/repro matrix and implementation-ready interface recommendations.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A01.md"
+        "planning/execution/reports/overnight-A01.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reviewed source findings/interface recommendations; static audit only, implementation findings open."
+      "notes": "Bounded system report supplied exact reproduction/integration recommendations; lead incorporated repairs and current QA evidence."
     },
     {
       "id": "A02-T1",
       "assignment": "A02",
       "description": "Make phone LAN development Origin/WebSocket/cookie configuration coherent without weakening production.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A02.md"
+        "planning/execution/reports/overnight-A02.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Exact LAN Origin and secure-context-independent UUID helper exercised on isolated actual LAN development; production strict HTTPS configuration tested locally."
     },
     {
       "id": "A02-T2",
       "assignment": "A02",
       "description": "Return canonical accepted invitation/readiness and normalize viewer capability on every latest-view response.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A02.md"
+        "planning/execution/reports/overnight-A02.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Accepted invitation/Ready and latest-view capabilities canonicalized; both creator directions and no-reload delivery verified."
     },
     {
       "id": "A02-T3",
       "assignment": "A02",
       "description": "Repair independent A/B Sudoku control/takeover notices and stale-generation reconciliation.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A02.md"
+        "planning/execution/reports/overnight-A02.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Independent Sudoku controllers and stale generation reconciliation tested; delayed same-version started-Duel recovery preservation narrowly repaired."
     },
     {
       "id": "A02-T4",
       "assignment": "A02",
       "description": "Remove automatic disconnect forfeits and saved expiry while retaining projection/alarm recovery.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A02.md"
+        "planning/execution/reports/overnight-A02.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Automatic disconnect loss and saved expiry removed; actual Worker alarm tests preserve active/saved state and projection recovery."
     },
     {
       "id": "A02-T5",
       "assignment": "A02",
       "description": "Add mode-correct controller/reconnect/uncertain-action regressions including the reported different-account setup.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A02.md"
+        "planning/execution/reports/overnight-A02.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Mode-specific controller and uncertain-action tests cover both A/B directions, duplicate receipts and different-account Remote browser flow."
     },
     {
       "id": "A03-T1",
       "assignment": "A03",
       "description": "Expose invitation Accept/Decline and accepted two-player Ready states with accurate names.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A03.md"
+        "planning/execution/reports/overnight-A03.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Named Accept/Decline and accepted Ready/start states rendered and exercised with both Remote creators."
     },
     {
       "id": "A03-T2",
       "assignment": "A03",
       "description": "Wire Leave-and-save and mode-correct Resume through existing authoritative actions; list saved entries.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A03.md"
+        "planning/execution/reports/overnight-A03.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Authoritative Save/Resume wired with mode-aware Home/setup/Vault entries; Practice, sender/receiver Challenge, Duel and secret modes exercised."
     },
     {
       "id": "A03-T3",
       "assignment": "A03",
       "description": "Gate all game controls by lifecycle/legal actions and real pending/offline/control status.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A03.md"
+        "planning/execution/reports/overnight-A03.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Controls gated by accepted lifecycle/capability, connection/pending and current account controller; old-account takeover blocks only its own controls."
     },
     {
       "id": "A03-T4",
       "assignment": "A03",
       "description": "Provide reachable sticky phone Back/Leave and safe app-history/deep-link fallback.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A03.md"
+        "planning/execution/reports/overnight-A03.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Visible Back and app-local fresh-document fallback exercised; accepted Save safely navigates to an initially unloaded route."
     },
     {
       "id": "A03-T5",
       "assignment": "A03",
       "description": "Use the safe UUID helper in owned action paths and explicit pending/takeover/recovery feedback.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A03.md"
+        "planning/execution/reports/overnight-A03.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Owned request paths use safe UUID identity and explicit pending/recovery notices; lost accepted creation retry preserves creation identity."
     },
     {
       "id": "A04-T1",
@@ -551,9 +583,11 @@
       "description": "Check all eight engines and supported board variants against current owner rules and existing saved versions.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A04.md"
+        "planning/execution/reports/overnight-A04.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+      "notes": "Eight engine/rule boundaries and existing saved versions audited; deterministic and terminal checks retained."
     },
     {
       "id": "A04-T2",
@@ -561,9 +595,11 @@
       "description": "Verify Together Cricket batting-until-OUT compatibility and secret handoff invariants.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A04.md"
+        "planning/execution/reports/overnight-A04.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+      "notes": "Together Cricket keeps the batter until OUT; actual UI repeated-scoring and masked handoff cases verify roles and privacy."
     },
     {
       "id": "A04-T3",
@@ -571,9 +607,11 @@
       "description": "Verify Ludo one-capture/six/deliberate-selection semantics and accepted path/effect completeness.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A04.md"
+        "planning/execution/reports/overnight-A04.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+      "notes": "Ludo one capture and repeated-six rules retained; unit/geometry and actual accepted motion tests use authoritative coordinates."
     },
     {
       "id": "A04-T4",
@@ -581,9 +619,11 @@
       "description": "Review simultaneous moves, secret locks, terminal immutability and rematch behavior.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A04.md"
+        "planning/execution/reports/overnight-A04.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+      "notes": "Simultaneous moves/secret locks and immutable terminal/rematch behavior covered across mocked, actual runtime and browser categories."
     },
     {
       "id": "A04-T5",
@@ -591,379 +631,491 @@
       "description": "Return precise code/rule findings and useful fixtures without unrequested engine replacement.",
       "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A04.md"
+        "planning/execution/reports/overnight-A04.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead inspected audit; 224 pure engine tests by reviewer; UI/runtime findings remain open."
+      "notes": "Precise engine review found no unresolved rule blocker; useful saved-version and stack fixtures retained without replacing engines."
     },
     {
       "id": "A05-T1",
       "assignment": "A05",
       "description": "Repair saved Practice, sender Challenge, receiver Challenge and Duel resume acknowledgments by actual mode.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A05.md"
+        "planning/execution/reports/overnight-A05.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reran75 unit/SQLite contract tests and4 actual Worker cases; committed8fce4f2. Final Sudoku multi-client UI/HTTP journey gate pending."
+      "notes": "Mode-specific saved acknowledgments exercised for A/B Practice, unpublished sender, published receiver and Duel; completed eligible sender publication repaired."
     },
     {
       "id": "A05-T2",
       "assignment": "A05",
       "description": "Make deliberately interrupted Duel outcomes history-only with a monotonic interrupted fact.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A05.md"
+        "planning/execution/reports/overnight-A05.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reran75 unit/SQLite contract tests and4 actual Worker cases; committed8fce4f2. Final Sudoku multi-client UI/HTTP journey gate pending."
+      "notes": "Deliberate save interruption is monotonic and history-only; ordinary reconnect remains continuously competitive."
     },
     {
       "id": "A05-T3",
       "assignment": "A05",
       "description": "Project interruption through versioned results/outbox and coordinate an additive D1 migration.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A05.md"
+        "planning/execution/reports/overnight-A05.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reran75 unit/SQLite contract tests and4 actual Worker cases; committed8fce4f2. Final Sudoku multi-client UI/HTTP journey gate pending."
+      "notes": "Versioned interruption projected through outbox and additive migration 0004; real Worker projection retry tested."
     },
     {
       "id": "A05-T4",
       "assignment": "A05",
       "description": "Exclude interrupted Duel wins/streaks/best times while preserving history/completion/known legacy metadata.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A05.md"
+        "planning/execution/reports/overnight-A05.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reran75 unit/SQLite contract tests and4 actual Worker cases; committed8fce4f2. Final Sudoku multi-client UI/HTTP journey gate pending."
+      "notes": "Interrupted Duel retained in history while wins/streaks/best times excluded, including explicit legacy metadata compatibility."
     },
     {
       "id": "A05-T5",
       "assignment": "A05",
       "description": "Replace unsupported Together-Sudoku fixtures and verify timer/privacy/duplicate projection recovery.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A05.md"
+        "planning/execution/reports/overnight-A05.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead reran75 unit/SQLite contract tests and4 actual Worker cases; committed8fce4f2. Final Sudoku multi-client UI/HTTP journey gate pending."
+      "notes": "Unsupported Together Sudoku fixtures replaced; private simultaneous edits, timing, saved recovery and duplicate projection checks exercised."
     },
     {
       "id": "A06-T1",
       "assignment": "A06",
       "description": "Use atomic bounded-window login failure increments under concurrent requests.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A06.md"
+        "planning/execution/reports/overnight-A06.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 1c1d26a after 28 unit/SQLite auth checks, browser startup and stale bootstrap regression. Final real Worker/security/matrix integration remains pending."
+      "notes": "Atomic bounded-window login failures and concurrent account/IP limit regressions pass."
     },
     {
       "id": "A06-T2",
       "assignment": "A06",
       "description": "Qualify local auth/session/CSRF/revocation paths and reject production wildcard misconfiguration.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A06.md"
+        "planning/execution/reports/overnight-A06.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 1c1d26a after 28 unit/SQLite auth checks, browser startup and stale bootstrap regression. Final real Worker/security/matrix integration remains pending."
+      "notes": "Local auth/CSRF/session revocation qualified; production wildcard/non-HTTPS configurations rejected. Deployed certification remains external."
     },
     {
       "id": "A06-T3",
       "assignment": "A06",
       "description": "Normalize HTTP startup/error feedback while retaining API/SPA and private-data boundaries.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A06.md"
+        "planning/execution/reports/overnight-A06.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 1c1d26a after 28 unit/SQLite auth checks, browser startup and stale bootstrap regression. Final real Worker/security/matrix integration remains pending."
+      "notes": "Bounded startup/API response handling and document/asset/API boundaries exercised with actual browser recovery checks."
     },
     {
       "id": "A06-T4",
       "assignment": "A06",
       "description": "Verify non-overwriting two-account provisioning and document safe production secret configuration.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A06.md"
+        "planning/execution/reports/overnight-A06.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 1c1d26a after 28 unit/SQLite auth checks, browser startup and stale bootstrap regression. Final real Worker/security/matrix integration remains pending."
+      "notes": "Exactly-two-account provisioning preserves existing verifiers/preferences; interactive production secret procedure documented, no production provisioning claimed."
     },
     {
       "id": "A06-T5",
       "assignment": "A06",
       "description": "Exercise 401/403/404/409/429/503 and malformed response/rate-limit paths with meaningful regressions.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A06.md"
+        "planning/execution/reports/overnight-A06.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 1c1d26a after 28 unit/SQLite auth checks, browser startup and stale bootstrap regression. Final real Worker/security/matrix integration remains pending."
+      "notes": "401/403/404/409/429/503 and invalid JSON surfaced useful errors; explicit retry and rate-limit regressions exercised."
     },
     {
       "id": "A07-T1",
       "assignment": "A07",
       "description": "Replace Ludo color/account selects with labeled swatches and named controls; preserve conflicts/persistence.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A07.md"
+        "planning/execution/reports/overnight-A07.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Named creator-relative Ludo swatches submit and persist real profile preferences; disabled/conflict behavior verified against independent profile GET."
     },
     {
       "id": "A07-T2",
       "assignment": "A07",
       "description": "Polish real format/library inputs and all disabled/pending/focus/error states without fake options.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A07.md"
+        "planning/execution/reports/overnight-A07.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Actual format/library controls retain real pending/error/focus states; current rendered paths and component checks reviewed."
     },
     {
       "id": "A07-T3",
       "assignment": "A07",
       "description": "Audit small details, labels/names, accessible targets, contrast and all four appearance combinations.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A07.md"
+        "planning/execution/reports/overnight-A07.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "All four appearances and four widths inspected across 256 board cells; contrast findings repaired and captures regenerated where affected."
     },
     {
       "id": "A07-T4",
       "assignment": "A07",
       "description": "Refine tracker hierarchy/tennis spacing/radii on current screens without changing accepted identity.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A07.md"
+        "planning/execution/reports/overnight-A07.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Tracker hierarchy, spacing and rounded controls refined within accepted Standard/Romantic identity; no game/account scope change."
     },
     {
       "id": "A07-T5",
       "assignment": "A07",
       "description": "Verify fixed navigation, long content, keyboard, landscape and 200-percent text/large-grid reachability.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A07.md"
+        "planning/execution/reports/overnight-A07.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead build and focused sync/SSR/browser/LAN checks pass; final task-specific runtime/visual gate remains for A11/A12 integration."
+      "notes": "Navigation, keyboard, simulated landscape/safe areas and 200-percent text exercised; largest SOS uses explicit Zoom for fitting glyphs."
     },
     {
       "id": "A08-T1",
       "assignment": "A08",
       "description": "Implement consistent accepted-event cancellation/settlement on reconcile/navigation/background/offline/live reduced motion.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A08.md"
+        "planning/execution/reports/overnight-A08.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 48b5d09 after current build, root44 SSR checks,4 motion browser checks, named creator A/B Ludo persistence and inspected phone/laptop evidence. Full matrix and post-A10 integration pending."
+      "notes": "Accepted motion cancels/settles on offline/background/navigation/reconciliation and live reduced motion without changing authority."
     },
     {
       "id": "A08-T2",
       "assignment": "A08",
       "description": "Repair secret reveal timer interruption, round resets and instant privacy masking/reduced-motion outcome.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A08.md"
+        "planning/execution/reports/overnight-A08.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 48b5d09 after current build, root44 SSR checks,4 motion browser checks, named creator A/B Ludo persistence and inspected phone/laptop evidence. Full matrix and post-A10 integration pending."
+      "notes": "Secret curtains remain first; actual missing outcome entrance repaired from accepted public state; next-round interruption and masked recovery exercised."
     },
     {
       "id": "A08-T3",
       "assignment": "A08",
       "description": "Finish meaningful accepted feedback for seven non-Ludo boards with bounded timings and no UI authority.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A08.md"
+        "planning/execution/reports/overnight-A08.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 48b5d09 after current build, root44 SSR checks,4 motion browser checks, named creator A/B Ludo persistence and inspected phone/laptop evidence. Full matrix and post-A10 integration pending."
+      "notes": "Seven non-Ludo boards retain bounded accepted feedback; sampled frames and final logical state checked on real local Worker paths."
     },
     {
       "id": "A08-T4",
       "assignment": "A08",
       "description": "Stabilize sheet focus/interruptible exit, real loading indicators and recovered error feedback.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A08.md"
+        "planning/execution/reports/overnight-A08.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 48b5d09 after current build, root44 SSR checks,4 motion browser checks, named creator A/B Ludo persistence and inspected phone/laptop evidence. Full matrix and post-A10 integration pending."
+      "notes": "Sheet replacement/exit/focus and loading/retry feedback exercised through peer updates and terminal/rematch transition."
     },
     {
       "id": "A08-T5",
       "assignment": "A08",
       "description": "Inspect interrupted/rapid/duplicate motion with actual local backend and sampled frames; coordinate final Ludo adapter integration.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A08.md"
+        "planning/execution/reports/overnight-A08.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Committed 48b5d09 after current build, root44 SSR checks,4 motion browser checks, named creator A/B Ludo persistence and inspected phone/laptop evidence. Full matrix and post-A10 integration pending."
+      "notes": "Nine secret/motion cases and five interaction cases executed; Ludo/Snakes settled DOM compared with independently derived accepted coordinates."
     },
     {
       "id": "A09-T1",
       "assignment": "A09",
       "description": "Inspect/pin LibreLudo revision/license as a reference-only snapshot and retain provenance.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A09.md"
+        "planning/execution/reports/overnight-A09.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead resolved pinned reference; geometry/SSR checked. Synthetic screenshots do not count as integrated matrix or packed digit readability."
+      "notes": "Pinned reference 425b100 and complete AGPLv3 license/archive verified outside production imports; final public artifact exclusion scanned."
     },
     {
       "id": "A09-T2",
       "assignment": "A09",
       "description": "Build original lightweight numbered pawns and stable mixed-stack layout up to eight tokens.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A09.md"
+        "planning/execution/reports/overnight-A09.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead resolved pinned reference; geometry/SSR checked. Synthetic screenshots do not count as integrated matrix or packed digit readability."
+      "notes": "Original numbered pawn/stack layout retained; mixed stacks use readable summary and large token controls. Tiny eight-pawn on-board glyphs are not claimed fully legible."
     },
     {
       "id": "A09-T3",
       "assignment": "A09",
       "description": "Animate accepted travel along existing ring/home coordinates with capped movement and settle.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A09.md"
+        "planning/execution/reports/overnight-A09.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead resolved pinned reference; geometry/SSR checked. Synthetic screenshots do not count as integrated matrix or packed digit readability."
+      "notes": "Accepted travel follows existing ring/home geometry with bounded interruption settlement; actual accepted logical-to-DOM target check passes."
     },
     {
       "id": "A09-T4",
       "assignment": "A09",
       "description": "Add dice-element, one-token capture-return, home/bonus/no-move and restrained final feedback.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A09.md"
+        "planning/execution/reports/overnight-A09.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead resolved pinned reference; geometry/SSR checked. Synthetic screenshots do not count as integrated matrix or packed digit readability."
+      "notes": "Dice, single captured token return, home/bonus/no-move and final feedback consume authoritative effects; contrast repairs inspected."
     },
     {
       "id": "A09-T5",
       "assignment": "A09",
       "description": "Verify rules/geometry/color/stack/fast-tap/reconnect cases without importing upstream runtime or artwork.",
-      "status": "READY_FOR_REVIEW",
+      "status": "VERIFIED",
       "evidence": [
-        "planning/execution/reports/overnight-A09.md"
+        "planning/execution/reports/overnight-A09.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
       ],
-      "notes": "Lead resolved pinned reference; geometry/SSR checked. Synthetic screenshots do not count as integrated matrix or packed digit readability."
+      "notes": "Rules/geometry/SSR and bounded synthetic stack/capture fixtures plus actual Worker UI motion checks retained; no upstream runtime or artwork imported."
     },
     {
       "id": "A10-T1",
       "assignment": "A10",
       "description": "Precache only required public shell/current fonts and preserve lazy route/game loading.",
-      "status": "RUNNING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A10.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Public precache reduced to required shell/current fonts; route/game chunks load on demand and notices remain publicly available outside startup precache."
     },
     {
       "id": "A10-T2",
       "assignment": "A10",
       "description": "Implement stale-chunk/cold-offline/startup recovery without private caches or active-game forced reload.",
-      "status": "RUNNING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A10.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Cold offline document and stale chunk/startup recovery tested; waiting service worker preserves active match without forced reload or private caching."
     },
     {
       "id": "A10-T3",
       "assignment": "A10",
       "description": "Measure comparable cold/warm loading, input response, accepted-motion frames and chunk budgets.",
-      "status": "RUNNING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED_PREVIOUS_CANDIDATE",
+      "evidence": [
+        "planning/execution/reports/overnight-A10.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Earlier pre-audit measurements preserved with original script identities; fresh final-candidate benchmark/resource loop deferred by owner. Comparable labeled final performance measured separately with preserved baseline, stated CPU/network/sample conditions and explicit regressions/limits."
     },
     {
       "id": "A10-T4",
       "assignment": "A10",
       "description": "Audit route/socket/listener/timer/poll lifetime and remove evidenced resource leaks.",
-      "status": "RUNNING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED_PREVIOUS_CANDIDATE",
+      "evidence": [
+        "planning/execution/reports/overnight-A10.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Earlier pre-audit measurements preserved with original script identities; fresh final-candidate benchmark/resource loop deferred by owner. Repeated route resource samples and hidden polling guard checked; one active socket/listener bounds observed, no exhaustive leak or lower heap claim."
     },
     {
       "id": "A10-T5",
       "assignment": "A10",
       "description": "Deliver measured before/after evidence plus safe PWA/asset/config release preparation requests.",
-      "status": "RUNNING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A10.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Measured loading/input/frame/chunk evidence and safe account-specific release preparation documented; deployed account/KDF and device gates remain external."
     },
     {
       "id": "A11-T1",
       "assignment": "A11",
       "description": "Prove A/B Remote invitation/readiness/moves/completion via two simultaneous UI-only contexts with no reloads.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A11.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "UI-only two-account Remote invitation/Ready/moves/normal Connect Four completion verified without reload; both creator directions separately exercised."
     },
     {
       "id": "A11-T2",
       "assignment": "A11",
       "description": "Exercise all seventeen game/mode journeys, independent Sudoku control and HTTP-fallback/reconnect cases.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A11.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Seventeen supported API-assisted completion journeys kept distinct from UI-only cases; independent Sudoku control and HTTP fallback browser checks exercised."
     },
     {
       "id": "A11-T3",
       "assignment": "A11",
       "description": "Implement/run actual failure/lifecycle/record/privacy races with isolated workerd/SQLite state.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A11.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Actual workerd/SQLite alarm, revocation, persistence and projection failure tests kept distinct from mocked source contracts."
     },
     {
       "id": "A11-T4",
       "assignment": "A11",
       "description": "Exercise 256 game/theme/width/motion cells and 44 targeted scenarios; attach real assertions/evidence.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "PARTIAL_DEFERRED_EXTERNAL",
+      "evidence": [
+        "planning/execution/reports/overnight-A11.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "256 inspected matrix passes;41 targeted local passes,1 earlier-candidate resource observation,1 owner-deferred final benchmark and1 external production gate. No 300-PASS claim."
     },
     {
       "id": "A11-T5",
       "assignment": "A11",
       "description": "Run complete current-source checks and distinguish mocks/SSR/API-assisted/local/device/deployed outcomes.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A11.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Current-source complete checks reported with exact unit/contracts/SSR/Workers/HTTP/browser/catalog categories and hardware/deployment limitations."
     },
     {
       "id": "A12-T1",
       "assignment": "A12",
       "description": "Audit each owner requirement against current source, real evidence and the task/acceptance ledgers.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED_WITH_LIMITS",
+      "evidence": [
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Existing independent source/artifact/provenance review performed before final closeout ledger. Lead reconciled final dispositions; no new broad audit per owner."
     },
     {
       "id": "A12-T2",
       "assignment": "A12",
       "description": "Inspect actual all-theme mobile/laptop UI and sampled important/interrupted motion for unfinished details.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Independent representative image/privacy/motion review plus all 256 reviewed-image hash/provenance checks qualify local visual acceptance."
     },
     {
       "id": "A12-T3",
       "assignment": "A12",
       "description": "Review security/privacy/licensing/bundle/account-specific deployment configuration and remaining external gates.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Final public inventory, solution/privacy markers and complete dependency/font licenses reviewed; real-account/deployed/device gates explicitly retained."
     },
     {
       "id": "A12-T4",
       "assignment": "A12",
       "description": "Return unresolved critical/important findings to exact owners and recheck their remediation.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "VERIFIED",
+      "evidence": [
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Concrete findings returned to exact owners and narrow remediations rechecked; no unresolved local blocker in final verdict."
     },
     {
       "id": "A12-T5",
       "assignment": "A12",
       "description": "Produce independent release verdict and concrete morning/next-agent continuation input; lead publishes final report/commits.",
-      "status": "PENDING",
-      "evidence": [],
-      "notes": ""
+      "status": "DEFERRED_OWNER",
+      "evidence": [
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md"
+      ],
+      "notes": "Final post-QA independent verdict deferred under owner closeout instruction. Existing A12 review remains recorded within its actual scope; lead saved the qualified handoff."
     }
   ],
   "rootIntegrationOwnership": [
@@ -983,5 +1135,15 @@
     "planning/ASSET-INVENTORY.md",
     "task and acceptance ledgers and checkpoints",
     "reference archive provenance after A09 release"
-  ]
+  ],
+  "updatedAtUtc": "2026-10-03T04:50:10.474124+00:00",
+  "summary": {
+    "VERIFIED": 55,
+    "VERIFIED_PREVIOUS_CANDIDATE": 2,
+    "PARTIAL_DEFERRED_EXTERNAL": 1,
+    "VERIFIED_WITH_LIMITS": 1,
+    "DEFERRED_OWNER": 1
+  },
+  "ownerCloseout": "Finish current validation and handoff; fix release blockers only; defer further UI polish/animations/performance/audit cycles to V2; stop after handoff.",
+  "statusMeaning": "Verified statuses qualify their actual local scope, never production/device certification. Previous-candidate, owner-deferred and external cases stay explicit."
 }

@@ -1,0 +1,10 @@
+{
+  "actualBrowserInstalledWaitingWorker": true,
+  "updateFixture": "same production sw.js registered under a new query URL, unchanged scope",
+  "controllerPreserved": true,
+  "documentNavigations": 0,
+  "activeMatchPreserved": true,
+  "nextUiActionAccepted": true,
+  "privateApiCached": false,
+  "hardwareStandaloneCertification": false
+}

@@ -1,0 +1,7 @@
+{
+  "focusPreservedAcrossAcceptedUpdate": true,
+  "resultEntranceCount": 1,
+  "terminalVersion": 8,
+  "rematchStartsEmpty": true,
+  "fixtureProgression": "UI only; API fixture creation/readback/cleanup"
+}

@@ -1,0 +1,9 @@
+{
+  "namedPlayers": true,
+  "sameAndSimilarConflictsExplained": true,
+  "submittedColors": {
+    "A": "red",
+    "B": "yellow"
+  },
+  "persistedAfterReload": true
+}

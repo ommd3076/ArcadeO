@@ -1,0 +1,447 @@
+{
+  "status": "V1_CLOSEOUT_WITH_EXPLICIT_LIMITS",
+  "recordedAtUtc": "2026-10-03T04:50:10.474124+00:00",
+  "applicationCommit": "7f82b2a",
+  "publicCacheRevision": "78decb9c6adb25d0",
+  "records": [
+    {
+      "id": "SEC-01",
+      "status": "PASS",
+      "notes": "Separate A/B cookie jars and denial of A private Practice pass; no cookie values persisted.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts"
+      ]
+    },
+    {
+      "id": "SEC-02",
+      "status": "PASS",
+      "notes": "Both account takeover directions affect only that account Sudoku controller; peer input stays usable.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts",
+        "tests/integration/matches/cross-device-controller.test.ts"
+      ]
+    },
+    {
+      "id": "SEC-03",
+      "status": "PASS",
+      "notes": "Actual HTTP filtered views/receipts and browser private/secret recovery pass; API-assisted fixture progression is distinguished.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/evidence/runtime-results.json",
+        "tests/browser/overnight-secret-motion.spec.ts"
+      ]
+    },
+    {
+      "id": "SEC-04",
+      "status": "PASS",
+      "notes": "Exact dated LAN flow and local strict-production HTTPS configuration/Origin/CSRF tests pass; deployed HTTPS is not certified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/evidence/overnight-lan-ui.json",
+        "tests/integration/auth/routing.test.ts"
+      ]
+    },
+    {
+      "id": "SEC-05",
+      "status": "PASS",
+      "notes": "Concurrent bounded-window account/IP failure regressions pass in the D1/SQLite mock category; deployed KDF remains external.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/integration/auth/auth.test.ts",
+        "planning/execution/reports/overnight-A06.md"
+      ]
+    },
+    {
+      "id": "SEC-06",
+      "status": "PASS",
+      "notes": "Actual revoked native socket closes before write/version/receipt; matching-session logout/profile/bootstrap races and HTTP logout pass.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/workers/overnight-saved-lifecycle.test.mjs",
+        "tests/browser/overnight-auth-race.spec.ts"
+      ]
+    },
+    {
+      "id": "SEC-07",
+      "status": "PASS",
+      "notes": "A12 recorded final public inventory, complete licenses and zero matches for scanned solution/private-data markers; preserved masked image hashes match.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/execution/reports/overnight-A12.md",
+        "planning/review/evidence/overnight-secret-motion/lead-masked-visual-review.json"
+      ]
+    },
+    {
+      "id": "SEC-08",
+      "status": "PASS",
+      "notes": "Deliberate Romantic start reproduces prior fixture state. First client saved opposite family survives stale conflict; second retains prior selection with conflict message.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-01",
+      "status": "PASS",
+      "notes": "All seven shared games pass UI invitation/acceptance with either creator; 14 current cases.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-remote-games.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-02",
+      "status": "PASS",
+      "notes": "Accepted Ready/start arrives without reload; actual scheduled-Duel alarm exposes only each participant cells without inventing versions/actions.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-remote-games.spec.ts",
+        "tests/workers/overnight-duel-start.test.mjs"
+      ]
+    },
+    {
+      "id": "REC-03",
+      "status": "PASS",
+      "notes": "Both takeover directions pass; delayed same-version started-Duel response order has separate sync regressions.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts",
+        "tests/unit/sync/duel-start-order.test.ts"
+      ]
+    },
+    {
+      "id": "REC-04",
+      "status": "PASS",
+      "notes": "Both UI Ready and simultaneous private Duel edits pass; later completion is explicitly API-assisted.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-sudoku-recovery.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-05",
+      "status": "PASS",
+      "notes": "Explicit Together transfer leaves exactly one controller and disables old device input.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-secret-motion.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-06",
+      "status": "PASS",
+      "notes": "A uses forced HTTP fallback while B stays on WS; UI move reaches peer, hidden polling pauses and visible polling resumes. Visibility is synthetic.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-07",
+      "status": "PASS",
+      "notes": "Both A/B Practice UI save/reload/sole Resume restore entered digit; Home Resume exercised for B.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts",
+        "tests/browser/overnight-sudoku-recovery.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-08",
+      "status": "PASS",
+      "notes": "Unpublished Async sender saves/reloads/resumes alone through UI.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-sudoku-recovery.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-09",
+      "status": "PASS",
+      "notes": "Eligible completed unassisted sender publishes; receiver edit/save/Vault Resume needs receiver alone. Sender completion fixture is API-assisted; capability denials separately tested.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-sudoku-recovery.spec.ts",
+        "tests/integration/sudoku/saved-resume.test.ts"
+      ]
+    },
+    {
+      "id": "REC-10",
+      "status": "PASS",
+      "notes": "Duel requires both UI Resume acknowledgments and retains history-only eligibility after explicitly API-assisted finish.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-sudoku-recovery.spec.ts",
+        "tests/integration/records/records.test.ts"
+      ]
+    },
+    {
+      "id": "REC-11",
+      "status": "PASS",
+      "notes": "Saved Remote RPS locked phase survives reload/two acknowledgments without exposing opponent choice; normal turn saved journeys are actual HTTP.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts",
+        "planning/review/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "REC-12",
+      "status": "PASS",
+      "notes": "Saved Together RPS retains controller and outstanding masked handoff.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts"
+      ]
+    },
+    {
+      "id": "REC-13",
+      "status": "PASS",
+      "notes": "Real Remote socket close plus injected exact legacy 31-minute clocks and actual alarm preserve active/version/result/slot; B next move accepted. Elapsed time is simulated.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/workers/overnight-saved-lifecycle.test.mjs"
+      ]
+    },
+    {
+      "id": "REC-14",
+      "status": "PASS",
+      "notes": "Actual alarm preserves saved state with 90-day legacy expiry metadata; explicit abandon and real projection flush release slot.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/workers/overnight-saved-lifecycle.test.mjs"
+      ]
+    },
+    {
+      "id": "REC-15",
+      "status": "PASS",
+      "notes": "Lost accepted creation response retries same identity; real HTTP secret receipt/duplicate/stale/race checks pass.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-recovery-ui.spec.ts",
+        "planning/review/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "REC-16",
+      "status": "PASS",
+      "notes": "Actual projection retry plus terminal/result race contracts and stale saved/terminal Duel alarm guards pass. Future-alarm platform eviction remains unverified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/workers/durability.test.mjs",
+        "tests/workers/overnight-duel-start.test.mjs",
+        "tests/integration/matches/authority-regressions.test.ts"
+      ]
+    },
+    {
+      "id": "UI-01",
+      "status": "PASS",
+      "notes": "Named creator-relative swatches persist real preferences/conflicts; named Ludo colour change preserves pending roll/tokens through refresh.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-recovery-ui.spec.ts",
+        "tests/browser/owner-corrections.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-02",
+      "status": "PASS",
+      "notes": "Visible Back and fresh-document app-local fallback pass in narrow browser viewport; physical phone navigation unverified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-interaction.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-03",
+      "status": "PASS",
+      "notes": "Browser Back consumes sheet before leaving match; Forward/replacement/cancel/accepted Save retain state. Android hardware not certified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-motion.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-04",
+      "status": "PASS",
+      "notes": "Distinct authoritative Save/resign/explicit abandon and lifecycle/legal-action/pending gates exercised through UI and actual DO/HTTP.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/lifecycle-ui.spec.ts",
+        "tests/browser/overnight-motion.spec.ts",
+        "tests/workers/overnight-saved-lifecycle.test.mjs"
+      ]
+    },
+    {
+      "id": "UI-05",
+      "status": "PASS",
+      "notes": "Home/setup/Vault mode-aware Resume exercised for Practice, sender/receiver Challenge, Duel and shared games; Home multi-match test passes current copy.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-sudoku-recovery.spec.ts",
+        "tests/browser/ui-shell-visual.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-06",
+      "status": "PASS",
+      "notes": "Both games pass exact accepted-name Ready, lock/reload/blur masks, zero accessible choices and first-frame concealment. Six older masked originals retain scoped equivalence.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-secret-motion.spec.ts",
+        "planning/review/evidence/overnight-secret-motion/lead-masked-visual-review.json"
+      ]
+    },
+    {
+      "id": "UI-07",
+      "status": "PASS",
+      "notes": "Actual Remote RPS effect is created/paused; Next cancels it and exposes usable new-round controls without stranded overlay.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-secret-motion.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-08",
+      "status": "PASS",
+      "notes": "Together Cricket repeated runs retain batter until OUT; both first batters, names/roles and authoritative ball label pass.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/hand-cricket.spec.ts",
+        "tests/browser/owner-visual.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-09",
+      "status": "PASS",
+      "notes": "Accepted Ludo/Snakes logical coordinates match settled DOM; C4/Dots/SOS settle under synthetic offline/background/navigation/blur.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-secret-motion.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-10",
+      "status": "PASS",
+      "notes": "Live reduced motion cancels travel without another action; preserved normal/reduced matrix retains equivalent facts. No artificial reveal countdown remains.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-interaction.spec.ts",
+        "planning/review/evidence/overnight-acceptance/lead-visual-review.json"
+      ]
+    },
+    {
+      "id": "UI-11",
+      "status": "PASS",
+      "notes": "Keyboard/landscape/simulated insets/200-percent/largest-grid checks pass. Compact SOS glyph clips; tested Zoom fits. Physical keyboard/safe areas unverified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-interaction.spec.ts",
+        "tests/browser/owner-zoom.spec.ts",
+        "tests/browser/ui-shell-visual.spec.ts"
+      ]
+    },
+    {
+      "id": "UI-12",
+      "status": "PASS",
+      "notes": "Sheet focus survives peer update; result entrance occurs once and rematch starts empty without changing terminal match.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-interaction.spec.ts"
+      ]
+    },
+    {
+      "id": "PERF-01",
+      "status": "DEFERRED_OWNER",
+      "notes": "Fresh final-candidate loading/input benchmark deferred by owner closeout; earlier pre-audit observations retain original script identities and conditions.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/evidence/owner-corrections/performance-overnight-final-pre-audit.json",
+        "planning/execution/reports/overnight-A10.md"
+      ]
+    },
+    {
+      "id": "PERF-02",
+      "status": "PASS",
+      "notes": "Bounded existing final entry read: 451168 raw/148695 gzip bytes, below 250 KiB; lazy selected-game graph and earlier network observations retained. No fresh timing claim.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "src/app/router.tsx",
+        "src/screens/match.tsx"
+      ]
+    },
+    {
+      "id": "PERF-03",
+      "status": "PASS",
+      "notes": "Current actual cold-offline/stale-chunk/startup Retry checks pass; only public shell/fonts cached and private/API requests excluded.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-pwa.spec.ts",
+        "tests/browser/overnight-startup.spec.ts",
+        "tests/browser/overnight-recovery.spec.ts"
+      ]
+    },
+    {
+      "id": "PERF-04",
+      "status": "VERIFIED_PREVIOUS_CANDIDATE",
+      "notes": "Current hidden-poll test passes. Route/socket/listener/heap loop numbers remain earlier-candidate observations; fresh loop deferred/unverified, no smaller heap or exhaustive leak claim.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-targeted.spec.ts",
+        "planning/review/evidence/owner-corrections/performance-overnight-final-pre-audit.json"
+      ]
+    },
+    {
+      "id": "PERF-05",
+      "status": "PASS",
+      "notes": "Current motion/frame/WAAPI/interruption observations pass; presentation never authors outcomes. Local frames do not certify phone performance.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-motion.spec.ts",
+        "tests/browser/overnight-secret-motion.spec.ts",
+        "tests/browser/owner-visual.spec.ts"
+      ]
+    },
+    {
+      "id": "PERF-06",
+      "status": "PASS",
+      "notes": "Current 403/404/409/429/503/invalidJSON retries, protected401 and unknown routes pass; actual HTTP asset/API routing remains distinct.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/overnight-recovery-ui.spec.ts",
+        "planning/review/evidence/runtime-results.json"
+      ]
+    },
+    {
+      "id": "PERF-07",
+      "status": "PARTIAL_EXTERNAL",
+      "notes": "Local safe preparation/config/nonoverwriting provisioning documented/tested; real account/D1/Origin, account-specific dry run, secrets, deployed KDF/deployment authorization remain external.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "planning/review/ARCADE-RELEASE-PREPARATION.md",
+        "scripts/prepare-release.mjs",
+        "tests/unit/provisioning.test.ts"
+      ]
+    },
+    {
+      "id": "PERF-08",
+      "status": "PASS",
+      "notes": "Actual waiting same-code service worker preserves active match/document with no forced reload or private caching; real deployed-update/installed phone unverified.",
+      "evidence": [
+        "planning/review/evidence/v1-closeout-validation.json",
+        "tests/browser/environment.spec.ts",
+        "tests/browser/overnight-recovery-ui.spec.ts"
+      ]
+    }
+  ],
+  "summary": {
+    "PASS": 41,
+    "DEFERRED_OWNER": 1,
+    "VERIFIED_PREVIOUS_CANDIDATE": 1,
+    "PARTIAL_EXTERNAL": 1
+  },
+  "policy": "No 300-PASS claim; owner closes V1 with further performance/polish/audit cycles deferred. Actual categories and earlier candidate provenance retained.",
+  "redaction": "No credentials, cookie values, raw session/match dumps, unrevealed choices or Sudoku solutions."
+}

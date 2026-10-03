@@ -56,9 +56,16 @@ async function waitForBoard(page: Page, game: string, tag = game) {
     sudoku: "sudoku-cell-0-0",
     "hand-cricket": "cricket-choose-bat",
   };
-  if (tag === "hand-cricket-play")
-    await expect(page.getByText(/^1st Innings • Ball #/)).toBeVisible();
-  else if (testId[game]) await expect(page.getByTestId(testId[game])).toBeVisible();
+  if (tag === "hand-cricket-play") {
+    const snapshot = await view(page, page.url().split("/").at(-1)!);
+    expect(snapshot.gameState.phase).toBe("first_innings");
+    const batterName = snapshot.participants[snapshot.gameState.roles.bat].displayName;
+    await expect(
+      page.getByText(`${batterName} batting • Ball #${snapshot.gameState.deliveryId}`, {
+        exact: true,
+      }),
+    ).toBeVisible();
+  } else if (testId[game]) await expect(page.getByTestId(testId[game])).toBeVisible();
   else
     await expect(
       page.getByRole("region", {
