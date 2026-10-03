@@ -49,8 +49,8 @@ export async function generateProvisioningSql(options = {}) {
   const playerAUser = options.playerAUser || process.env.ACCOUNT_A_USERNAME || process.env.PLAYER_A_USERNAME || "player_a";
   const playerBUser = options.playerBUser || process.env.ACCOUNT_B_USERNAME || process.env.PLAYER_B_USERNAME || "player_b";
 
-  const playerAName = options.playerAName || process.env.PLAYER_A_NAME || "Player A";
-  const playerBName = options.playerBName || process.env.PLAYER_B_NAME || "Player B";
+  const playerAName = options.playerAName || process.env.PLAYER_A_NAME || "Sly fox 🦊";
+  const playerBName = options.playerBName || process.env.PLAYER_B_NAME || "Dumb Bunny 🐰";
   if (!playerAUser.trim() || !playerBUser.trim() || playerAUser.trim().toLowerCase() === playerBUser.trim().toLowerCase()) {
     throw new Error("Two distinct nonempty usernames are required");
   }

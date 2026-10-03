@@ -85,4 +85,33 @@ describe("Explicit configuration and preserving provisioning", () => {
     expect(db.prepare("SELECT COUNT(*) AS count FROM accounts").get()).toMatchObject({ count: 2 });
     db.close();
   });
+
+  it("renames existing accounts without changing credentials or appearance and rejects stale revisions", async () => {
+    const db = new DatabaseSync(":memory:");
+    db.exec(fs.readFileSync("migrations/0001_initial_schema.sql", "utf8"));
+    const seed = await generateProvisioningSql({
+      playerAPassword: "explicit-long-password-A",
+      playerBPassword: "explicit-long-password-B",
+      playerAName: "Old A",
+      playerBName: "Old B",
+    });
+    db.exec(seed.sql);
+    db.exec("UPDATE accounts SET paletteFamily='romantic', preferenceVersion=9 WHERE id='A'");
+    db.exec("UPDATE accounts SET preferenceVersion=6 WHERE id='B'");
+    const before = db.prepare("SELECT * FROM accounts ORDER BY id").all();
+    const migration = fs.readFileSync("migrations/0005_personal_display_names.sql", "utf8");
+    db.exec(migration);
+    const after = db.prepare("SELECT * FROM accounts ORDER BY id").all();
+    expect(after).toEqual([
+      { ...before[0], displayName: "Sly fox 🦊", preferenceVersion: 10 },
+      { ...before[1], displayName: "Dumb Bunny 🐰", preferenceVersion: 7 },
+    ]);
+    const staleEdit = db
+      .prepare("UPDATE accounts SET displayName='Old A' WHERE id='A' AND preferenceVersion=9")
+      .run();
+    expect(staleEdit.changes).toBe(0);
+    db.exec(migration);
+    expect(db.prepare("SELECT * FROM accounts ORDER BY id").all()).toEqual(after);
+    db.close();
+  });
 });

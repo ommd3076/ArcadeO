@@ -4,6 +4,14 @@ Status: **ARCADEO LOCALLY VERIFIED AND PUBLISHED TO MASTER. Deployment remains a
 
 ## Scope and delivered behavior
 
+### Owner display names follow-up — 2026-10-03
+
+Account A's default is **Sly fox 🦊**; account B's default is **Dumb Bunny 🐰**, including the owner's capitalization correction. Fresh provisioning uses those names. Data-only migration `0005_personal_display_names.sql` renames existing accounts and advances only changed preference revisions, preventing stale profile edits from overwriting the change. Credentials, usernames, themes and saved-match snapshots are preserved. Names remain editable in Us; historical match snapshots retain the labels saved with them.
+
+The identical redundant `scripts/provision-accounts.d.ts` was removed; `.d.mts` remains the declaration for `.mjs` imports. No tracked build outputs, logs, private provisioning SQL or local state were found in the follow-up inventory. Required runtime/content/license/qualification files remain.
+
+Follow-up verification: build including TypeScript, production artifact verification, targeted Prettier, 16 provisioning/auth checks and 2 Chromium cases against an isolated bundled Worker/D1 passed. The migration regression checks all account fields, changed revisions, repeat application and stale writes. Home at 390px was inspected with the fox name/emoji, and the existing name editor saved through the UI. Generated evidence remains ignored under `.local/evidence`. The initial sandbox build/tests hit Windows EPERM before execution; the authorized reruns are the passing results. This is bounded follow-up verification, not a rerun of every previous suite or physical-phone certification. Current build cache is `90d0354a890fbb52`; entry JavaScript SHA and 148,683-byte initial gzip remain unchanged. Deployment remains pending and must apply all five migrations before provisioning.
+
 The owner requested the product name ArcadeO, removal of unnecessary files and evidence, detailed production analysis, and a push to the repository's release branch. Live remote inspection confirmed `master` is the default; the owner's later correction selects it. `main` remains an older baseline and will not be updated by this work.
 
 ArcadeO retains exactly two predetermined accounts and eight games. Seven support Remote and Together; Sudoku adds Practice, live Duel and asynchronous Challenge. This pass changes identity and repository hygiene, with one integration security repair. It does not change rules, saved outcomes, account credentials, theme families or match identities.

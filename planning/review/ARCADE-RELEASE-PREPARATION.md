@@ -1,5 +1,7 @@
 # ArcadeO production preparation
 
+Owner display names are **Sly fox 🦊** (account A) and **Dumb Bunny 🐰** (account B). Fresh provisioning uses these defaults. Apply migration `0005_personal_display_names.sql` for existing accounts; it updates only their display names and preference revisions. Usernames/passwords, appearance and saved-match snapshots remain unchanged. Names remain editable in Us. Provisioning overrides via `PLAYER_A_NAME`/`PLAYER_B_NAME` remain available; leave them unset to use the owner names.
+
 This is preparation, not deployment evidence. No Cloudflare account ID, real Arcade D1 UUID, production origin, deployed KDF measurement or physical phone is available in this execution. Keep those gates explicit. Do not use another project's database or change global Wrangler login.
 
 1. In the existing Cloudflare login, select/create the owner-requested Arcade account. Copy its account ID and create the ArcadeO-only D1 database after release authorization. Existing account membership is not evidence that the intended new account is ready.

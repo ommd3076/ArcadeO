@@ -1,5 +1,15 @@
 {
   "schemaVersion": 1,
+  "currentPersonalNames": {
+    "date": "2026-10-03",
+    "status": "VERIFIED",
+    "owner": "Codex lead, sequential execution",
+    "scope": "Account A: Sly fox 🦊; account B: Dumb Bunny 🐰. Preserve editable names, authentication and saved state; remove duplicate provisioning declaration; commit and push master.",
+    "owns": ["scripts/provision-accounts.mjs", "scripts/provision-accounts.d.ts", "migrations/0005_personal_display_names.sql", "tests/unit/provisioning.test.ts", "tests/integration/auth/auth.test.ts", "planning/execution/TASKS.json", "planning/execution/STATE.md", "planning/review/ARCADE-RELEASE-PREPARATION.md", "planning/review/ARCADEO-PRODUCTION-READINESS.md"],
+    "schemaLease": "Lead owns additive data-only migration 0005; no schema or shared protocol changes.",
+    "validation": "Build (including TypeScript), production artifact checks, targeted Prettier, 16 provisioning/auth checks and 2 Chromium cases against isolated bundled workerd/D1 passed. Home at 390px inspected with Sly fox 🦊; existing name editor saves through the UI. Migration regression preserves all other account fields, increments only changed revisions and rejects stale writes.",
+    "cleanup": "Removed scripts/provision-accounts.d.ts, an identical redundant declaration. scripts/provision-accounts.d.mts is retained and the TypeScript build passes. No tracked generated logs, build outputs, private SQL or local state found."
+  },
   "preparedAt": "2026-09-30",
   "executionStatus": "ARCADEO_LOCAL_VERIFIED_AND_PUBLISHED",
   "currentExecutor": "Codex native GPT-6.1 Sol High lead with twelve bounded GPT-6 Luna High submissions, at most three active specialists",

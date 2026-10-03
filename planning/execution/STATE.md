@@ -1,5 +1,9 @@
 # Current checkpoint — ArcadeO verified and published
 
+## Owner display names — 2026-10-03
+
+Verified: account A defaults to **Sly fox 🦊** and account B to **Dumb Bunny 🐰**. Fresh provisioning defaults and data-only migration 0005 preserve credentials, appearance and history; profile revisions prevent stale name overwrites. Existing Us name editing stays available. Removed the duplicate `.d.ts` provisioning declaration and retained `.d.mts`. Build/TypeScript, production artifact checks, targeted formatting, 16 provisioning/auth checks and 2 actual Chromium cases passed. New Home greeting inspected at 390px; generated evidence stays ignored under `.local/evidence`. Release target is `master`; no Cloudflare deployment in this scope. The older full-suite counts below retain their previous scope/date.
+
 Updated 2026-10-03T06:51:55.122849+00:00. Product ArcadeO; cache `c8c3324dd80bb4fd`; default/release branch `master` verified remotely. Rename, inventoried cleanup, strict shared socket Origin validation and complete local verification are done. Normal merge `f5a1dd9` preserves both histories and reviewed remote constraints. No deployment or owner-state reset.
 
 Fresh results: build/typecheck/lint/format PASS; 305 unit, 78 mocked contracts, 62 SSR components, 12 actual Worker, 26 bundled HTTP, 1,000 catalog, 124 unique selected browser cases across full run and affected continuation. Both dependency audits report zero known vulnerabilities. 1,363 tracked files / 115,220,994 original bytes removed; final matrix compacted and 48 representative hashes retained. New generated artifacts go to ignored .local/evidence.

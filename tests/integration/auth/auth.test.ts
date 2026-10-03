@@ -111,12 +111,14 @@ describe("Worker Auth Foundation (F02)", () => {
 
       expect(rowA).toBeDefined();
       expect(rowA.username).toBe(accountA.username);
+      expect(rowA.displayName).toBe("Sly fox 🦊");
       expect(rowA.paletteFamily).toBe("standard");
       expect(rowA.accentFamily).toBe("teal");
       expect(rowA.kdfAlgorithm).toBe("PBKDF2-SHA256:600000");
 
       expect(rowB).toBeDefined();
       expect(rowB.username).toBe(accountB.username);
+      expect(rowB.displayName).toBe("Dumb Bunny 🐰");
       expect(rowB.paletteFamily).toBe("romantic");
       expect(rowB.accentFamily).toBe("violet");
       expect(rowB.kdfAlgorithm).toBe("PBKDF2-SHA256:600000");
@@ -198,7 +200,7 @@ describe("Worker Auth Foundation (F02)", () => {
       // Safe profile verification
       expect(data.profile.id).toBe("A");
       expect(data.profile.username).toBe("player_a");
-      expect(data.profile.displayName).toBe("Player A");
+      expect(data.profile.displayName).toBe("Sly fox 🦊");
       expect(data.profile.accentFamily).toBe("teal");
       expect(data.profile.paletteFamily).toBe("standard");
       expect(data.profile.passwordHash).toBeUndefined();
