@@ -469,13 +469,14 @@ export class MatchSession {
       return;
     }
 
+    const view = this.preserveStartedSudokuDuelView(this.state.view, msg.view);
     const pendingAction = this.state.pendingAction;
 
     this.updateState({
-      view: msg.view,
-      deliveryVersion: msg.view.deliveryVersion,
+      view,
+      deliveryVersion: view.deliveryVersion,
       acceptedEvent: null,
-      controllerStatus: this.controllerStatusFor(msg.view),
+      controllerStatus: this.controllerStatusFor(view),
       pendingAction,
       error: null,
     });
@@ -597,11 +598,14 @@ export class MatchSession {
       this.clearPendingAction();
     }
 
-    if (reply.view && effectiveDeliveryVersion >= this.state.deliveryVersion) {
+    const replyView = reply.view
+      ? this.preserveStartedSudokuDuelView(this.state.view, reply.view)
+      : undefined;
+    if (replyView && effectiveDeliveryVersion >= this.state.deliveryVersion) {
       this.updateState({
-        view: reply.view,
+        view: replyView,
         deliveryVersion: effectiveDeliveryVersion,
-        controllerStatus: this.controllerStatusFor(reply.view),
+        controllerStatus: this.controllerStatusFor(replyView),
         ...(animate
           ? { acceptedEvent: { eventId: reply.eventId, effects: reply.effects ?? [] } }
           : {}),
@@ -631,11 +635,14 @@ export class MatchSession {
       error: sessionError,
     };
 
-    if (reply.latestView && reply.latestView.deliveryVersion >= this.state.deliveryVersion) {
-      updates.view = reply.latestView;
-      updates.deliveryVersion = reply.latestView.deliveryVersion;
+    const latestView = reply.latestView
+      ? this.preserveStartedSudokuDuelView(this.state.view, reply.latestView)
+      : undefined;
+    if (latestView && latestView.deliveryVersion >= this.state.deliveryVersion) {
+      updates.view = latestView;
+      updates.deliveryVersion = latestView.deliveryVersion;
       updates.acceptedEvent = null;
-      updates.controllerStatus = this.controllerStatusFor(reply.latestView);
+      updates.controllerStatus = this.controllerStatusFor(latestView);
     }
 
     this.updateState(updates);
@@ -653,6 +660,82 @@ export class MatchSession {
       takeoverNotice:
         exclusiveControl && previous !== null && previous.isController !== isController,
     };
+  }
+
+  /**
+   * Duel start becomes visible as server time crosses its scheduled deadline,
+   * without changing deliveryVersion. Do not let an older equal-version view
+   * undo that visibility for this same viewer and unchanged active duel.
+   */
+  private preserveStartedSudokuDuelView(
+    current: FilteredMatchView | null,
+    incoming: FilteredMatchView,
+  ): FilteredMatchView {
+    if (!current) return incoming;
+
+    const currentSudoku = current.gameState as {
+      mode?: string;
+      puzzleId?: string;
+      scheduledStartTime?: number;
+      hasStarted?: boolean;
+      terminalResult?: unknown;
+    };
+    const incomingSudoku = incoming.gameState as {
+      mode?: string;
+      puzzleId?: string;
+      scheduledStartTime?: number;
+      hasStarted?: boolean;
+      terminalResult?: unknown;
+    };
+    const currentActorSeat =
+      current.participants.A.accountId === this.options.actorAccountId
+        ? "A"
+        : current.participants.B?.accountId === this.options.actorAccountId
+          ? "B"
+          : null;
+    const incomingActorSeat =
+      incoming.participants.A.accountId === this.options.actorAccountId
+        ? "A"
+        : incoming.participants.B?.accountId === this.options.actorAccountId
+          ? "B"
+          : null;
+
+    const sameParticipantIdentity =
+      currentActorSeat !== null &&
+      currentActorSeat === incomingActorSeat &&
+      current.participants.A.accountId === incoming.participants.A.accountId &&
+      current.participants.B?.accountId === incoming.participants.B?.accountId;
+    const sameControllerIdentity =
+      current.controller.controllingAccountId === incoming.controller.controllingAccountId &&
+      current.controller.controllerGeneration === incoming.controller.controllerGeneration &&
+      current.controller.isController === incoming.controller.isController;
+
+    if (
+      current.matchId === incoming.matchId &&
+      current.deliveryVersion === this.state.deliveryVersion &&
+      current.deliveryVersion === incoming.deliveryVersion &&
+      current.gameId === "sudoku" &&
+      incoming.gameId === "sudoku" &&
+      current.mode === "duel" &&
+      incoming.mode === "duel" &&
+      current.lifecycle === "active" &&
+      incoming.lifecycle === "active" &&
+      currentSudoku.mode === "duel" &&
+      incomingSudoku.mode === "duel" &&
+      currentSudoku.puzzleId === incomingSudoku.puzzleId &&
+      typeof currentSudoku.scheduledStartTime === "number" &&
+      currentSudoku.scheduledStartTime === incomingSudoku.scheduledStartTime &&
+      currentSudoku.hasStarted === true &&
+      incomingSudoku.hasStarted === false &&
+      !currentSudoku.terminalResult &&
+      !incomingSudoku.terminalResult &&
+      sameParticipantIdentity &&
+      sameControllerIdentity
+    ) {
+      return current;
+    }
+
+    return incoming;
   }
 
   public async sendAction<T extends ActionType>(
@@ -1035,11 +1118,14 @@ export class MatchSession {
         const data: SecretRecoveryResponse = await res.json();
         this.clearPendingAction();
 
-        if (data.view && data.view.deliveryVersion >= this.state.deliveryVersion) {
+        const view = data.view
+          ? this.preserveStartedSudokuDuelView(this.state.view, data.view)
+          : null;
+        if (view && view.deliveryVersion >= this.state.deliveryVersion) {
           this.updateState({
-            view: data.view,
-            deliveryVersion: data.view.deliveryVersion,
-            controllerStatus: this.controllerStatusFor(data.view),
+            view,
+            deliveryVersion: view.deliveryVersion,
+            controllerStatus: this.controllerStatusFor(view),
             pendingAction: null,
           });
         }
@@ -1063,22 +1149,28 @@ export class MatchSession {
         const receipt: ReceiptResponse = await res.json();
         if (receipt.status === "accepted") {
           this.clearPendingAction();
-          if (receipt.view && receipt.view.deliveryVersion >= this.state.deliveryVersion) {
+          const view = receipt.view
+            ? this.preserveStartedSudokuDuelView(this.state.view, receipt.view)
+            : null;
+          if (view && view.deliveryVersion >= this.state.deliveryVersion) {
             this.updateState({
-              view: receipt.view,
-              deliveryVersion: receipt.view.deliveryVersion,
-              controllerStatus: this.controllerStatusFor(receipt.view),
+              view,
+              deliveryVersion: view.deliveryVersion,
+              controllerStatus: this.controllerStatusFor(view),
               pendingAction: null,
             });
           }
           return;
         } else if (receipt.status === "superseded") {
           this.clearPendingAction();
-          if (receipt.view && receipt.view.deliveryVersion >= this.state.deliveryVersion) {
+          const view = receipt.view
+            ? this.preserveStartedSudokuDuelView(this.state.view, receipt.view)
+            : null;
+          if (view && view.deliveryVersion >= this.state.deliveryVersion) {
             this.updateState({
-              view: receipt.view,
-              deliveryVersion: receipt.view.deliveryVersion,
-              controllerStatus: this.controllerStatusFor(receipt.view),
+              view,
+              deliveryVersion: view.deliveryVersion,
+              controllerStatus: this.controllerStatusFor(view),
               pendingAction: null,
             });
           }
