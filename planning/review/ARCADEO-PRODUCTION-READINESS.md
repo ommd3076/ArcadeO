@@ -1,6 +1,6 @@
 # ArcadeO production readiness — 2026-10-03
 
-Status: **LOCAL ARCADEO VERIFIED; publication verification pending. Deployment remains a later, separately authorized stage**. This report supersedes older execution summaries for the rename, repository hygiene and current readiness. Updated 2026-10-03T06:51:55.122849+00:00. [Compact validation](evidence/arcadeo-validation.json) records commands, actual browser cases and registry audit counts.
+Status: **ARCADEO LOCALLY VERIFIED AND PUBLISHED TO MASTER. Deployment remains a later, separately authorized stage**. This report supersedes older execution summaries for the rename, repository hygiene and current readiness. Updated 2026-10-03T06:51:55.122849+00:00. [Compact validation](evidence/arcadeo-validation.json) records commands, actual browser cases and registry audit counts.
 
 ## Scope and delivered behavior
 
@@ -85,4 +85,4 @@ Rollback restores a compatible previous Worker version while retaining additive 
 
 Remote inspection: `refs/heads/master` was default at `62e8700`; `main` was `4fa98e3`. Separate histories caused 385 add/add conflicts. A baseline comparison proved 382 remote files unchanged relative to the inspected old baseline; the other three were preview Origin, Worker Origin config and socket Origin checks. Their stricter behavior is retained through explicit resolution. Normal merge commit `f5a1dd9` preserves both parents; [integration record](../execution/reports/arcadeo-master-integration.json) records this process. No force-push strategy is used.
 
-Final cleanup/test/report commit and equality with remote `master`: pending actual successful publication. No Cloudflare deployment occurs in this pass.
+Implementation/cleanup commit `7ed5b61d337b3cef3234d1752ccbf0c6baf40a7d` was pushed without force to `master`; independent `git ls-remote` verified exact equality at 2026-10-03T06:56:08.444539+00:00. The implementation snapshot has 708 tracked files / 104,920,793 checked-out bytes (100.06 MiB), compared with 2,063 / 225,061,378 (214.64 MiB) before cleanup. This publication receipt is saved in a documentation-only successor; no runtime source changed after validation. No Cloudflare deployment occurred.

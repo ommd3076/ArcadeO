@@ -8,8 +8,8 @@ Current owner scope: rename ArcadeO, remove unnecessary files/evidence, deliver 
   EVIDENCE: arcadeo-cleanup-inventory.json enumerates 1,363 removals / 115,220,994 original bytes; required files and 48 retained image hashes checked; new outputs ignored.
 - [x] AO3: Fresh static, unit, mocked, component, real Worker/HTTP, content and selected full browser checks pass on the renamed cleaned tree. Production analysis states findings and remaining deployment/hardware requirements.
   EVIDENCE: arcadeo-validation.json records fresh 305 unit, 78 mocked, 62 component, 12 Worker, 26 HTTP, 1,000 content and 124 unique browser passes; zero advisories in both dependency audits; detailed production analysis saved.
-- [ ] AO4: Remote target is verified, remote changes/history preserved, final local commit equals remote master without force push, no deployment.
-  EVIDENCE: actual remote HEAD is master 62e8700; main is older 4fa98e3. Normal merge exposes conflicts for explicit review.
+- [x] AO4: Remote target is verified, remote changes/history preserved, final local commit equals remote master without force push, no deployment.
+  EVIDENCE: normal merge f5a1dd9 preserves master history and reviewed Origin constraints. Successful non-force push and independent ls-remote verify implementation 7ed5b61d337b3cef3234d1752ccbf0c6baf40a7d on master at 2026-10-03T06:56:08.444539+00:00; no deployment. This receipt is a documentation-only successor.
 
 ---
 

@@ -1,6 +1,6 @@
 # ArcadeO final local verification
 
-Updated 2026-10-03T06:51:55.122849+00:00. ArcadeO rename and cleanup are locally verified; publication to verified default branch `master` is pending. No Cloudflare deployment occurs.
+Updated 2026-10-03T06:51:55.122849+00:00. ArcadeO rename and cleanup are locally verified; implementation `7ed5b61d337b3cef3234d1752ccbf0c6baf40a7d` is pushed to verified default branch `master` with independent remote equality confirmed at 2026-10-03T06:56:08.444539+00:00. No Cloudflare deployment occurs.
 
 Build/static checks pass; 305 unit, 78 mocked, 62 component, 12 real Worker, 26 real HTTP and 1,000 Sudoku checks pass. All 124 selected browser cases pass across the full run and bounded affected continuation. The full run passed 123 before its last Home fixture assumed an empty database; legal isolated fixture cleanup fixes that assumption, and the saved-secret/Home reproduction passes 2/2. No single uninterrupted 124-pass run is claimed. Both current dependency audits report zero known vulnerabilities.
 

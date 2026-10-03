@@ -1,10 +1,10 @@
-# Current checkpoint — ArcadeO local verified, publication pending
+# Current checkpoint — ArcadeO verified and published
 
 Updated 2026-10-03T06:51:55.122849+00:00. Product ArcadeO; cache `c8c3324dd80bb4fd`; default/release branch `master` verified remotely. Rename, inventoried cleanup, strict shared socket Origin validation and complete local verification are done. Normal merge `f5a1dd9` preserves both histories and reviewed remote constraints. No deployment or owner-state reset.
 
 Fresh results: build/typecheck/lint/format PASS; 305 unit, 78 mocked contracts, 62 SSR components, 12 actual Worker, 26 bundled HTTP, 1,000 catalog, 124 unique selected browser cases across full run and affected continuation. Both dependency audits report zero known vulnerabilities. 1,363 tracked files / 115,220,994 original bytes removed; final matrix compacted and 48 representative hashes retained. New generated artifacts go to ignored .local/evidence.
 
-Read [current production analysis](../review/ARCADEO-PRODUCTION-READINESS.md), [validation](../review/evidence/arcadeo-validation.json), [cleanup inventory](../review/evidence/arcadeo-cleanup-inventory.json) and root GATES.md. Commit/push and exact remote equality are pending. Cloudflare account/D1/Origin/secrets/authorization and physical phones remain later gates. Everything below is historical.
+Read [current production analysis](../review/ARCADEO-PRODUCTION-READINESS.md), [validation](../review/evidence/arcadeo-validation.json), [cleanup inventory](../review/evidence/arcadeo-cleanup-inventory.json) and root GATES.md. Implementation `7ed5b61d337b3cef3234d1752ccbf0c6baf40a7d` pushed without force to master; independent remote equality verified at 2026-10-03T06:56:08.444539+00:00. This receipt is a documentation-only successor. Cloudflare account/D1/Origin/secrets/authorization and physical phones remain later gates. Everything below is historical.
 
 ---
 
