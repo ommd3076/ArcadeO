@@ -100,6 +100,53 @@ describe("Sudoku saved-attempt resume requirements by mode", () => {
     };
   }
 
+  it("offers publish only to the controller of a completed unassisted sender attempt", async () => {
+    const fixture = await makeFixture();
+    try {
+      const act = await initialize(fixture, "challenge", "publish-sender");
+      const legalActions = (account: AccountId, session: string) =>
+        fixture.authority.buildFilteredView(fixture.authority.getSnapshot()!, account, session)
+          .legalActions;
+      expect(legalActions("A", "session-A")).not.toContain("challenge.publish");
+      for (let cell = 0; cell < 81; cell++) {
+        if (fixture.puzzle.givens[cell] !== "0") continue;
+        expect(
+          (
+            await act("sudoku.edit", "A", {
+              row: Math.floor(cell / 9),
+              col: cell % 9,
+              value: Number(fixture.solution[cell]),
+              operation: "set",
+            })
+          ).status,
+        ).toBe("accepted");
+      }
+      expect(fixture.authority.getSnapshot()!.lifecycle).toBe("completed");
+      expect(legalActions("A", "session-A")).toContain("challenge.publish");
+      for (const [account, session] of [
+        ["A", "other-session"],
+        ["B", "session-B"],
+      ] as const) {
+        expect(legalActions(account, session)).not.toContain("challenge.publish");
+      }
+      const eligible = fixture.authority.getSnapshot()!.gameState as SudokuState;
+      for (const ineligible of [
+        { ...eligible, challengePublished: true },
+        {
+          ...eligible,
+          players: { ...eligible.players, A: { ...eligible.players.A, assisted: true } },
+        },
+      ]) {
+        fixture.sqlite
+          .prepare("UPDATE match_snapshot SET gameState = ?")
+          .run(JSON.stringify(ineligible));
+        expect(legalActions("A", "session-A")).not.toContain("challenge.publish");
+      }
+    } finally {
+      fixture.sqlite.close();
+    }
+  });
+
   it("resumes Practice and unpublished sender Challenge with the sole participant", async () => {
     for (const [mode, matchId] of [
       ["practice", "practice-saved"],

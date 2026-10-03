@@ -440,6 +440,23 @@ export class MatchDurableObject implements DurableObject {
       if (viewerSeat === "A") legalActions.push("match.cancel");
     }
 
+    if (
+      snapshot.gameId === "sudoku" &&
+      snapshot.mode === "challenge" &&
+      snapshot.lifecycle === "completed"
+    ) {
+      const game = snapshot.gameState as SudokuState;
+      const senderSeat = game.senderSeat ?? "A";
+      const sender = game.players[senderSeat];
+      if (
+        viewerSeat === senderSeat &&
+        !game.challengePublished &&
+        sender?.completedAt &&
+        !sender.assisted
+      )
+        legalActions.push("challenge.publish");
+    }
+
     if ((snapshot.mode === "together" || snapshot.gameId === "sudoku") && !isController)
       legalActions = [];
     return {

@@ -775,9 +775,9 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
           (view.gameState as SudokuView)?.self.completed &&
           !(view.gameState as SudokuView)?.challenge?.published && (
             <Button
-              disabled={!canSubmit("challenge.publish", true)}
+              disabled={!canSubmit("challenge.publish")}
               onClick={async () => {
-                if (!canSubmit("challenge.publish", true)) return;
+                if (!canSubmit("challenge.publish")) return;
                 try {
                   let request = challengeRequests.current.get(matchId);
                   if (!request) {
