@@ -287,9 +287,9 @@ export function SecretHandoff<T = string | number>({
   }
 
   // 2. OUTCOME DISPLAY (Revealed result + Next Round button)
-  const isOutcomeShown =
-    (mode === "together" && togetherStep === "revealed-outcome") ||
-    (mode === "remote" && remoteStep === "revealed-outcome");
+  // Mount the accepted outcome in this commit so its motion can find the panel.
+  // A new-round view also removes it immediately, before transient steps catch up.
+  const isOutcomeShown = isRevealed || (mode === "remote" && isResolved);
 
   if (isOutcomeShown && outcome) {
     return (
