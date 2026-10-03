@@ -1,5 +1,5 @@
 import type { AccountRecord, SafeProfile } from "../auth/types";
-import { verifyPassword } from "../auth/kdf";
+import { verifyPasswordOnWorker } from "../auth/kdf-do";
 import {
   createClearSessionCookieHeaders,
   createSession,
@@ -14,6 +14,7 @@ import { getCsrfSecret, isAllowedOrigin } from "../config";
 
 export interface AuthEnv {
   DB: D1Database;
+  AUTH_KDF_DO?: DurableObjectNamespace;
   ENVIRONMENT?: string;
   ALLOWED_ORIGIN?: string;
   CSRF_SECRET?: string;
@@ -116,7 +117,7 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
 
     if (!account) {
       // Dummy constant-time work to prevent timing side-channels
-      await verifyPassword("dummy-password", "0".repeat(64), "0".repeat(32), 600_000);
+      await verifyPasswordOnWorker(env, "dummy-password", "0".repeat(64), "0".repeat(32), 600_000);
       await recordLoginFailure(env.DB, normalizedUsername, ip);
       return jsonResponse(
         { error: "Invalid username or password", code: "INVALID_CREDENTIALS" },
@@ -129,7 +130,7 @@ export async function handleAuthRequest(request: Request, env: AuthEnv): Promise
     const isValidPassword =
       iterations >= 600_000 &&
       iterations <= 2_000_000 &&
-      (await verifyPassword(password, account.passwordHash, account.salt, iterations));
+      (await verifyPasswordOnWorker(env, password, account.passwordHash, account.salt, iterations));
     if (!isValidPassword) {
       await recordLoginFailure(env.DB, normalizedUsername, ip);
       return jsonResponse(

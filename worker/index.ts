@@ -11,6 +11,7 @@ import { extractSessionToken, validateSession } from "./auth/session";
 export interface Env {
   DB: D1Database;
   MATCH_DO: DurableObjectNamespace;
+  AUTH_KDF_DO?: DurableObjectNamespace;
   ENVIRONMENT: string;
   ALLOWED_ORIGIN: string;
   CSRF_SECRET?: string;
@@ -19,6 +20,7 @@ export interface Env {
 }
 
 export { MatchDurableObject } from "./matches/match-do";
+export { AuthKdfDurableObject } from "./auth/kdf-do";
 
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext): Promise<Response> {

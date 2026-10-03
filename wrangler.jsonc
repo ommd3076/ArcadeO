@@ -25,6 +25,10 @@
       {
         "name": "MATCH_DO",
         "class_name": "MatchDurableObject"
+      },
+      {
+        "name": "AUTH_KDF_DO",
+        "class_name": "AuthKdfDurableObject"
       }
     ]
   },
@@ -33,6 +37,12 @@
       "tag": "v1",
       "new_sqlite_classes": [
         "MatchDurableObject"
+      ]
+    },
+    {
+      "tag": "v2-auth-kdf",
+      "new_sqlite_classes": [
+        "AuthKdfDurableObject"
       ]
     }
   ],

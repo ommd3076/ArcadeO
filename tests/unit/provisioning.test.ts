@@ -5,6 +5,7 @@ import { generateProvisioningSql } from "../../scripts/provision-accounts.mjs";
 import { assertOriginConfiguration, getCsrfSecret, isAllowedOrigin } from "../../worker/config";
 import { parseCookies } from "../../worker/auth/session";
 import { hashPassword, verifyPassword } from "../../worker/auth/kdf";
+import { derivePbkdf2InDurableObject } from "../../worker/auth/kdf-do";
 
 describe("Explicit configuration and preserving provisioning", () => {
   it("verifies existing 600,000-iteration account hashes without reducing the work factor", async () => {
@@ -17,7 +18,10 @@ describe("Explicit configuration and preserving provisioning", () => {
     });
     expect(await verifyPassword("runtime-pbkdf2-regression", expectedHash, salt)).toBe(true);
     expect(await verifyPassword("wrong-password", expectedHash, salt)).toBe(false);
-  });
+    expect(derivePbkdf2InDurableObject("runtime-pbkdf2-regression", salt, 600_000)).toBe(
+      expectedHash,
+    );
+  }, 30_000);
 
   it("refuses missing secrets and malformed cookies safely", async () => {
     expect(() => getCsrfSecret({})).toThrow();
