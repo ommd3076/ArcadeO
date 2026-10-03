@@ -4,8 +4,21 @@ import fs from "node:fs";
 import { generateProvisioningSql } from "../../scripts/provision-accounts.mjs";
 import { assertOriginConfiguration, getCsrfSecret, isAllowedOrigin } from "../../worker/config";
 import { parseCookies } from "../../worker/auth/session";
+import { hashPassword, verifyPassword } from "../../worker/auth/kdf";
 
 describe("Explicit configuration and preserving provisioning", () => {
+  it("verifies existing 600,000-iteration account hashes without reducing the work factor", async () => {
+    const salt = "000102030405060708090a0b0c0d0e0f";
+    const expectedHash = "51060a247a88153918bfcd5dcaf6199fcc62aebd0eea4d74155257b6c8d045dd";
+    expect(await hashPassword("runtime-pbkdf2-regression", Buffer.from(salt, "hex"))).toEqual({
+      passwordHash: expectedHash,
+      salt,
+      kdfAlgorithm: "PBKDF2-SHA256:600000",
+    });
+    expect(await verifyPassword("runtime-pbkdf2-regression", expectedHash, salt)).toBe(true);
+    expect(await verifyPassword("wrong-password", expectedHash, salt)).toBe(false);
+  });
+
   it("refuses missing secrets and malformed cookies safely", async () => {
     expect(() => getCsrfSecret({})).toThrow();
     expect(() => getCsrfSecret({ CSRF_SECRET: "short" })).toThrow();

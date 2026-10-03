@@ -1,3 +1,4 @@
+import { pbkdf2 } from "node:crypto";
 import { bytesToHex, hexToBytes, timingSafeEqual } from "./crypto";
 
 export const DEFAULT_KDF_ALGORITHM = "PBKDF2-SHA256:600000";
@@ -20,6 +21,18 @@ export async function derivePbkdf2Key(
   iterations: number,
   keyByteLength = KEY_BYTE_LENGTH,
 ): Promise<Uint8Array> {
+  // Cloudflare's Web Crypto rejects PBKDF2 iteration counts above 100,000.
+  // Keep the 600,000-iteration account hashes by using its Node crypto API
+  // for those values; do not silently turn a runtime error into a bad password.
+  if (iterations > 100_000) {
+    return new Promise((resolve, reject) => {
+      pbkdf2(password, saltBytes, iterations, keyByteLength, "sha256", (error, key) => {
+        if (error) reject(error);
+        else resolve(new Uint8Array(key));
+      });
+    });
+  }
+
   const encoder = new TextEncoder();
   const passwordKey = await crypto.subtle.importKey(
     "raw",
@@ -70,14 +83,10 @@ export async function verifyPassword(
   saltHex: string,
   iterations = DEFAULT_ITERATIONS,
 ): Promise<boolean> {
-  try {
-    const saltBytes = hexToBytes(saltHex);
-    const derivedKey = await derivePbkdf2Key(password, saltBytes, iterations, KEY_BYTE_LENGTH);
-    const actualHash = bytesToHex(derivedKey);
-    return timingSafeEqual(actualHash, expectedHash);
-  } catch {
-    return false;
-  }
+  const saltBytes = hexToBytes(saltHex);
+  const derivedKey = await derivePbkdf2Key(password, saltBytes, iterations, KEY_BYTE_LENGTH);
+  const actualHash = bytesToHex(derivedKey);
+  return timingSafeEqual(actualHash, expectedHash);
 }
 
 /**
