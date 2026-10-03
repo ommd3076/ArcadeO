@@ -61,10 +61,11 @@ export function RPSBoard({
   const isSeatBLocked = view.lockedSeats.includes("B");
   const isResolved = view.phase === "resolved" || view.phase === "terminal";
   const isRevealed = view.revealed;
+  const isPublicOutcome = isRevealed || (mode === "remote" && isResolved);
 
   useAcceptedMotion(
     acceptedEventId,
-    isRevealed ? [{ type: "revealed" as const }] : [],
+    isPublicOutcome ? [{ type: "revealed" as const }] : [],
     () => {
       const panel = rootRef.current?.querySelector<HTMLElement>(".arcade-secret-handoff--outcome");
       return panel?.animate
