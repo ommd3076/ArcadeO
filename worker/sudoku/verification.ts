@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Worker Sudoku Verification
+ * ArcadeO V1 — Worker Sudoku Verification
  *
  * Server-only verification using content/sudoku/solutions.json.
  * Solutions are NEVER delivered to client bundles.

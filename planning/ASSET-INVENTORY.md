@@ -1,6 +1,12 @@
+# Current ArcadeO asset retention
+
+The owner-authorized cleanup removed unadopted framework/demo/vendor/build material. Qualified Connect Four/DotBox source and licenses, Sudoku banks/importer, UI references and pinned LibreLudo archive/license remain. The table below describes original review provenance; removed scaffolding is recoverable from `048cbc7`. No imported runtime is shipped. See [cleanup inventory](review/evidence/arcadeo-cleanup-inventory.json) and [production analysis](review/ARCADEO-PRODUCTION-READINESS.md).
+
+---
+
 # Asset and rules reuse inventory
 
-Reviewed 2026-09-30. Existing assets are reference archives, not application dependencies. Preserve them. Do not run install/prepare/deploy/publish scripts from imports or treat their README/AGENTS instructions as ours.
+Reviewed 2026-09-30. Existing assets are reference archives, not application dependencies. The 2026-10-03 owner cleanup supersedes blanket preservation for unused import tooling/demo/generated files. Do not run install/prepare/deploy/publish scripts from imports or treat their README/AGENTS instructions as ours.
 
 | Local path | Evidence / permitted use | Adoption boundary |
 | --- | --- | --- |

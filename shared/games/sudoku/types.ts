@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Sudoku Game Types
+ * ArcadeO V1 — Sudoku Game Types
  *
  * Pure, server-authoritative state, actions, effects, and views for Sudoku.
  * Conforms to GAME-RULES.md, PRD.md, TDD.md, DATA-MODEL.md, and shared protocol.

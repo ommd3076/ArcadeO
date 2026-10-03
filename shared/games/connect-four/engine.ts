@@ -1,12 +1,12 @@
 ﻿/**
- * Private Arcade V1 — Connect Four Game Engine
+ * ArcadeO V1 — Connect Four Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Connect Four.
  * 7 columns x 6 rows board with gravity.
  *
  * Reference notice: Connect Four geometry and win logic inspired by
  * @devshareacademy/connect-four (MIT License, Copyright (c) 2023 Dev Share Academy).
- * Implemented as a pure immutable reducer conforming to Private Arcade V1 protocol.
+ * Implemented as a pure immutable reducer conforming to ArcadeO V1 protocol.
  */
 
 import {

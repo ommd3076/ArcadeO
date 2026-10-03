@@ -57,7 +57,7 @@ test("stalled session bootstrap shows loading and Retry states, then recovers", 
   ).toBe("none");
   await testInfo.attach("auth-loading-state", {
     body: await page.screenshot({
-      path: "planning/review/evidence/owner-corrections/overnight-auth-loading.png",
+      path: ".local/evidence/owner-corrections/overnight-auth-loading.png",
     }),
     contentType: "image/png",
   });
@@ -68,7 +68,7 @@ test("stalled session bootstrap shows loading and Retry states, then recovers", 
   await expect(page.getByText("Opening your arcade…")).toHaveCount(0);
   await testInfo.attach("auth-retry-state", {
     body: await page.screenshot({
-      path: "planning/review/evidence/owner-corrections/overnight-auth-retry.png",
+      path: ".local/evidence/owner-corrections/overnight-auth-retry.png",
     }),
     contentType: "image/png",
   });

@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Dots & Boxes Game Types
+ * ArcadeO V1 — Dots & Boxes Game Types
  *
  * Server-authoritative, deterministic pure types for Dots & Boxes.
  * 5x5 dots giving 4x4 boxes (16 boxes total, 40 orthogonal edges).

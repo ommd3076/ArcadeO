@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Hand Cricket Game Engine Adapters
+ * ArcadeO V1 — Hand Cricket Game Engine Adapters
  *
  * Rules Version 1: 1..6 choices (legacy saved matches)
  * Rules Version 2: 1..10 choices (confirmed owner rules for new matches)

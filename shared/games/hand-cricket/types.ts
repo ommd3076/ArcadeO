@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Hand Cricket Game Types
+ * ArcadeO V1 — Hand Cricket Game Types
  *
  * Server-authoritative state, effects, and views for Hand Cricket.
  * Legacy choices 1..6; current choices 1..10. Together: both bat until OUT.

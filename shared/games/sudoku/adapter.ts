@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Sudoku Game Engine Adapter
+ * ArcadeO V1 — Sudoku Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

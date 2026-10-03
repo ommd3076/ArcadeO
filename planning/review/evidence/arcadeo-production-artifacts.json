@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-10-03T06:43:18.335Z",
+  "status": "PASS",
+  "publicCacheRevision": "c8c3324dd80bb4fd",
+  "publicFiles": 59,
+  "initialGzipBytes": 148683,
+  "privateSolutionLeakCheck": "1000 private solutions absent from public JavaScript",
+  "identity": "ArcadeO browser, install manifest and arcadeo package/lock verified",
+  "storageCompatibility": "Existing DB/MATCH_DO bindings and MatchDurableObject identity retained",
+  "notices": "Eight complete dependency/reference notices and byte-identical project attribution",
+  "entryFiles": [
+    {
+      "file": "assets/index-ShscFwcf.js",
+      "sha256": "ad019cb8420e091af191192feac172e116939f55b7e9bc40303115c613ae0a44"
+    }
+  ],
+  "limits": "Artifact/source checks only. No deployed account, production URL or physical device certification."
+}

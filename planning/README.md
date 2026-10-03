@@ -1,3 +1,9 @@
+# ArcadeO contracts and current readiness
+
+The owner-requested rename and cleanup is tracked in [production analysis](review/ARCADEO-PRODUCTION-READINESS.md), [cleanup inventory](review/evidence/arcadeo-cleanup-inventory.json), [checkpoint](execution/STATE.md) and root [gates](../GATES.md). GitHub default/release branch is `master`. Deployment and physical-phone certification remain separate. Older planning/execution text below is historical. Historical links to removed images/attempts refer to recoverable evidence in commit `048cbc7`; see [evidence policy](review/evidence/README.md).
+
+---
+
 # Implementation handoff index
 
 ## Current execution — 2026-10-03

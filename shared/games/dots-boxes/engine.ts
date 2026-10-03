@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Dots & Boxes Game Engine
+ * ArcadeO V1 — Dots & Boxes Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Dots & Boxes.
  * 5x5 dots giving 4x4 boxes (16 boxes total, 40 orthogonal edges).

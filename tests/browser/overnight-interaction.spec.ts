@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { action, create, login, origin, view, writeJsonWithRetry } from "./helpers";
 
-const evidence = "planning/review/evidence/overnight-interaction";
+const evidence = ".local/evidence/overnight-interaction";
 
 async function reachable(control: Locator) {
   await expect(control).toBeVisible();

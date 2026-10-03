@@ -1,0 +1,767 @@
+{
+  "verifiedAt": "2026-10-03T06:51:55.122849+00:00",
+  "status": "LOCAL_ARCADEO_READY_FOR_PUBLICATION",
+  "cacheRevision": "c8c3324dd80bb4fd",
+  "checks": [
+    {
+      "command": "npm run test",
+      "status": "PASS",
+      "logSha256": "7a9fce16a54fc0380eda24b634c2c56e86123e8f4ac253aa5b44f547269f9fc5"
+    },
+    {
+      "command": "npm run test:contracts",
+      "status": "PASS",
+      "logSha256": "76d473bbf71b32d197ed7b80c9b433e9cdea3017abdb27c12c9053998190e108"
+    },
+    {
+      "command": "npm run test:components",
+      "status": "PASS",
+      "logSha256": "84be408d204e61f05af2a476a75e5d0ae4968dd31be8055c071f7eb5e70bcd40"
+    },
+    {
+      "command": "npm run test:integration",
+      "status": "PASS",
+      "logSha256": "000d46addc484e8ff9248eef8dc8c7b7e548c4e46e086863d1898f53cf6e3ba3"
+    },
+    {
+      "command": "npm run lint",
+      "status": "PASS",
+      "logSha256": "4bebe5436b4f04f39c687659a28a0241fc58c071b03d84fef7a9b1f0390debfa"
+    },
+    {
+      "command": "npm run format:check",
+      "status": "PASS",
+      "logSha256": "18279f41ee0b869947fc40273adffdae451483ddae94a043728a3d34c90fdc24"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "PASS",
+      "logSha256": "61d4e864be5d8d8120bf94578dc6a9a53af6cb4d4007a29687bf0a09c7f33bbd"
+    }
+  ],
+  "workerTests": 12,
+  "httpScenarios": 26,
+  "contentPuzzles": 1000,
+  "browser": {
+    "uniquePassed": 124,
+    "fullRunPassed": 123,
+    "fullRunFailed": 1,
+    "affectedRerunPassed": 2,
+    "failure": "Home empty-state fixture assumed no retained matches; real saved Remote RPS made Home correctly show Continue. Fixture now uses legal lifecycle actions against isolated synthetic Worker, then verifies unchanged empty/multiple/appearance/overflow assertions.",
+    "scope": "Full selected 124 cases, excluding standalone 256-cell matrix and performance benchmark; not one uninterrupted 124-PASS run.",
+    "cases": [
+      {
+        "case": "tests/browser/arcadeo-brand.spec.ts:6:1 \u203a ArcadeO identity is consistent across browser, installed manifest, login and Home",
+        "duration": "1.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:3:1 \u203a deep-link authentication guard, client session deadline and UI logout",
+        "duration": "1.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:21:1 \u203a four saved theme families/modes, portrait/laptop layout, keyboard focus and reduced motion screenshots",
+        "duration": "2.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:86:1 \u203a actual service worker registration caches only public assets; API and private pages absent",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:114:1 \u203a offline board input disabled then recovered; second device takeover disables previous controller",
+        "duration": "4.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:149:1 \u203a native authenticated browser WebSocket sends real authoritative snapshot",
+        "duration": "1.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/environment.spec.ts:178:1 \u203a same-account independent sessions require explicit Together takeover",
+        "duration": "3.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/hand-cricket.spec.ts:14:3 \u203a Together Hand Cricket keeps A batting until out and swaps once",
+        "duration": "7.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/hand-cricket.spec.ts:14:3 \u203a Together Hand Cricket keeps B batting until out and swaps once",
+        "duration": "6.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:4:1 \u203a two independent UI logins, remote invitation/readiness, normal Connect Four win, refresh and rematch",
+        "duration": "5.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:53:3 \u203a connect-four Together UI creation and normal rule completion (API actions)",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:53:3 \u203a dots-boxes Together UI creation and normal rule completion (API actions)",
+        "duration": "3.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:53:3 \u203a sos Together UI creation and normal rule completion (API actions)",
+        "duration": "3.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:53:3 \u203a snakes-and-ladders Together UI creation and normal rule completion (API actions)",
+        "duration": "4.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:53:3 \u203a ludo Together UI creation and normal rule completion (API actions)",
+        "duration": "18.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:97:1 \u203a Together RPS handoff lock refresh masking Reveal Next and normal best-of completion",
+        "duration": "3.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:128:1 \u203a practice UI notes undo pause Check assistance and server solution completion",
+        "duration": "5.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a dots-boxes remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "8.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a sos remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "9.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a snakes-and-ladders remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "11.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a ludo remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "34.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a rock-paper-scissors remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "5.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:189:3 \u203a hand-cricket remote UI invitation both Ready first action and Rematch; API normal completion",
+        "duration": "5.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:318:1 \u203a Sudoku duel prestart private board common timer independent revisions and normal finish (API setup/actions)",
+        "duration": "10.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/journeys.spec.ts:357:1 \u203a async sender normal completion UI Publish receiver invitation acceptance and normal finish",
+        "duration": "12.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/lifecycle-ui.spec.ts:4:1 \u203a Back preserves an active match, saved setup resumes it, and intentional abandon is confirmed",
+        "duration": "3.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-auth-race.spec.ts:5:1 \u203a late unauthenticated bootstrap cannot replace the newer UI sign-in session",
+        "duration": "1.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-auth-race.spec.ts:50:1 \u203a a successful sign-out clears the same session after a preference refresh",
+        "duration": "1.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-interaction.spec.ts:40:1 \u203a UI02: a fresh document deep link uses Games instead of external browser history",
+        "duration": "1.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-interaction.spec.ts:62:1 \u203a UI10: changing reduced motion during accepted disc travel settles without another action",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-interaction.spec.ts:140:3 \u203a UI11: dots-boxes largest grid remains keyboard reachable in landscape with simulated safe insets and 200% text",
+        "duration": "2.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-interaction.spec.ts:140:3 \u203a UI11: sos largest grid remains keyboard reachable in landscape with simulated safe insets and 200% text",
+        "duration": "2.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-interaction.spec.ts:248:1 \u203a UI12: an accepted update preserves sheet focus and one result/rematch",
+        "duration": "3.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-motion.spec.ts:14:1 \u203a accepted disc travel has sampled movement and a settled laptop frame",
+        "duration": "3.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-motion.spec.ts:81:1 \u203a Connect Four accepted motion runs once, stays under 600ms and settles offline",
+        "duration": "2.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-motion.spec.ts:215:1 \u203a match option sheet consumes browser Back before leaving the match and restores focus",
+        "duration": "1.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-motion.spec.ts:234:1 \u203a options-to-confirmation sheet replacement preserves Back and accepted match state",
+        "duration": "4.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-motion.spec.ts:286:1 \u203a Ludo accepted roll and board fit a narrow phone viewport",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-pwa.spec.ts:4:1 \u203a precaches only the public shell graph and recovers cold offline routes",
+        "duration": "1.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:10:1 \u203a UI01: named pawn swatches explain conflicts and persist real setup colors",
+        "duration": "2.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup 403 failure ends pending state and allows a successful explicit retry",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup 404 failure ends pending state and allows a successful explicit retry",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup 409 failure ends pending state and allows a successful explicit retry",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup 429 failure ends pending state and allows a successful explicit retry",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup 503 failure ends pending state and allows a successful explicit retry",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:73:3 \u203a PERF06: setup invalid-json failure ends pending state and allows a successful explicit retry",
+        "duration": "2.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:134:1 \u203a PERF06: a protected 401 returns to sign in and unknown game/match routes expose safe navigation",
+        "duration": "4.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:163:1 \u203a REC15: an accepted creation with a lost response retries its identity and opens one saved match",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery-ui.spec.ts:218:1 \u203a PERF08: an actual waiting service worker update preserves the active match and document",
+        "duration": "2.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-recovery.spec.ts:4:1 \u203a an unloaded route opened offline enables Retry when the connection returns",
+        "duration": "1.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a connect-four: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a connect-four: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a dots-boxes: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a dots-boxes: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a sos: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a sos: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a snakes-and-ladders: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a snakes-and-ladders: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "3.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a ludo: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a ludo: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a rock-paper-scissors: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a rock-paper-scissors: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a hand-cricket: creator A accepts and delivers the first Remote action through UI without reload",
+        "duration": "4.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote-games.spec.ts:77:5 \u203a hand-cricket: creator B accepts and delivers the first Remote action through UI without reload",
+        "duration": "5.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-remote.spec.ts:4:1 \u203a different accounts finish Remote Connect Four using live UI without reload",
+        "duration": "7.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:121:1 \u203a REC-05 Together control transfers explicitly and leaves exactly one device active",
+        "duration": "4.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:162:3 \u203a UI-06 rock-paper-scissors masks locked, refreshed, and blurred secret choices in pixels and accessibility",
+        "duration": "3.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:162:3 \u203a UI-06 hand-cricket masks locked, refreshed, and blurred secret choices in pixels and accessibility",
+        "duration": "4.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:237:1 \u203a UI-07 Remote RPS advances during a paused outcome exit without stranding Round 1",
+        "duration": "4.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:354:1 \u203a UI-09 Ludo accepted pawn travel settles to the accepted token coordinate after offline",
+        "duration": "3.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 \u203a UI-09 snakes-and-ladders accepted presentation settles to its accepted target after background",
+        "duration": "2.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 \u203a UI-09 connect-four accepted presentation settles to its accepted target after navigation",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 \u203a UI-09 dots-boxes accepted presentation settles to its accepted target after offline",
+        "duration": "2.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-secret-motion.spec.ts:432:3 \u203a UI-09 sos accepted presentation settles to its accepted target after blur",
+        "duration": "2.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-startup.spec.ts:3:1 \u203a stalled session bootstrap shows loading and Retry states, then recovers",
+        "duration": "12.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-sudoku-recovery.spec.ts:128:1 \u203a REC08: unpublished Async sender saves, reloads, and resumes alone through the UI",
+        "duration": "5.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-sudoku-recovery.spec.ts:175:1 \u203a REC07B/UI05: B's Practice saves through Home and resumes with its own digit",
+        "duration": "3.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-sudoku-recovery.spec.ts:221:1 \u203a REC09: accepted Async receiver resumes alone while the completed sender stays in history",
+        "duration": "13.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-sudoku-recovery.spec.ts:297:1 \u203a REC04/REC10: simultaneous private Duel edits, two UI resume acknowledgments, and history-only completion",
+        "duration": "15.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:46:1 \u203a SEC01: independent accounts receive distinct browser session cookies and cannot read a private match",
+        "duration": "2.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:78:1 \u203a SEC08: stale account preference write is rejected in the UI without replacing the saved family",
+        "duration": "3.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:127:1 \u203a REC03: Sudoku Duel A takeover preserves B control while the old A session loses edits",
+        "duration": "20.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:225:1 \u203a REC03: Sudoku Duel B takeover leaves A editable and revokes the prior B session",
+        "duration": "7.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:284:1 \u203a REC07: Sudoku Practice A keeps a UI-entered digit through save, reload, and resume",
+        "duration": "3.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:332:1 \u203a REC12: a Together secret handoff survives save and resume without exposing the locked choice",
+        "duration": "4.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:377:1 \u203a REC11: saved Remote secret round resumes only after both participants acknowledge, without revealing the locked choice",
+        "duration": "5.6s",
+        "run": "affected-recovery-home"
+      },
+      {
+        "case": "tests/browser/overnight-targeted.spec.ts:446:1 \u203a REC06: forced socket outage falls back to HTTP, submits through UI, and stops hidden polling",
+        "duration": "10.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:33:1 \u203a remote Ludo colour changes belong to the authenticated seat and reject stale writes",
+        "duration": "3.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:120:3 \u203a dots-boxes rejects an action that attempts to change the saved grid size",
+        "duration": "3.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:120:3 \u203a sos rejects an action that attempts to change the saved grid size",
+        "duration": "3.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a dots-boxes creation rejects unsupported grid size 3",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a sos creation rejects unsupported grid size 3",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a dots-boxes creation rejects unsupported grid size 11",
+        "duration": "1.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a sos creation rejects unsupported grid size 11",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a dots-boxes creation rejects unsupported grid size 99",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:168:5 \u203a sos creation rejects unsupported grid size 99",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:186:3 \u203a Ludo creation rejects near-identical colours blue/cyan",
+        "duration": "1.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:186:3 \u203a Ludo creation rejects near-identical colours red/pink",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-authority.spec.ts:186:3 \u203a Ludo creation rejects near-identical colours yellow/orange",
+        "duration": "1.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:6:5 \u203a dots-boxes 7 setup saves an outer playable grid",
+        "duration": "2.1s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:6:5 \u203a dots-boxes 9 setup saves an outer playable grid",
+        "duration": "2.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:6:5 \u203a sos 7 setup saves an outer playable grid",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:6:5 \u203a sos 9 setup saves an outer playable grid",
+        "duration": "2.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:34:1 \u203a Ludo pending pawn selection survives refresh and a colour update",
+        "duration": "3.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-corrections.spec.ts:77:1 \u203a personal pins stay isolated, shared queue rejects stale writes, and name save retains account",
+        "duration": "3.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a ludo: four appearances at phone and laptop widths",
+        "duration": "6.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a snakes-and-ladders: four appearances at phone and laptop widths",
+        "duration": "6.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a dots-boxes: four appearances at phone and laptop widths",
+        "duration": "6.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a sos: four appearances at phone and laptop widths",
+        "duration": "5.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a connect-four: four appearances at phone and laptop widths",
+        "duration": "5.9s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a rock-paper-scissors: four appearances at phone and laptop widths",
+        "duration": "6.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a hand-cricket: four appearances at phone and laptop widths",
+        "duration": "5.3s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a sudoku: four appearances at phone and laptop widths",
+        "duration": "5.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a dots-boxes-7: four appearances at phone and laptop widths",
+        "duration": "6.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a dots-boxes-9: four appearances at phone and laptop widths",
+        "duration": "6.5s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a sos-7: four appearances at phone and laptop widths",
+        "duration": "6.2s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a sos-9: four appearances at phone and laptop widths",
+        "duration": "6.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:105:5 \u203a owner visual matrix on real Worker \u203a hand-cricket-play: four appearances at phone and laptop widths",
+        "duration": "6.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-visual.spec.ts:201:1 \u203a accepted action motion video and live Animation observations",
+        "duration": "40.0s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-zoom.spec.ts:7:3 \u203a dots-boxes: zoom pans to the outer column and accepts an outer action at 320px",
+        "duration": "2.7s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-zoom.spec.ts:7:3 \u203a sos: zoom pans to the outer column and accepts an outer action at 320px",
+        "duration": "2.6s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/owner-zoom.spec.ts:43:1 \u203a shared recap projects a real scored result and excludes an abandoned match",
+        "duration": "2.4s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/ui-shell-visual.spec.ts:20:1 \u203a Home, Games and Us render across all appearances and responsive widths",
+        "duration": "16.8s",
+        "run": "full-selection"
+      },
+      {
+        "case": "tests/browser/ui-shell-visual.spec.ts:120:1 \u203a Home renders accurate empty and multi-match states in all four appearances",
+        "duration": "5.4s",
+        "run": "affected-recovery-home"
+      }
+    ]
+  },
+  "dependencyAudits": [
+    {
+      "command": "npm audit --omit=dev --json",
+      "status": "PASS",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencyCounts": {
+        "prod": 11,
+        "dev": 367,
+        "optional": 138,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 377
+      }
+    },
+    {
+      "command": "npm audit --json",
+      "status": "PASS",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencyCounts": {
+        "prod": 11,
+        "dev": 367,
+        "optional": 138,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 377
+      }
+    }
+  ],
+  "artifacts": {
+    "verifiedAt": "2026-10-03T06:43:18.335Z",
+    "status": "PASS",
+    "publicCacheRevision": "c8c3324dd80bb4fd",
+    "publicFiles": 59,
+    "initialGzipBytes": 148683,
+    "privateSolutionLeakCheck": "1000 private solutions absent from public JavaScript",
+    "identity": "ArcadeO browser, install manifest and arcadeo package/lock verified",
+    "storageCompatibility": "Existing DB/MATCH_DO bindings and MatchDurableObject identity retained",
+    "notices": "Eight complete dependency/reference notices and byte-identical project attribution",
+    "entryFiles": [
+      {
+        "file": "assets/index-ShscFwcf.js",
+        "sha256": "ad019cb8420e091af191192feac172e116939f55b7e9bc40303115c613ae0a44"
+      }
+    ],
+    "limits": "Artifact/source checks only. No deployed account, production URL or physical device certification."
+  },
+  "cleanup": {
+    "removedFiles": 1363,
+    "removedBytes": 115220994,
+    "categories": {
+      "unused-import-files": {
+        "files": 480,
+        "bytes": 7752415
+      },
+      "evidence": {
+        "files": 882,
+        "bytes": 107461527
+      },
+      "compiler-cache": {
+        "files": 1,
+        "bytes": 7052
+      }
+    },
+    "preCleanupTrackedFiles": 2063,
+    "preCleanupTrackedBytes": 225061378
+  },
+  "reviewScope": "Lead review; current static/runtime/browser checks; historical independent reports are not new final certification.",
+  "external": [
+    "Cloudflare account/D1/exact HTTPS Origin/secrets/authorization",
+    "production KDF CPU/memory and HTTPS security verification",
+    "physical phone/browser/installed PWA certification"
+  ],
+  "publication": {
+    "target": "master",
+    "remoteBeforeIntegration": "62e8700",
+    "normalMerge": "f5a1dd9",
+    "status": "PENDING_PUSH"
+  }
+}

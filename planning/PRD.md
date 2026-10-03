@@ -1,4 +1,4 @@
-# Product requirements document — Private Arcade V1
+# Product requirements document — ArcadeO V1
 
 ## Current owner acceptance requirements — 2026-10-03
 

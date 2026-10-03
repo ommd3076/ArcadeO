@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — SOS Board Component
+ * ArcadeO V1 — SOS Board Component
  *
  * 5x5 cell grid with tactile letter placement, S/O selector toggle,
  * animated SVG strike-through lines for formed SOS sequences,

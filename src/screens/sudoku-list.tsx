@@ -1,6 +1,6 @@
 import { apiFetch } from "../app/auth";
 /**
- * Private Arcade V1 — Sudoku Catalog & Mode Launcher Screen
+ * ArcadeO V1 — Sudoku Catalog & Mode Launcher Screen
  *
  * Provides:
  * - 1,000 launch puzzle catalog browsing (250 Easy, 250 Medium, 250 Hard, 250 Expert)

@@ -12,7 +12,7 @@ async function check(name, fn) {
   saveReport();
 }
 function saveReport(failed) {
-  fs.mkdirSync("planning/review/evidence", { recursive: true });
+  fs.mkdirSync(".local/evidence", { recursive: true });
   const content = JSON.stringify(
     {
       runtime: "Wrangler/workerd, SQLite Durable Objects and D1, real HTTP",
@@ -27,7 +27,7 @@ function saveReport(failed) {
   );
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
-      fs.writeFileSync("planning/review/evidence/runtime-results.json", content);
+      fs.writeFileSync(".local/evidence/runtime-results.json", content);
       break;
     } catch (err) {
       if (attempt === 4) throw err;

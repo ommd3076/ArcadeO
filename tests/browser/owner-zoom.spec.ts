@@ -27,7 +27,7 @@ for (const game of ["dots-boxes", "sos"] as const) {
           return game === "sos" ? saved.gameState.board[0][8] : saved.gameState.edges.length;
         })
         .toBe(game === "sos" ? "S" : 1);
-      const evidence = path.resolve("planning/review/evidence/owner-corrections");
+      const evidence = path.resolve(".local/evidence/owner-corrections");
       fs.mkdirSync(evidence, { recursive: true });
       await captureScreenshot(page, path.join(evidence, `${game}-zoom-panned-320.png`));
       await page.getByRole("button", { name: "Reset board zoom", exact: true }).click();

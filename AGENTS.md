@@ -29,3 +29,7 @@ Standard is A's colorful black/white theme with mint/cyan/yellow; Romantic is B'
 No root Git convention is evidenced. Use descriptive Conventional Commits. PRs explain behavior/scope, actual validation/limits and relevant screenshots/issues. Never commit credentials, public solutions, session dumps or choices.
 
 Current owner authorization (2026-10-03): execute the Overnight Finish brief and its 60-task/300-case queues in a new GPT-6.1 Sol High chat with GPT-6 Luna specialists, twelve submissions and at most three active. Different-account phone/PC Remote play, saved recovery and small-control/navigation/motion polish are release gates. No automatic disconnect loss or saved expiry; interrupted Duels are history-only. Preserve edits/scope. Deployment remains separately authorized; phone certification requires hardware.
+
+## Current owner rename and cleanup scope — 2026-10-03
+
+The product is ArcadeO. Owner authorizes inventoried removal of unnecessary evidence/import tooling, detailed production analysis and push to the verified default branch master. Deployment is later. Preserve runtime/data/required source qualification/licenses; generated validation output goes under ignored .local/evidence. Current report: planning/review/ARCADEO-PRODUCTION-READINESS.md. Earlier scope/checkpoints remain historical.

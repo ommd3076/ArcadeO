@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Shared Protocol Types
+ * ArcadeO V1 — Shared Protocol Types
  * Server-authoritative contract for all game engines, matches, and actions.
  */
 

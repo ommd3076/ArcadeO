@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — SOS Game Engine Adapter
+ * ArcadeO V1 — SOS Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

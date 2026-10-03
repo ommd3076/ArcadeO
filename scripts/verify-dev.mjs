@@ -13,6 +13,6 @@ for (const id of ["A", "B"]) {
   const session = await fetch(origin + "/api/v1/auth/session",{headers:{Cookie:cookie}}); assert.equal((await session.json()).profile.id,id);
   const logout=await fetch(origin+"/api/v1/auth/logout",{method:"POST",headers:{Origin:origin,Cookie:cookie,"X-CSRF-Token":body.csrfToken}}); assert.equal(logout.status,200);
 }
-fs.mkdirSync("planning/review/evidence",{recursive:true});
-fs.writeFileSync("planning/review/evidence/dev-startup.json",JSON.stringify({command:"npm run dev",origin,workerOrigin:"http://localhost:8787",assertions:["SPA and deep links","same-origin API proxy","A and B real login/bootstrap/logout"],verifiedAt:new Date().toISOString()},null,2));
+fs.mkdirSync(".local/evidence",{recursive:true});
+fs.writeFileSync(".local/evidence/dev-startup.json",JSON.stringify({command:"npm run dev",origin,workerOrigin:"http://localhost:8787",assertions:["SPA and deep links","same-origin API proxy","A and B real login/bootstrap/logout"],verifiedAt:new Date().toISOString()},null,2));
 console.log("DEV_STARTUP_VERIFIED");

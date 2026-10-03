@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Records & Statistics API
+ * ArcadeO V1 — Records & Statistics API
  *
  * Exposes server-authoritative projections:
  * - Head-to-head match stats between Player A and Player B

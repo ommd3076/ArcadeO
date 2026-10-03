@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Dots & Boxes Game Engine Adapter
+ * ArcadeO V1 — Dots & Boxes Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

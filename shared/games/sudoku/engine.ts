@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Pure Sudoku Game Engine
+ * ArcadeO V1 — Pure Sudoku Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Sudoku.
  * Conforms to GAME-RULES.md, PRD.md, TDD.md, and DATA-MODEL.md.

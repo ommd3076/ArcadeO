@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Connect Four Game Engine Adapter
+ * ArcadeO V1 — Connect Four Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

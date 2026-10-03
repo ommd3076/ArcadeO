@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Worker Sudoku Records Projection Helper
+ * ArcadeO V1 — Worker Sudoku Records Projection Helper
  *
  * Implements projections from terminal DO outcomes to D1 `sudoku_records` table.
  * Source is server-authoritative DO snapshot, NOT client-submitted scores.

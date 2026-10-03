@@ -26,7 +26,7 @@ type MotionFrame = {
 };
 
 const ledgerPath = path.resolve("planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json");
-const evidenceDir = path.resolve("planning/review/evidence/overnight-acceptance");
+const evidenceDir = path.resolve(".local/evidence/overnight-acceptance");
 const viewports: Record<VisualCell["width"], { width: number; height: number }> = {
   320: { width: 320, height: 700 },
   390: { width: 390, height: 844 },

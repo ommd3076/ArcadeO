@@ -230,9 +230,6 @@ test("measure comparable loading, input, frames and route resource lifetime", as
     samples,
     traffic,
   };
-  await writeJsonWithRetry(
-    `planning/review/evidence/owner-corrections/performance-${label}.json`,
-    result,
-  );
+  await writeJsonWithRetry(`.local/evidence/owner-corrections/performance-${label}.json`, result);
   console.log("PERFORMANCE_MEASURED", label);
 });

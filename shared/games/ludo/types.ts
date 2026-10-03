@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Ludo Game Types
+ * ArcadeO V1 — Ludo Game Types
  *
  * Server-authoritative, deterministic pure types and fixed geometry for Ludo.
  * 15x15 board geometry with 52-cell shared ring and private home lanes.

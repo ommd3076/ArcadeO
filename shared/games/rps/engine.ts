@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Rock Paper Scissors Game Engine
+ * ArcadeO V1 — Rock Paper Scissors Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Rock Paper Scissors.
  *

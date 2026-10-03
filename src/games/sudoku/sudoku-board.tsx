@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Sudoku Board & Interactive Controls
+ * ArcadeO V1 — Sudoku Board & Interactive Controls
  *
  * Server-authoritative 9x9 Sudoku interface with:
  * - 9x9 cell grid with 3x3 block borders

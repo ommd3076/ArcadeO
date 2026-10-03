@@ -1,4 +1,8 @@
-# Private Arcade
+# ArcadeO
+
+## Current owner scope — rename and cleanup, 2026-10-03
+
+Product identity is ArcadeO. The owner authorizes removal of unnecessary repository/evidence files, detailed production analysis and a push to the verified default branch `master`. Deployment follows later when the intended Cloudflare account/D1/Origin and authorization are available. This supersedes earlier artifact-preservation instructions for the explicitly inventoried removals; rules, accounts, persistence, notices and required qualification data remain intact. Read [current analysis](planning/review/ARCADEO-PRODUCTION-READINESS.md).
 
 ## Owner correction — 2026-10-03
 

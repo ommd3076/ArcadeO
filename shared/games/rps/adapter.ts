@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Rock Paper Scissors Game Engine Adapter
+ * ArcadeO V1 — Rock Paper Scissors Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

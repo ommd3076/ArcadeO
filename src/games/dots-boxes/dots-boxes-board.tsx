@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Dots & Boxes Board Component
+ * ArcadeO V1 — Dots & Boxes Board Component
  *
  * 5x5 dot grid with 4x4 claimable boxes.
  * Features generous edge hit areas, alternative dot-to-dot selection,

@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Snakes & Ladders Game Types
+ * ArcadeO V1 — Snakes & Ladders Game Types
  *
  * Server-authoritative, deterministic pure types for Snakes & Ladders.
  * 10x10 board with positions 0 (off-board) to 100 (win).

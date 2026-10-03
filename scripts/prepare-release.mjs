@@ -20,10 +20,10 @@ const config = {
   ...base,
   $schema: "../node_modules/wrangler/config-schema.json",
   account_id: accountId,
-  name: "private-arcade",
+  name: "arcadeo",
   main: "../worker/index.ts",
   assets: { ...base.assets, directory: "../dist/client" },
-  d1_databases: [{ binding: "DB", database_name: "private-arcade-db", database_id: databaseId, migrations_dir: "../migrations" }],
+  d1_databases: [{ binding: "DB", database_name: "arcadeo-db", database_id: databaseId, migrations_dir: "../migrations" }],
   vars: { ENVIRONMENT: "production", ALLOWED_ORIGIN: origin.origin },
 };
 if (process.argv.includes("--check")) {

@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { action, create, login, view, writeJsonWithRetry } from "./helpers";
 
-const evidence = "planning/review/evidence/overnight-recovery-ui";
+const evidence = ".local/evidence/overnight-recovery-ui";
 
 async function cleanup(page: Page, id: string) {
   if ((await view(page, id)).lifecycle === "active") await action(page, id, "match.agree-abandon");

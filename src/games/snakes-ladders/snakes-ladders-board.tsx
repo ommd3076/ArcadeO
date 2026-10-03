@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Snakes & Ladders Board Component
+ * ArcadeO V1 — Snakes & Ladders Board Component
  *
  * 10x10 serpentine grid with positions 1 to 100, off-board starting zone,
  * SVG paths from the saved board version, player tokens,

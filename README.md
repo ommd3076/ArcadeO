@@ -1,6 +1,12 @@
-# Private Arcade V1
+# ArcadeO V1
 
 Private, installable arcade for exactly two people. Supports remote (two devices) and together (single device) play with server-authoritative rules and offline input pause.
+
+## Readiness and repository hygiene
+
+The current product is **ArcadeO**. Read [production analysis](planning/review/ARCADEO-PRODUCTION-READINESS.md) for exact current validation, cleanup measurements and deployment prerequisites. Cloudflare deployment and physical-phone certification are separate stages. The GitHub default/release branch is `master`; `main` is a historical baseline.
+
+Use `npm ci` for reproducible dependency installation. Browser/runtime evidence is generated under ignored `.local/evidence`; tracked evidence contains intentionally retained summaries and representative captures. Do not commit credentials, local databases, traces, seed SQL or compiler caches. Run `node scripts/verify-production.mjs` after `npm run build` to validate the public identity, notices, privacy boundaries and initial JavaScript budget.
 
 ## Games Included
 - **Connect Four**
@@ -22,7 +28,7 @@ Private, installable arcade for exactly two people. Supports remote (two devices
 
 ```bash
 # Install dependencies
-npm install
+npm ci
 
 # Start development servers
 npm run dev

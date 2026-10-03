@@ -1,6 +1,6 @@
 {
-  "name": "Private Arcade",
-  "short_name": "Arcade",
+  "name": "ArcadeO",
+  "short_name": "ArcadeO",
   "description": "Private, intentional two-player arcade games and shared records.",
   "start_url": "/",
   "display": "standalone",

@@ -1,4 +1,4 @@
-# Private Arcade V1 — design specification
+# ArcadeO V1 — design specification
 
 Revision 2, 2026-09-30. This is the visual and screen design brief. [UI-CONTRACT](planning/UI-CONTRACT.md) governs interaction, identity and motion; [PRD](planning/PRD.md) governs behavior. Tokens are the first implementation baseline, subject to rendered contrast/fidelity review rather than another product question round.
 
@@ -60,7 +60,7 @@ At laptop width, shell content max-width about 960 px. Home uses one hero/Contin
 
 | Screen | Hierarchy and action | Design decisions |
 | --- | --- | --- |
-| Login | Private Arcade title, short welcome, form, Sign in | Compact centered panel; no signup or unexplained avatar selection. Inline generic error; submitting feedback does not erase entered username. |
+| Login | ArcadeO title, short welcome, form, Sign in | Compact centered panel; no signup or unexplained avatar selection. Inline generic error; submitting feedback does not erase entered username. |
 | Home | Greeting/name, short weekly sentence, dominant Continue, quick games | Continue names game/mode/whose turn. Several matches adds All active count; one main card, no stack of oversized competing CTAs. Empty Continue becomes Choose a game. Mint/cyan/yellow in Standard; tonal purple/rose equivalents in Romantic. |
 | Games | Title, eight named tiles, mode context on detail | Procedural symbols from real games. Tile name remains readable; no hidden swipe carousel. Phone two columns when width/text allows, one at narrow/text-scaled widths. |
 | Game detail | Back/name, compact symbol, mode choices, concise rules, Play/Resume | RPS format/Sudoku difficulty only. Existing slot names saved state and promotes Resume. Avoid a configuration-heavy lobby. |

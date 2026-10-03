@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Ludo Game Engine
+ * ArcadeO V1 — Ludo Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Ludo.
  * 4 tokens per seat (IDs 0..3), 52-cell shared ring, safe squares,

@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Hand Cricket Board Component
+ * ArcadeO V1 — Hand Cricket Board Component
  *
  * Implements the complete Hand Cricket gameplay:
  * - Toss winner role selection (Bat / Bowl)

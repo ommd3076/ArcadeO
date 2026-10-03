@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Snakes & Ladders Game Engine
+ * ArcadeO V1 — Snakes & Ladders Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Snakes & Ladders.
  * 10x10 board, positions 0 (off-board) to 100 (win).

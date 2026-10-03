@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — SOS Game Types
+ * ArcadeO V1 — SOS Game Types
  *
  * Server-authoritative, deterministic pure types for SOS.
  * 5x5 grid (25 cells).

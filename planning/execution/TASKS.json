@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "preparedAt": "2026-09-30",
-  "executionStatus": "V1_LOCAL_CLOSED_WITH_DEFERRED_AND_EXTERNAL_GATES",
+  "executionStatus": "ARCADEO_LOCAL_VERIFIED_PUBLICATION_PENDING",
   "currentExecutor": "Codex native GPT-6.1 Sol High lead with twelve bounded GPT-6 Luna High submissions, at most three active specialists",
-  "currentHandoff": "planning/review/OVERNIGHT-FINISH-REPORT-2026-10-03.md",
-  "currentValidation": "planning/review/evidence/v1-closeout-validation.json",
+  "currentHandoff": "planning/review/ARCADEO-PRODUCTION-READINESS.md",
+  "currentValidation": "planning/review/evidence/arcadeo-validation.json",
   "currentExecutionQueue": "planning/execution/OVERNIGHT-TASKS-2026-10-03.json",
   "currentAcceptanceLedger": "planning/execution/OVERNIGHT-ACCEPTANCE-2026-10-03.json",
   "currentHandCricketRepair": {

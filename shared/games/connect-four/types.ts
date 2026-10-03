@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Connect Four Game Types
+ * ArcadeO V1 — Connect Four Game Types
  *
  * Server-authoritative state, effects, and views for Connect Four.
  * 7 columns x 6 rows board with gravity.

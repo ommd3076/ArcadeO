@@ -137,7 +137,7 @@ export function HomePage() {
   return (
     <div className="home-page">
       <header className="home-page__header">
-        <p className="eyebrow">Private Arcade</p>
+        <p className="eyebrow">ArcadeO</p>
         <h1>
           {session?.profile.displayName ? `Hello, ${session.profile.displayName}` : "Welcome"}
         </h1>

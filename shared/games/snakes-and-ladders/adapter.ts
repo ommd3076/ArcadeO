@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — Snakes & Ladders Game Engine Adapter
+ * ArcadeO V1 — Snakes & Ladders Game Engine Adapter
  */
 
 import { GameEngineAdapter } from "../registry";

@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Rock Paper Scissors Game Types
+ * ArcadeO V1 — Rock Paper Scissors Game Types
  *
  * Server-authoritative state, effects, and views for Rock Paper Scissors.
  * Supports best of 3 (target 2), best of 5 (target 3), and best of 7 (target 4).

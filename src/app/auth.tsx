@@ -129,7 +129,7 @@ function AuthStateView({
           <StatusIcon size={22} aria-hidden="true" />
         </span>
         <div className="auth-state__copy">
-          <p className="auth-state__eyebrow">PRIVATE ARCADE</p>
+          <p className="auth-state__eyebrow">ArcadeO</p>
           <h1 className="auth-state__title">
             {loading ? "Opening your arcade…" : "Reconnect to your arcade"}
           </h1>

@@ -3,7 +3,7 @@ import path from "node:path";
 import { test, expect, type Page } from "@playwright/test";
 import { login, create, view, action, captureScreenshot, writeJsonWithRetry } from "./helpers";
 
-const evidence = path.resolve("planning/review/evidence/owner-corrections");
+const evidence = path.resolve(".local/evidence/owner-corrections");
 const games = [
   "ludo",
   "snakes-and-ladders",

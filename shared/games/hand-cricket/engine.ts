@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Hand Cricket Game Engine
+ * ArcadeO V1 — Hand Cricket Game Engine
  *
  * Server-authoritative, deterministic pure reducer for Hand Cricket.
  *

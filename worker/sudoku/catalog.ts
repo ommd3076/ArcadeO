@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Worker Sudoku Catalog Queries
+ * ArcadeO V1 — Worker Sudoku Catalog Queries
  *
  * Exposes safe public catalog querying from content/sudoku/catalog.json.
  * Solutions are strictly excluded.

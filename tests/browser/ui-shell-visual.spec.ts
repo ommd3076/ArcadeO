@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { test, expect } from "@playwright/test";
-import { action, create, login } from "./helpers";
+import { action, create, login, request, view, origin } from "./helpers";
 
 const appearances = [
   { family: "Standard", mode: "Dark", key: "standard-dark" },
@@ -10,7 +10,7 @@ const appearances = [
   { family: "Romantic", mode: "Light", key: "romantic-light" },
 ] as const;
 const widths = [320, 390, 430, 1280] as const;
-const output = path.resolve("planning/review/evidence/owner-corrections/ui-shell");
+const output = path.resolve(".local/evidence/owner-corrections/ui-shell");
 const blurPageFocus = (page: import("@playwright/test").Page) =>
   page.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
@@ -123,6 +123,44 @@ test("Home renders accurate empty and multi-match states in all four appearances
   const activeMatches: string[] = [];
   await login(page, "A");
   try {
+    // Recovery cases intentionally retain matches. Establish this fixture's
+    // empty state through legal actions in the isolated browser-test Worker.
+    expect(new URL(page.url()).origin).toBe(origin);
+    const existing = await request(page, "/api/v1/matches");
+    expect(existing.r.ok()).toBe(true);
+    for (const match of existing.body.matches ?? []) {
+      if (!["waiting", "active", "saved"].includes(match.lifecycle)) continue;
+      let snapshot = await view(page, match.matchId);
+      if (!snapshot.controller.isController) {
+        const takeover = await request(
+          page,
+          `/api/v1/matches/${match.matchId}/controller`,
+          "POST",
+          {
+            expectedControllerGeneration: snapshot.controller.controllerGeneration,
+          },
+        );
+        expect(takeover.r.ok()).toBe(true);
+        snapshot = await view(page, match.matchId);
+      }
+      const lifecycleAction = [
+        "match.agree-abandon",
+        "match.resign",
+        "match.request-abandon",
+        "match.cancel",
+        "match.decline",
+      ].find((candidate) => snapshot.legalActions.includes(candidate));
+      expect(lifecycleAction, "Synthetic fixture has a legal cleanup action").toBeTruthy();
+      const closed = await action(
+        page,
+        match.matchId,
+        lifecycleAction!,
+        lifecycleAction === "match.resign" && snapshot.mode === "together"
+          ? { resigningSeat: "A" }
+          : {},
+      );
+      expect(["abandoned", "resigned", "cancelled"]).toContain(closed.lifecycle);
+    }
     await page.goto("/");
     await expect(page.getByRole("heading", { name: "Pick a game to play" })).toBeVisible();
 

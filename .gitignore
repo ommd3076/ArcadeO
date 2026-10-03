@@ -38,3 +38,6 @@ Thumbs.db
 .local/
 .unlazy/
 planning/execution/*.local.md
+
+# Reproducible TypeScript build cache
+*.tsbuildinfo

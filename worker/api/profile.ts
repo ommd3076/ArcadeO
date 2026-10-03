@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Profile & Preferences API
+ * ArcadeO V1 — Profile & Preferences API
  *
  * Server-authoritative preferences and account settings:
  * - Versioned palette family updates

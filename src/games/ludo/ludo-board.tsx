@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Ludo Board Component
+ * ArcadeO V1 — Ludo Board Component
  *
  * Server-authoritative visual representation of the 15x15 Ludo board.
  * Renders the 52-cell outer ring, player yards, safe squares, home lanes,

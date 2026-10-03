@@ -1,5 +1,5 @@
 ﻿/**
- * Private Arcade V1 — SOS Game Engine
+ * ArcadeO V1 — SOS Game Engine
  *
  * Server-authoritative, deterministic pure reducer for SOS.
  * 5x5 grid (25 cells) general scoring variant.

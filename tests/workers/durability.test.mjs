@@ -32,6 +32,27 @@ async function envelope(m, action = "connect-four.drop", payload = {column:0}) {
   return {protocolVersion:1,matchId:m.id,actionId:crypto.randomUUID(),action,payload,expectedVersion:v.deliveryVersion,turnId:v.turnId,roundId:v.roundId,controllerGeneration:v.controller.controllerGeneration};
 }
 async function submit(m, e) { return (await m.stub.fetch("http://do/action", {method:"POST",headers:{"X-Actor-Account":"A","X-Session-Id":"session-A"},body:JSON.stringify(e)})).json(); }
+it("native socket enforces exact HTTPS production Origin inside the Durable Object", async () => {
+  const m = await match();
+  await runInDurableObject(m.stub, async (instance) => {
+    const originalEnvironment = instance.env;
+    const socketRequest = (origin) => new Request("https://arcadeo.example/socket", {
+      headers: { Upgrade: "websocket", Origin: origin, "X-Actor-Account": "A", "X-Session-Id": "session-A" },
+    });
+    try {
+      instance.env = { ...originalEnvironment, ENVIRONMENT: "production", ALLOWED_ORIGIN: "*" };
+      expect((await instance.fetch(socketRequest("https://arcadeo.example"))).status).toBe(403);
+      instance.env = { ...originalEnvironment, ENVIRONMENT: "production", ALLOWED_ORIGIN: "https://arcadeo.example" };
+      expect((await instance.fetch(socketRequest("https://other.example"))).status).toBe(403);
+      const accepted = await instance.fetch(socketRequest("https://arcadeo.example"));
+      expect(accepted.status).toBe(101);
+      accepted.webSocket.accept();
+      accepted.webSocket.close(1000, "Origin positive control complete");
+    } finally {
+      instance.env = originalEnvironment;
+    }
+  });
+});
 it("real SQLite rolls back snapshot, event, receipt and outbox when a middle acceptance write fails", async () => {
   const m = await match(); const before = await view(m); const e = await envelope(m);
   await runInDurableObject(m.stub, (_instance, state) => {

@@ -1,5 +1,5 @@
 /**
- * Private Arcade V1 — Worker Sudoku Module
+ * ArcadeO V1 — Worker Sudoku Module
  */
 
 export * from "./catalog";

@@ -14,6 +14,6 @@ try {
   await page.getByRole("button", { name: /^Sign in$/i }).click();
   await page.waitForURL("http://localhost:8787/");
   console.log("HOME", await page.locator("body").innerText());
-  fs.mkdirSync("planning/review/evidence", { recursive: true });
-  await page.screenshot({ path: "planning/review/evidence/home-mobile-initial.png", fullPage: true });
+  fs.mkdirSync(".local/evidence", { recursive: true });
+  await page.screenshot({ path: ".local/evidence/home-mobile-initial.png", fullPage: true });
 } finally { await browser.close(); }

@@ -1,3 +1,5 @@
+> Historical V1 validation before ArcadeO rename/cleanup. Superseded captures/attempts are preserved in Git commit `048cbc7`. See [current production analysis](ARCADEO-PRODUCTION-READINESS.md) for current checks and publication.
+
 # Private Arcade V1 final local handoff
 
 Updated 2026-10-03T04:57:34.156160+00:00. Status: **V1 LOCAL CLOSED WITH DEFERRED AND EXTERNAL GATES**.

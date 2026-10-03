@@ -2,12 +2,12 @@
 
 Current owner scope: rename ArcadeO, remove unnecessary files/evidence, deliver detailed production analysis, and push to verified default branch `master`. Deployment is later. The earlier gates below are historical.
 
-- [ ] AO1: Browser title, login/Home/error identity, install manifest and package/release configuration use ArcadeO; protocol and storage identities stay compatible.
-  EVIDENCE: pending fresh source/build/browser checks.
-- [ ] AO2: Removed files have a measured inventory reason; runtime/tests/notices/contracts and required Sudoku sources remain usable. New generated evidence stays ignored.
-  EVIDENCE: pending measured inventory and cleanup record.
-- [ ] AO3: Fresh static, unit, mocked, component, real Worker/HTTP, content and selected full browser checks pass on the renamed cleaned tree. Production analysis states findings and remaining deployment/hardware requirements.
-  EVIDENCE: pending actual runs and detailed report.
+- [x] AO1: Browser title, login/Home/error identity, install manifest and package/release configuration use ArcadeO; protocol and storage identities stay compatible.
+  EVIDENCE: current source/static/build checks, new live browser identity case and scripts/verify-production.mjs pass; public cache c8c3324dd80bb4fd.
+- [x] AO2: Removed files have a measured inventory reason; runtime/tests/notices/contracts and required Sudoku sources remain usable. New generated evidence stays ignored.
+  EVIDENCE: arcadeo-cleanup-inventory.json enumerates 1,363 removals / 115,220,994 original bytes; required files and 48 retained image hashes checked; new outputs ignored.
+- [x] AO3: Fresh static, unit, mocked, component, real Worker/HTTP, content and selected full browser checks pass on the renamed cleaned tree. Production analysis states findings and remaining deployment/hardware requirements.
+  EVIDENCE: arcadeo-validation.json records fresh 305 unit, 78 mocked, 62 component, 12 Worker, 26 HTTP, 1,000 content and 124 unique browser passes; zero advisories in both dependency audits; detailed production analysis saved.
 - [ ] AO4: Remote target is verified, remote changes/history preserved, final local commit equals remote master without force push, no deployment.
   EVIDENCE: actual remote HEAD is master 62e8700; main is older 4fa98e3. Normal merge exposes conflicts for explicit review.
 

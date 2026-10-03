@@ -88,7 +88,7 @@ export function LoginPage() {
               margin: "0 0 6px 0",
             }}
           >
-            Private Arcade
+            ArcadeO
           </h1>
           <p style={{ fontSize: "14px", color: "var(--color-muted-text)", margin: 0 }}>
             Sign in to your private two-player arcade.
