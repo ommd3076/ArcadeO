@@ -1,0 +1,223 @@
+{
+  "recordedAt": "2026-10-03T03:32:19.026Z",
+  "policy": "Prettier-only cleanup of pre-existing baseline files. Each file's minified esbuild TS/TSX transform is byte-identical before and after; no runtime execution implied.",
+  "records": [
+    {
+      "file": "src/app/pages/games-page.tsx",
+      "beforeSha256": "4fae2666ca64bdfa5064476016a6ede7c2f3c761c02e9ab71ae86bc80d9576e2",
+      "afterSha256": "6bce537ed3e8adc88ef49a659c32a687a455166def11f3328fac93fb1cd3f342",
+      "normalizedOutputSha256": "84c9a5f5642cbf81f920cca461be23bc841b4143899de179ad8ad564632da837",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "src/app/shell.tsx",
+      "beforeSha256": "e121b7cf5ae0985a638a6f24042abf6a8eb67055cc0300843adc476dde0b5a12",
+      "afterSha256": "82cda21d359dc264bde3665bb219c92539de70b27d856cfe28fa69b408ba493a",
+      "normalizedOutputSha256": "c17af82c06c9f6078a1401e96afb6e8b2dcb1d0aeb6c62423144b8fe09e06090",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "src/components/icons/us-couple-icon.tsx",
+      "beforeSha256": "ec0cf270d40c3cecc55a25b29d50b5136516ab7bfe57e31022ef8e40c5d4f53e",
+      "afterSha256": "ffb6fed023be0b2281f3160fb4ceadb6926174ec2fb4972720380a231f1e7ff2",
+      "normalizedOutputSha256": "3f7fa0da4ed08f99de8bb6a189a4fd0ecb86409c6239ae670a4e06e27fc02045",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "src/components/nav-tabs.tsx",
+      "beforeSha256": "d70c786b0a694267c80bca66ad783cc8f1fac15402a768f46cd735087150ba80",
+      "afterSha256": "4fdfb2eae2e133f3c848631c323f0e0f3114ed6279529bcebed5ebafdcff3b98",
+      "normalizedOutputSha256": "3f373c9c213913ff762ac715db7c0a5af0a26e38cce71b27fb85fd3f72c73af7",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "src/components/secret-round/types.ts",
+      "beforeSha256": "9d58dd2d62a40896e31f8e81010b5f12234cbee143adc26d27906ca0facea532",
+      "afterSha256": "d13285e0cd7cfb5554d4e3d36682a0ebd2f2c32cbfd0668be21c13de472727af",
+      "normalizedOutputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "src/theme/tokens.ts",
+      "beforeSha256": "4d1e77cd555e150435dd7850dfc58af15016c78854e5e31737d02083a2c6602e",
+      "afterSha256": "4edc2b1db37feea3e3e71e29b0ab505da24a5c752db0a1c81956096f2d5d907d",
+      "normalizedOutputSha256": "d57c08a1c66ef6346f10533c2bf3bc537ecb24c9ff17849a2a3c276e13050b90",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/dots-boxes/types.ts",
+      "beforeSha256": "9b0e936d0053a662ced5519bfe3206be7a964ff6cdd7d00e428cc13e0f0fd090",
+      "afterSha256": "420850a84b1dae085a0e1417a759e3205fdc17803f37d9c299115106f0df6aa8",
+      "normalizedOutputSha256": "fed28aaddd2190abfe4b53a1e378fd031b4ed19b92ec89752f106fa656b2e896",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/hand-cricket/adapter.ts",
+      "beforeSha256": "b1f0b6757d7f58e3e611e17e3313d4c8b802faf7f627689890b472e8ca35dba2",
+      "afterSha256": "9648a6b1623621989ea6b3b82b8f373a7e7a057c7fd7f1509a57ac63b668f677",
+      "normalizedOutputSha256": "8b48a0c75eb37d25634f236f3f784026258083ea4db585b5cb32908d78d6bef1",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/hand-cricket/engine.ts",
+      "beforeSha256": "bcb37f6856a71e9075c6d98aa6dd649c675254c5e6c1a533ad2d0a48532f59f6",
+      "afterSha256": "60dfd586fdb085b8c903d7da23bcd2ad4acc00cc8475a5842d3cbf446075ea79",
+      "normalizedOutputSha256": "c9c44a640bf22b46c375d942ca1ed2b9191603e133846bb3f929af43d9ea8e9e",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/hand-cricket/types.ts",
+      "beforeSha256": "a24dbf1b274e7b9141677d2b4df133253db86797ed093638abc1e3fcafe22569",
+      "afterSha256": "6902e659248d5b5f23321507146f9a9394175bf3c824b3d14dd16ba3d42569bb",
+      "normalizedOutputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/registry.ts",
+      "beforeSha256": "52d54d2fde41d187e18d427ce3e881f43c7c9a0d9196227ed18e241485549cc6",
+      "afterSha256": "a8a9d06b93444c4b38caa37260635cd7997a12dcf08c64a4d32d90ddbaa47650",
+      "normalizedOutputSha256": "ffaea9d539ea463810de4d27320fcab6e8166fcf65e830060a66dfd088e80613",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/rps/engine.ts",
+      "beforeSha256": "baf65b4ad1cc0a897c10035a68df99a0c0605812f7ef3d8e2357b84c9cafcd88",
+      "afterSha256": "721954496892ccc023785f31c2d5f75a84669299aec97f66a895eae2cd6b197d",
+      "normalizedOutputSha256": "ca98905990f7180600ef99596eb5e9b2562dee2cb8b6ebc85600d324de4f9c95",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/snakes-and-ladders/types.ts",
+      "beforeSha256": "9936e0f7b9a5023d29abfeabf937310b991472e3d398e50a14b600c6704b262f",
+      "afterSha256": "ec0cf6765c6d83c892d557c59ab88ad5ec316f73357dd22b58f24f19d7acc068",
+      "normalizedOutputSha256": "6290ec7b90c23c66f7af826dd2b54dd1b7fec4f3a1033df6068afdedd9f3f079",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/sos/types.ts",
+      "beforeSha256": "421fa7c3b3f53b38e3991798cd3fc901f44b1231085ddbea7dc81850aa182c6a",
+      "afterSha256": "bfc92beda6f9150d0bb11826908aee5ea2fbbe4aa5331a74c82d15fec0f19993",
+      "normalizedOutputSha256": "9e9e0117253905cebb3656b38bca5b6e244d4348a295a39f894d6d472c247a9b",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/sudoku/engine.ts",
+      "beforeSha256": "42614f4b9b150fdbe1718ba63ec322599d4a114687d4956cb918e3ee5326840c",
+      "afterSha256": "d1feb562dec0b844ebab3debf8e8b8557883441a081aa0d2cc0567b4aa3b7567",
+      "normalizedOutputSha256": "3ba5a66166ab1db42ddc49912a4a36bfc283f4060f7c8b593917ea3ef6581c26",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/games/sudoku/types.ts",
+      "beforeSha256": "ad69d94f84237f8eed58ad2b62d3650a9bf74daed1350735c2ae1bd53a547f06",
+      "afterSha256": "3ecf6bbf999dbb7c9e982e488251df509eacc457c0f4d7c165fb90014a7a1c17",
+      "normalizedOutputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/protocol/guards.ts",
+      "beforeSha256": "c077d1b8e14ace893d0928ea53b70b6e0cd3563adfec4060f469e42d6cc8ad96",
+      "afterSha256": "9459b6ec39fb171b325c436a9955599ada9d025a299a9b618c8e879c77ed421b",
+      "normalizedOutputSha256": "bf51ca7f5a02b5c4da40caa984c2c572286ebae63daf1253f166f79f30468b9d",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "shared/utils/uuid.ts",
+      "beforeSha256": "1127312726463c5bc075d1c80ee7e16af79d4e078867f9825551f4b05b88e795",
+      "afterSha256": "e785b044cccb4842ec564de7e05046830ae0d5dad9cdb91ef0086bbbf3a02fc1",
+      "normalizedOutputSha256": "6f76e1e12c051d0ba86cbcc85f4c297fd7dfd5b2ca83871459d9eea3afadc488",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "worker/api/catalog.ts",
+      "beforeSha256": "e6fb61eb19508cabe5c4c48461fc2deeb8d0f2e8e2f05121b68ab41799c7e7bb",
+      "afterSha256": "f4c122a8df53051e4a2f7f57ec9f37902c078d173116933701f8f9b38238e9f3",
+      "normalizedOutputSha256": "ad16321ca3cd0882d840a5c1c8da822bcc92469a5c4fc760d90523602d7f4184",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/environment.spec.ts",
+      "beforeSha256": "af065116bc0f6a6fff5a72449cb8b21c65ad2ae8637973b99f26ea73821a0940",
+      "afterSha256": "47d2fdd4b8b1819d2d7b1a40634901a629f9d1e4a690ed62ec57d91fc04198ad",
+      "normalizedOutputSha256": "0eee45c014ee7ea0b94b26144a453a29f14833a41f7f46016be66c46756cd065",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/hand-cricket.spec.ts",
+      "beforeSha256": "0df32d36ef9350de50580e572e204681cdbeacf33fe12506bd80a8f6127903c7",
+      "afterSha256": "477d6da9c649ec7d55d15cbb5e3565d89f6e1e014837b70caa1c37be2703609e",
+      "normalizedOutputSha256": "cedb0e7865a1597052ba8ebcfd5e7f7de3af4ea8220b817a71e4047e53c53af4",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/journeys.spec.ts",
+      "beforeSha256": "0f27b9a829bfa40d19310beb49cff59ac2affce2230f8028f05a909e0a092df2",
+      "afterSha256": "d231de7dab648c1b0fbec080365510a757208825c80b56926394e40983b68745",
+      "normalizedOutputSha256": "ceea61326ddaec0c3eac2612166acc07f34fdbebcd26146ba3e1e2e850ce6273",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/lifecycle-ui.spec.ts",
+      "beforeSha256": "81b489b3a7e54ee451be880bd7d0ddaa36b3a37bc3dcb7435194e4f95cebce99",
+      "afterSha256": "f0283f3b688a4355565b08d892b975b30ec2ea7ca0e874834c1850f5a11c7cff",
+      "normalizedOutputSha256": "964437d90987eff754110f8b9e62c630c0a64267c2621b9b59b0ec70ab1e3731",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/owner-corrections.spec.ts",
+      "beforeSha256": "d65bead891faf875a9cdd0153f43a91a66cb2543e6cbc1fb9b71a3369332804c",
+      "afterSha256": "50e64b22882a21dd38c62d40febb71ccc527c61254743736742201d978a9bd34",
+      "normalizedOutputSha256": "86aefa5819d3d2c5b2022e670cb2ec299b71eb50f72d03aa7acc827abd70ff3a",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/owner-visual.spec.ts",
+      "beforeSha256": "6683e4492bbdb80d5c01776f80d6527d05ed811bee7169a038ec80127715a256",
+      "afterSha256": "ab8e3d7de879a86b868e8a671b4e261de3a099d88606e22e59b26e6fc7863820",
+      "normalizedOutputSha256": "04e8cc65cc5c68c40d155a47e23fd90cb77caf6c7262f9e24a91d3a42590f95b",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/owner-zoom.spec.ts",
+      "beforeSha256": "199885b1dcd6e31c570c1b66fffc64d50c59b8549484f35f31536b92ab028924",
+      "afterSha256": "5dcbef3e4b2a596dece6b07b01a24fab460b12ba50c448cda9d4987e8240c1f2",
+      "normalizedOutputSha256": "3421cb34158a8ca1c582f1f49a10defe369668998a76676ee99eb9b0c6febca2",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/ui-shell-visual.spec.ts",
+      "beforeSha256": "f06e0adea44ce1b179fb7416bd582388095a40993faebfc8291773520b0a8540",
+      "afterSha256": "52cc548b284c365aca46b4d4e66956aafba99eb9b2b52761a77ebb6d886832d9",
+      "normalizedOutputSha256": "83978014d6202fbd96d8fc9571f1c2320b2f36b1511745f4be358453822e5dfc",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/browser/helpers.ts",
+      "beforeSha256": "9fa93b3997a88508252204379c9e4e65ce0fc58c9a4167e1b43787bbdf098aba",
+      "afterSha256": "7c2162145c0d1621efdc11fef90a8d0c5668329bd089a6e66a4de369e43b3feb",
+      "normalizedOutputSha256": "ef35e82bbed1b336c2ac83de3f10fa9eae51e760afd20e30d7e00bab3d8bedbe",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/unit/games/hand-cricket/hand-cricket.test.ts",
+      "beforeSha256": "54a4e10905469316067a22cb0841216a4e1e1780999eb7475004e3a659a30dfc",
+      "afterSha256": "872f337867ddef145b8027a855226d52a4c6167e32fe560a7a0852b3b6e407ce",
+      "normalizedOutputSha256": "3a82c06705e2d298dd525ef5a7804979d058062334e6952229b5dd13c775ecd8",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/unit/games/hand-cricket/together-batting.test.ts",
+      "beforeSha256": "70e36fd097bd2145f2c538c75bcb02b93490a79519989ed56cc96c309267e0a2",
+      "afterSha256": "6dc90c11ab246a68e0829783eb3c0a957b30122c1a0ff6706c6da1813bf20391",
+      "normalizedOutputSha256": "da382806596650ba872c0595f0ad40ae10a10ceab3d2ad2109394edc1922b3e7",
+      "compiledOutputUnchanged": true
+    },
+    {
+      "file": "tests/unit/theme/theme.test.ts",
+      "beforeSha256": "7d53461d52b4650d53abcb4f5b63863136863f5639e6e3f246b8d8ef5248cb81",
+      "afterSha256": "a07cf17b1fe4af2022ae8992ac031612de95cd5e1fef1e1ce2c90e3e904d2783",
+      "normalizedOutputSha256": "e20ef71977732b480bbda8c4e796306f8a7540d1c0ee848738939812c38152ae",
+      "compiledOutputUnchanged": true
+    }
+  ]
+}
