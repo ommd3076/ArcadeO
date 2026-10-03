@@ -1,0 +1,157 @@
+{
+  "status": "PROVISIONAL_FINDINGS_REQUIRING_RECAPTURE",
+  "reviewedAt": "2026-10-02T22:09:39.736116+00:00",
+  "candidate": "a3dec73 (before 7cc3f81 Ludo contrast correction)",
+  "inspection": "Lead viewed original-size four-theme phone contact sheets at 320/390/430 and two-theme desktop pairs at 1280. These are actual viewed images, not file-count verification.",
+  "inspected": [
+    {
+      "id": "VIS-001",
+      "imageSha256": "d0ec227d81c4dfae5eadc768d863520f8000eee646e1e0765b04e894740225c8"
+    },
+    {
+      "id": "VIS-002",
+      "imageSha256": "4e3cba2c055e2e497690fbb760dcc3a9028c9ecf7a0d214bc0e7a3a4d59c0988"
+    },
+    {
+      "id": "VIS-003",
+      "imageSha256": "75f011cb83cd2dc57020837d478544e14996e445fe9ea892b319ea0192027685"
+    },
+    {
+      "id": "VIS-004",
+      "imageSha256": "75f011cb83cd2dc57020837d478544e14996e445fe9ea892b319ea0192027685"
+    },
+    {
+      "id": "VIS-005",
+      "imageSha256": "89af2a3529567b2dbfd12b2d712340be1832f9de8a892aa26747efe6b9932be6"
+    },
+    {
+      "id": "VIS-006",
+      "imageSha256": "95e708ff94c2d422a8b273a93f5f7a105b63c53ba6a393d88add3b5ec55e8081"
+    },
+    {
+      "id": "VIS-007",
+      "imageSha256": "131a6b0e3c1f05991d6b290d40ddcfe648569415ce813795c40c8b43371d311b"
+    },
+    {
+      "id": "VIS-008",
+      "imageSha256": "131a6b0e3c1f05991d6b290d40ddcfe648569415ce813795c40c8b43371d311b"
+    },
+    {
+      "id": "VIS-009",
+      "imageSha256": "23a4495807832f6ef1fc3621dcfa28c0540b01c742ec698625718bb2e508cb24"
+    },
+    {
+      "id": "VIS-010",
+      "imageSha256": "23a4495807832f6ef1fc3621dcfa28c0540b01c742ec698625718bb2e508cb24"
+    },
+    {
+      "id": "VIS-011",
+      "imageSha256": "011bf587b298233f3bb9244cacf9282108091d218b4b24967a84e9c1a4505eb3"
+    },
+    {
+      "id": "VIS-012",
+      "imageSha256": "011bf587b298233f3bb9244cacf9282108091d218b4b24967a84e9c1a4505eb3"
+    },
+    {
+      "id": "VIS-013",
+      "imageSha256": "7db0ef30711b0285dcc53d0725629e8f74cb1ccfdf2aa63c915692b2a5457510"
+    },
+    {
+      "id": "VIS-014",
+      "imageSha256": "7db0ef30711b0285dcc53d0725629e8f74cb1ccfdf2aa63c915692b2a5457510"
+    },
+    {
+      "id": "VIS-015",
+      "imageSha256": "2232ea93402e9a3cf8bd2809eaacc11f701a8ce2af3e4a43c6ae5c7c614ec373"
+    },
+    {
+      "id": "VIS-016",
+      "imageSha256": "bf3ba150974fe3ba23ad6d37807fd536b020134de8f59abcd95408536bccb4b5"
+    },
+    {
+      "id": "VIS-017",
+      "imageSha256": "36e1fb3a2d0e2c3cf995ad044f1840bcbfa444d43540f0132b24a612bd4e40dd"
+    },
+    {
+      "id": "VIS-018",
+      "imageSha256": "36e1fb3a2d0e2c3cf995ad044f1840bcbfa444d43540f0132b24a612bd4e40dd"
+    },
+    {
+      "id": "VIS-019",
+      "imageSha256": "3b1e7534cbdc7898ab2931e8cdc7146747c3c41f7df91c62c2d932639a81695c"
+    },
+    {
+      "id": "VIS-020",
+      "imageSha256": "3e45b890976244ed9944fdb8e60da00d51dd414c452dfd95da7f48da7ff22ef9"
+    },
+    {
+      "id": "VIS-021",
+      "imageSha256": "638e136dc45726bb32cccc8fb197e43d4e7adf3c3addc66ff25ac918566f9f45"
+    },
+    {
+      "id": "VIS-022",
+      "imageSha256": "328ddd1d4090a21127e7c393b21f177f97df6425aa266eb9b6096070050a5d56"
+    },
+    {
+      "id": "VIS-023",
+      "imageSha256": "8031ee4c7872597dd0b8e00d2ffe68aa8c323a5e2b6d7900770f3ff06e04a70b"
+    },
+    {
+      "id": "VIS-025",
+      "imageSha256": "28cc49ddc7ec9d564d9d425230260f1f88bdff417df9d916e6b95a058bc7b0ef"
+    },
+    {
+      "id": "VIS-026",
+      "imageSha256": "28cc49ddc7ec9d564d9d425230260f1f88bdff417df9d916e6b95a058bc7b0ef"
+    },
+    {
+      "id": "VIS-027",
+      "imageSha256": "510f3c25dcd5e8b9c0b6b37e11544c2f895b3e84435d890a7bc7e7a5bdd9de75"
+    },
+    {
+      "id": "VIS-028",
+      "imageSha256": "510f3c25dcd5e8b9c0b6b37e11544c2f895b3e84435d890a7bc7e7a5bdd9de75"
+    },
+    {
+      "id": "VIS-029",
+      "imageSha256": "c121819495aa125447ea9b2f0c3c78afed9d2d650016bc3c747d007d68b71e60"
+    },
+    {
+      "id": "VIS-030",
+      "imageSha256": "c121819495aa125447ea9b2f0c3c78afed9d2d650016bc3c747d007d68b71e60"
+    },
+    {
+      "id": "VIS-031",
+      "imageSha256": "d0f9ef6bc8311932f40212c03aaef2c65bfbfe9264f6e7a940490228c384883d"
+    }
+  ],
+  "findings": [
+    {
+      "ids": [
+        "VIS-001",
+        "VIS-002",
+        "VIS-003",
+        "VIS-004",
+        "VIS-005",
+        "VIS-006",
+        "VIS-007",
+        "VIS-008"
+      ],
+      "issue": "Standard Dark bonus roll uses dark yellow ink against raised dark surface; poorly readable.",
+      "repair": "7cc3f81 uses theme text token; fresh screenshots pending."
+    },
+    {
+      "ids": [
+        "VIS-007",
+        "VIS-008",
+        "VIS-015",
+        "VIS-016",
+        "VIS-023",
+        "VIS-031"
+      ],
+      "issue": "Desktop full-page screenshot taken after control scroll places sticky header across upper board; capture does not prove complete visual board.",
+      "repair": "A11 instructed to scroll document to top and wait fonts/settlement before capture, retaining earlier reachability/hit assertions."
+    }
+  ],
+  "otherObservations": "Inspected phone samples show full fifteen-row board, distinct numbered ownership and reachable Roll Dice; Light and Romantic bonus text readable. No final VIS cell is marked passed from this provisional inspection."
+}

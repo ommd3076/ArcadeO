@@ -1,0 +1,50 @@
+{
+  "finalApplicationCommit": "7f82b2a",
+  "finalPublicCacheRevision": "78decb9c6adb25d0",
+  "visualDisposition": "256 distinct actual accepted-gameplay assertion records and 256 separately inspected original PNGs with matching SHA256 hashes; the affected 64 were regenerated on final application candidate 7f82b2a.",
+  "captures": [
+    {
+      "ids": "VIS-001 through VIS-096",
+      "games": [
+        "ludo",
+        "snakes-and-ladders",
+        "connect-four"
+      ],
+      "candidate": "ce60da8 application candidate",
+      "equivalence": "Subsequent production changes affect SOS, creation-response parsing, Sudoku Duel same-version response ordering, and Sudoku header/grid rendering. These Together game paths and their header label remain unchanged. Existing captures were preserved; remaining full-browser QA runs the final bundle separately. Final secret-panel and completed-Challenge publication changes do not affect these Together boards."
+    },
+    {
+      "ids": "VIS-097 through VIS-128 and VIS-193 through VIS-224",
+      "games": [
+        "dots-boxes",
+        "sos"
+      ],
+      "candidate": "post-6f3c5bc SOS grid build, public revision f06fa1cd747193b0",
+      "equivalence": "Later creation-response parsing changes are outside API-created matrix fixtures. Duel ordering preservation applies only to active Sudoku Duel. The final header conditional keeps Together for these two games. Sudoku grid changes do not affect them. These captures were preserved. The 4ae2896 secret outcome component change does not affect Dots or SOS."
+    },
+    {
+      "ids": "VIS-225 through VIS-256",
+      "games": [
+        "sudoku"
+      ],
+      "candidate": "8a7db13, public revision cd79381c103ceb57",
+      "equivalence": "All 32 regenerated after actual visual findings. Every case asserts the Practice subtitle and all 81 cell/glyph geometry bounds. Pre-fix Sudoku captures and assertion report remain under attempts/sudoku-pre-row-fit. Subsequent secret-panel/RPS and completed-Challenge publication changes do not affect Sudoku Practice."
+    },
+    {
+      "ids": "VIS-129 through VIS-192",
+      "games": [
+        "rock-paper-scissors",
+        "hand-cricket"
+      ],
+      "candidate": "7f82b2a, public revision 78decb9c6adb25d0",
+      "equivalence": "All 64 affected RPS/Cricket cells were regenerated after the actual UI-07 missing entrance finding and narrow repairs. The lead actually inspected all 64 fresh originals across four themes, widths and motion settings, then recorded hashes. The superseded 64 images, previous 256 assertion/review JSON and bounded 64 recapture JSON are retained under attempts/secret-outcome-pre-mount. The unchanged 192 assertions were explicitly merged back; the final 256 IDs are unique with zero failures."
+    }
+  ],
+  "limits": [
+    "The final 256 capture set was completed through bounded resumes; it is not one uninterrupted browser process.",
+    "Unchanged source paths justify preserving prior inspected captures; they are not represented as recaptured from the final bundle.",
+    "The matrix uses API-created isolated fixtures and UI-only accepted gameplay. Supported Remote modes, recovery and interrupted motion are separate checks.",
+    "Physical phone and deployed production certification remain separate external gates.",
+    "Completed Challenge publishing capability/button fix in 7f82b2a does not alter Together or Sudoku Practice matrix paths."
+  ]
+}
