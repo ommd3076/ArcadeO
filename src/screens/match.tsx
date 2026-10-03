@@ -651,7 +651,17 @@ export function MatchScreen({ actorAccountId = "A", initialView = null }: MatchS
       <GameHeader
         className="arcade-match-header"
         title={view?.gameId ? (GAME_TITLES[view.gameId] ?? view.gameId) : "Match"}
-        subtitle={isTogether ? "Together" : "Remote"}
+        subtitle={
+          sudokuView?.mode === "practice"
+            ? "Practice"
+            : sudokuView?.mode === "duel"
+              ? "Duel"
+              : sudokuView?.mode === "challenge"
+                ? "Async Challenge"
+                : isTogether
+                  ? "Together"
+                  : "Remote"
+        }
         fallbackTo="/games"
         rightAction={
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>

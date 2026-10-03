@@ -322,8 +322,8 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
           border: "3px solid var(--color-border-bold, #475569)",
           overflow: "hidden",
           display: "grid",
-          gridTemplateColumns: "repeat(9, 1fr)",
-          gridTemplateRows: "repeat(9, 1fr)",
+          gridTemplateColumns: "repeat(9, minmax(0, 1fr))",
+          gridTemplateRows: "repeat(9, minmax(0, 1fr))",
         }}
       >
         {/* Paused Mask Overlay */}
@@ -404,6 +404,8 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
                   alignItems: "center",
                   justifyContent: "center",
                   padding: 0,
+                  minWidth: 0,
+                  minHeight: 0,
                   position: "relative",
                   cursor: "pointer",
                   transition: "background-color 150ms ease",
@@ -414,6 +416,7 @@ export const SudokuBoard: React.FC<SudokuBoardProps> = ({
                   <span
                     style={{
                       fontSize: "20px",
+                      lineHeight: 1,
                       fontWeight: isGiven ? 900 : 700,
                       color: isIncorrect
                         ? "var(--color-danger, #ef4444)"

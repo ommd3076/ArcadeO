@@ -75,7 +75,7 @@ describe("Sudoku Screen & Board Integration (Task S03)", () => {
 
     // Board and touch keypad must retain different column layouts.
     expect(html).toContain(
-      "grid-template-columns:repeat(9, 1fr);grid-template-rows:repeat(9, 1fr)",
+      "grid-template-columns:repeat(9, minmax(0, 1fr));grid-template-rows:repeat(9, minmax(0, 1fr))",
     );
     expect(html).toContain("grid-template-columns:repeat(3, minmax(44px, 1fr))");
 
